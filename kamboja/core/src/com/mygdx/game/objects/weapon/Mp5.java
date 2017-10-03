@@ -66,6 +66,9 @@ public class Mp5 extends Weapon{
 				
 				knockback(0.3f);
 				
+				player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(1));
+
+				
 				shootTimer = 0;
 				BodyDef def = new BodyDef();
 				def.bullet = true;

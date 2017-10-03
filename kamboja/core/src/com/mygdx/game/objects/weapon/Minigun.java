@@ -74,6 +74,9 @@ public class Minigun extends Weapon{
 				knockback(0.2f);
 				screenshake(0.05f);
 				
+				player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(1));
+
+				
 				overheat_flag = false;
 				try{
 				if(GameState.SFX)

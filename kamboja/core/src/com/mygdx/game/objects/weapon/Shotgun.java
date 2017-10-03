@@ -64,6 +64,9 @@ public class Shotgun extends Weapon{
 				knockback(1.5f);
 				screenshake(0.3f);
 				
+				player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(1));
+
+				
 				for(float i = -2; i < 3; i += 0.5f){
 					float radius = 2;
 					

@@ -117,6 +117,7 @@ public class GameState extends State{
 	private static ArrayList<Body> forRemoval;	
 	
 	PersistentParticleEffect bloodEffect;
+	PersistentParticleEffect shellEffect;
 	
 	private ParticleEffect rock;
 	private ParticleEffectPool rockPool;
@@ -332,6 +333,14 @@ public class GameState extends State{
 		bloodEffect.setMinScale(1f/UNIT_SCALE * .3f);
 		bloodEffect.setMaxScale(1f/UNIT_SCALE * .3f);
 		
+		shellEffect = new PersistentParticleEffect(new Texture("imgs/weapons/shell.png"));
+		shellEffect.setMinVel(new Vector2(-0.05f, -0.05f));
+		shellEffect.setMaxVel(new Vector2(0.05f, 0.05f));
+		shellEffect.setMinLinDamp(10);
+		shellEffect.setMaxLinDamp(10);
+		shellEffect.setMinScale(1f/UNIT_SCALE);
+		shellEffect.setMaxScale(1f/UNIT_SCALE);
+		
 		
 		
 		rock = new ParticleEffect();
@@ -544,13 +553,19 @@ public class GameState extends State{
 	}
 	
 	public void showBlood(Vector2 worldCenter) {
-		
 		bloodEffect.setMinPos(worldCenter);
 		bloodEffect.setMaxPos(worldCenter);
-		
 		bloodEffect.addParticle();
-		
 	}
+	
+	public void showShell(Vector2 worldCenter, Vector2 direction) {
+		shellEffect.setMinPos(worldCenter);
+		shellEffect.setMaxPos(worldCenter);
+		shellEffect.setMinVel(direction);
+		shellEffect.setMaxVel(direction);
+		shellEffect.addParticle();
+	}
+	
 	
 	public void showRock(Vector2 pos){
 		
@@ -631,6 +646,7 @@ public class GameState extends State{
 		sb.end();
 		
 		bloodEffect.render(sb);
+		shellEffect.render(sb);
 		
 		sb.begin();
 
@@ -794,6 +810,7 @@ public class GameState extends State{
 		
 		if(!isPause()){
 			bloodEffect.update(delta);
+			shellEffect.update(delta);
 			
 			for(int i = rockEffects.size() - 1; i >= 0; i --){
 				ParticleEffect pe = rockEffects.get(i);

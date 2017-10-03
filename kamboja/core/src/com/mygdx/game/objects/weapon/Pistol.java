@@ -58,6 +58,8 @@ public class Pistol extends Weapon{
 				knockback(0.3f);
 				screenshake(0.07f);
 				
+				player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(1));
+				
 				float dif = 0.05f;
 				if(GameState.SFX)
 				shoot.play(0.6f, (float)Math.random()*dif + (1f - dif/2f), 0);

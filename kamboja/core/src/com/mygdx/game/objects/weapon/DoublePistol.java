@@ -71,12 +71,14 @@ public class DoublePistol extends Weapon{
 				def.type = BodyType.DynamicBody;
 				def.linearDamping = 0;
 				if(side == 1){
-					//TODO: tirar instancia nova a cada frame
+					player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(1));
 					def.position.set(
 							getPlayer().getBody().getWorldCenter().x + (float)Math.cos(Math.toRadians(-getPlayer().getAngle() + 18)) * (5 / GameState.UNIT_SCALE),
 							getPlayer().getBody().getWorldCenter().y + (float)Math.sin(Math.toRadians(-getPlayer().getAngle() + 18)) * (5 / GameState.UNIT_SCALE));
 				}
 				else{
+					player.getState().showShell(player.getPosition(), player.getAngleVector().cpy().scl(1, -1).scl(0.05f).rotate90(-1));
+
 					def.position.set(
 							getPlayer().getBody().getWorldCenter().x + (float)Math.cos(Math.toRadians(-getPlayer().getAngle() - 10)) * (5 / GameState.UNIT_SCALE),
 							getPlayer().getBody().getWorldCenter().y + (float)Math.sin(Math.toRadians(-getPlayer().getAngle() - 10)) * (5 / GameState.UNIT_SCALE));
