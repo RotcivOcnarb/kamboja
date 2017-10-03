@@ -382,14 +382,13 @@ public class MainMenu extends State{
 		sr.end();
 	}
 
-	public void update(float delta) {
-		
+	public void update(float delta) {		
 		background.update(delta, exiting);
 		
 		if(exiting){ //saindo do state, escondendo tudo
 			timer -= delta;
 			for(int i = 0; i < 4; i ++){
-				controlPos[i] += (-200 - controlPos[i])/10.0f;
+				controlPos[i] += (-200 - controlPos[i])/10.0f * delta*60;
 			}
 			
 			if(timer < -1){
@@ -424,31 +423,31 @@ public class MainMenu extends State{
 		}
 		
 		for(int i = 0; i < 8; i ++){
-			arrowScale[i] += (1 - arrowScale[i])/10.0f;
+			arrowScale[i] += (1 - arrowScale[i])/10.0f * delta*60;
 		}
 		
 		if(timer > 2){
 			layout.setText(menuFont, options[0]);
-			menuPos[0] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[0])/10.0f;
+			menuPos[0] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[0])/10.0f * delta*60;
 		}
 		
 		if(timer > 2.5){
 			layout.setText(menuFont, options[1]);
-			menuPos[1] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[1])/10.0f;
+			menuPos[1] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[1])/10.0f * delta*60;
 		}
 		
 		if(timer > 3){
 			layout.setText(menuFont, options[2]);
-			menuPos[2] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[2])/10.0f;
+			menuPos[2] += (3f/4f*Gdx.graphics.getWidth() - layout.width/2f - menuPos[2])/10.0f * delta*60;
 		}
 		
 		if(timer > 4){ //mostra os gui de controle depois de 4 segundos
 			for(int i = 0; i < 4; i ++){
 				if(KambojaMain.getControllers().size()-1 >= i){
-					controlPos[i] += (100 - controlPos[i])/10.0f;
+					controlPos[i] += (100 - controlPos[i])/10.0f * delta*60;
 				}
 				else{
-					controlPos[i] += (0 - controlPos[i])/10.0f;
+					controlPos[i] += (0 - controlPos[i])/10.0f * delta*60;
 				}
 			}
 		}

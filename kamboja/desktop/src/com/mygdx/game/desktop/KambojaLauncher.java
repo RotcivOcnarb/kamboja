@@ -60,6 +60,9 @@ public class KambojaLauncher {
 			config.width = ((ScreenSize)combo.getSelectedItem()).getWidth();
 			config.height = ((ScreenSize)combo.getSelectedItem()).getHeight();
 			config.fullscreen = chk_full.isSelected();
+			config.foregroundFPS = 60;
+			config.backgroundFPS = 60;
+			config.resizable = false;
 			
 
 		new LwjglApplication(new KambojaMain(), config);
