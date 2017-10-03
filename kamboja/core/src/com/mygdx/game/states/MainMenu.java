@@ -59,7 +59,7 @@ public class MainMenu extends State{
 	private float[] controlPos; //the positions of the controllers GUI (yellow things)
 	private BitmapFont controllerFont; //the font used to draw the controllers gui text
 	private int[] controllerSelecion; //wich player is selecting what (skin or weapon)
-	//sise 4 because we have at maximum 4 players
+	//size 4 because we have at maximum 4 players
 	
 	private MenuCursors cursors; //handles the cursor movement and clicking
 	private Texture[] texWep; //texture for each weapon
