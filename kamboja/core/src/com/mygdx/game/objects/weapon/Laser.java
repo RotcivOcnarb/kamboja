@@ -87,16 +87,10 @@ public class Laser extends Weapon{
 		sr = new ShapeRenderer();
 		
 		float distance = 50;
-		float range = 10;
+		float range = 1;
 		
 		PolygonShape s = new PolygonShape();
-		s.set(new float[]{
-				0, 0,
-				(float)Math.cos(Math.toRadians(range/2)) * distance,
-				(float)Math.sin(Math.toRadians(range/2)) * distance,
-				(float)Math.cos(Math.toRadians(-range/2)) * distance,
-				(float)Math.sin(Math.toRadians(-range/2)) * distance,
-				});
+		s.setAsBox(distance/2f, range/2f, new Vector2(distance/2, 0), 0);
 		
 		Fixture laseraim = player.getBody().createFixture(s, 0);
 		laseraim.setSensor(true);
@@ -239,7 +233,7 @@ public class Laser extends Weapon{
 	
 	public void update(float delta) {
 		shootTimer += delta;
-		//opacity -= delta;
+		opacity -= delta;
 		if(opacity < 0) opacity = 0;
 		
 		if(analog > 0.7){
@@ -257,15 +251,19 @@ public class Laser extends Weapon{
 				//caso exista algum player em range, acha o mais próximo
 				for(int i = 0; i < inRange.size(); i ++){
 					if(inRange.get(i).getUserData() instanceof Player && inRange.get(i).getUserData() != this.getPlayer()){
-						if(bodyplayer == null)
+						Player p = (Player) inRange.get(i).getUserData();
+						if(bodyplayer == null) {
+							if(!p.isDead())
 							bodyplayer = inRange.get(i);
+						}
 						else{
-							
-							float lastDist = bodyplayer.getWorldCenter().cpy().sub(this.getPlayer().getPosition().cpy()).len2();
-							float currentDist = inRange.get(i).getWorldCenter().cpy().sub(this.getPlayer().getPosition().cpy()).len2();
-							
-							if(currentDist < lastDist){
-								bodyplayer = inRange.get(i);
+							if(!p.isDead()) {
+								float lastDist = bodyplayer.getWorldCenter().cpy().sub(this.getPlayer().getPosition().cpy()).len2();
+								float currentDist = inRange.get(i).getWorldCenter().cpy().sub(this.getPlayer().getPosition().cpy()).len2();
+								
+								if(currentDist < lastDist){
+									bodyplayer = inRange.get(i);
+								}
 							}
 						}
 					}

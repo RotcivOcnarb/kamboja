@@ -49,7 +49,8 @@ public class Player implements Steerable<Vector2>{
 	
 	protected Body body;
 	protected Vector2 angle = new Vector2();
-	protected float life = 100;
+	protected float maxLife = 70;
+	protected float life = maxLife;
 	protected float mana = 100;
 	protected float speed = 10;
 
@@ -549,7 +550,7 @@ public class Player implements Steerable<Vector2>{
 	uiTransparency += (targetUiTransparency - uiTransparency)/10.0f;
 	
 	dLife += (getLife() - dLife)/10.0f;
-	float lifeWidth = (int) (dLife/100f * life_bar.getWidth());
+	float lifeWidth = (int) (dLife/maxLife * life_bar.getWidth());
 	if(lifeWidth < 0) lifeWidth = 0;
 
 	dMana += (getMana() - dMana)/10.0f;
@@ -698,7 +699,7 @@ public class Player implements Steerable<Vector2>{
 		inputBlocked = false;
 		throwBlood = false;		
 		imunity = 1;
-		life = 100;
+		life = maxLife;
 		body.getFixtureList().get(0).setSensor(false);
 		
 		MapLayer ml = getState().getTiledMap().getLayers().get("Player");
@@ -719,7 +720,7 @@ public class Player implements Steerable<Vector2>{
 	public void setBuff(int id){
 		if(id == Item.LIFE){
 			life += 30;
-			if(getLife() > 100) life = 100;
+			if(getLife() > maxLife) life = maxLife;
 		}
 		else if(id == Item.TURRET){
 			setShift(new Turret(this));
