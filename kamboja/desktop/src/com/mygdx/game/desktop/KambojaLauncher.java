@@ -15,7 +15,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.KambojaMain;
 
-public class DesktopLauncher {
+public class KambojaLauncher {
 	public static void main (String[] arg) {
 		
 		JPanel panel = new JPanel();
