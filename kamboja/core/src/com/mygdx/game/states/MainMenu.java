@@ -48,7 +48,7 @@ public class MainMenu extends State{
 	private BitmapFont menuFont; //to draw text
 	
 	private float[] menuPos; //positions of the buttons (X coord)
-	private String[] options = new String[]{"Exit", "Options", "Start"};
+	private String[] options = new String[]{"Exit", "MONARK", "Start"};
 	private FrameBuffer[] buffers; //so the font can be drawed at a buffer, that can be resized 
 	//(fonts cant be resized after initialization)
 	private Texture logoMain;
