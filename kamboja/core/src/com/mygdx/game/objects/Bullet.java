@@ -14,14 +14,22 @@ public class Bullet {
 	public Body body;
 	float damage;
 	
+	static Texture defaultBulletTex;
+	static Texture muzzleTex;
+	
 	Texture bulletTex;
-	Texture muzzleTex;
+	
 	Animation bulletAnimation;
 	float radius;
 	protected boolean canRemove = false;
 	public Player player;
 	
 	TrailRenderer trail;
+	
+	static {
+		defaultBulletTex = new Texture("imgs/weapons/bullet.png");
+		muzzleTex = new Texture("imgs/weapons/muzzle.png");
+	}
 	
 	boolean destroyed = false;
 	boolean disposed = false;
@@ -46,8 +54,7 @@ public class Bullet {
 		this.damage = damage;
 		this.player = player;
 		
-		bulletTex = new Texture("imgs/weapons/bullet.png");
-		muzzleTex = new Texture("imgs/weapons/muzzle.png");
+		bulletTex = defaultBulletTex;
 		
 		bulletAnimation = new Animation(1/50f, new TextureRegion(muzzleTex), new TextureRegion(bulletTex));
 
