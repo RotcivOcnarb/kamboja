@@ -1,0 +1,368 @@
+package com.mygdx.game.objects;
+
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.mygdx.game.objects.Player.PlayerFall;
+import com.mygdx.game.objects.map.Block;
+import com.mygdx.game.objects.map.BreakableBlock;
+import com.mygdx.game.objects.map.HoleBlock;
+import com.mygdx.game.objects.map.UnbreakableBlock;
+import com.mygdx.game.objects.shift.BarrierObject;
+import com.mygdx.game.objects.shift.TurretObject;
+import com.mygdx.game.objects.weapon.Flamethrower;
+import com.mygdx.game.objects.weapon.Laser;
+import com.mygdx.game.states.GameState;
+
+public class MyContactListener implements ContactListener{
+
+	public void beginContact(Contact contact) {
+		
+		//player com buraco
+		if(contact.getFixtureA().getUserData() instanceof PlayerFall && contact.getFixtureB().getUserData() instanceof HoleBlock){
+			PlayerFall p = (PlayerFall) contact.getFixtureA().getUserData();
+			p.player.setFalling();
+			System.out.println("player fall");
+		}
+		if(contact.getFixtureB().getUserData() instanceof PlayerFall && contact.getFixtureA().getUserData() instanceof HoleBlock){
+			PlayerFall p = (PlayerFall) contact.getFixtureB().getUserData();
+			
+			p.player.setFalling();
+			System.out.println("player fall");
+		}
+
+		//qualquer objeto com range do laser
+		if(contact.getFixtureA().getUserData() instanceof Laser){
+			Laser l = (Laser) contact.getFixtureA().getUserData();
+			if(!(contact.getFixtureB().getUserData() instanceof Laser))
+			l.addRange(contact.getFixtureB().getBody());
+		}
+		if(contact.getFixtureB().getUserData() instanceof Laser){
+			Laser l = (Laser) contact.getFixtureB().getUserData();
+			if(!(contact.getFixtureA().getUserData() instanceof Laser))
+			l.addRange(contact.getFixtureA().getBody());
+		}
+		
+		//tiro com turret
+		if(contact.getFixtureA().getUserData() instanceof Bullet && contact.getFixtureB().getUserData() instanceof TurretObject){
+			
+			Bullet bullet = (Bullet)contact.getFixtureA().getUserData();
+			TurretObject to = (TurretObject) contact.getFixtureB().getUserData();
+			
+			if(!bullet.player.equals(to.turret.player)){
+				
+				if(bullet instanceof BazookaBullet){
+					((BazookaBullet)bullet).explosionDamage();
+				}
+				
+				to.takeDamage(bullet.getDamage());
+				bullet.remove();
+				GameState.removeBody(contact.getFixtureA().getBody());
+			}
+			else{
+				contact.setEnabled(false);
+			}
+			
+			
+			
+		}
+		if(contact.getFixtureB().getUserData() instanceof Bullet && contact.getFixtureA().getUserData() instanceof TurretObject){
+			
+			Bullet bullet = (Bullet)contact.getFixtureB().getUserData();
+			TurretObject to = (TurretObject) contact.getFixtureA().getUserData();
+			
+			if(!bullet.player.equals(to.turret.player)){
+				if(bullet instanceof BazookaBullet){
+					((BazookaBullet)bullet).explosionDamage();
+				}
+				to.takeDamage(bullet.getDamage());
+				bullet.remove();
+				GameState.removeBody(contact.getFixtureB().getBody());
+			}
+			else{
+				contact.setEnabled(false);
+			}
+			
+			
+			
+		}
+		
+		//tiro com barrier
+				if(contact.getFixtureA().getUserData() instanceof Bullet && contact.getFixtureB().getUserData() instanceof BarrierObject){
+					
+					Bullet bullet = (Bullet)contact.getFixtureA().getUserData();
+					BarrierObject to = (BarrierObject) contact.getFixtureB().getUserData();
+					
+					if(!bullet.player.equals(to.barrier.player)){
+						if(bullet instanceof BazookaBullet){
+							((BazookaBullet)bullet).explosionDamage();
+						}
+						to.takeDamage(bullet.getDamage());
+						bullet.remove();
+						GameState.removeBody(contact.getFixtureA().getBody());
+					}
+					else{
+						contact.setEnabled(false);
+					}
+					
+					
+					
+				}
+				if(contact.getFixtureB().getUserData() instanceof Bullet && contact.getFixtureA().getUserData() instanceof BarrierObject){
+					
+					Bullet bullet = (Bullet)contact.getFixtureB().getUserData();
+					BarrierObject to = (BarrierObject) contact.getFixtureA().getUserData();
+					
+					if(!bullet.player.equals(to.barrier.player)){
+						if(bullet instanceof BazookaBullet){
+							((BazookaBullet)bullet).explosionDamage();
+						}
+						to.takeDamage(bullet.getDamage());
+						bullet.remove();
+						GameState.removeBody(contact.getFixtureB().getBody());
+					}
+					else{
+						contact.setEnabled(false);
+					}
+					
+					
+					
+				}
+		
+		
+		//tiro com parede
+		if(contact.getFixtureA().getUserData() instanceof Bullet && contact.getFixtureB().getBody().getUserData() != null &&
+				contact.getFixtureB().getBody().getUserData().equals("BLOCK")){
+			Bullet b = (Bullet) contact.getFixtureA().getUserData();
+			
+			if(b instanceof BazookaBullet){
+				((BazookaBullet)b).explosionDamage();
+			}
+			
+			b.remove();
+			GameState.removeBody(contact.getFixtureB().getBody());
+		}
+		
+		if(contact.getFixtureB().getUserData() instanceof Bullet &&
+				contact.getFixtureA().getBody().getUserData() != null && contact.getFixtureA().getBody().getUserData().equals("BLOCK")){
+			Bullet b = (Bullet) contact.getFixtureB().getUserData();
+			
+			if(b instanceof BazookaBullet){
+				((BazookaBullet)b).explosionDamage();
+			}
+			
+			b.remove();
+			GameState.removeBody(contact.getFixtureB().getBody());
+		}
+		
+		//player com item
+		if(contact.getFixtureA().getUserData() instanceof Player && contact.getFixtureB().getUserData() instanceof Item){
+			Item it = (Item) contact.getFixtureB().getUserData();
+			Player pl = (Player) contact.getFixtureA().getUserData();
+			
+			pl.setBuff(it.id);
+			it.remove();
+		}
+		
+		if(contact.getFixtureB().getUserData() instanceof Player && contact.getFixtureA().getUserData() instanceof Item){
+			Item it = (Item) contact.getFixtureA().getUserData();
+			Player pl = (Player) contact.getFixtureB().getUserData();
+			
+			pl.setBuff(it.id);
+			it.remove();
+		}
+		
+		
+		//bala atinge inimigo
+		if(contact.getFixtureA().getUserData() instanceof Player && contact.getFixtureB().getUserData() instanceof Bullet){
+			Player player = (Player) contact.getFixtureA().getUserData();
+			Bullet b = (Bullet) contact.getFixtureB().getUserData();
+			
+			
+			
+			if(b.getID() != player.getID()){
+				if(!player.isDead()){
+					player.takeDamage(b.getDamage(), b.getPlayer());
+				}
+				else{
+					contact.setEnabled(false);
+					return;
+				}
+				
+				if(b instanceof BazookaBullet){
+					((BazookaBullet)b).explosionDamage();
+				}
+				
+				b.remove();
+				GameState.removeBody(contact.getFixtureB().getBody());
+				
+			}
+			
+		}
+		if(contact.getFixtureB().getUserData() instanceof Player && contact.getFixtureA().getUserData() instanceof Bullet){
+			Player player = (Player) contact.getFixtureB().getUserData();
+			Bullet b = (Bullet) contact.getFixtureA().getUserData();
+			
+			if(b.getID() != player.getID()){
+				if(!player.isDead()){
+					player.takeDamage(b.getDamage(), b.getPlayer());
+				}
+				else{
+					contact.setEnabled(false);
+					return;
+				}
+				
+
+				if(b instanceof BazookaBullet){
+					((BazookaBullet)b).explosionDamage();
+				}
+				
+				
+				b.remove();
+				GameState.removeBody(contact.getFixtureA().getBody());
+				
+			}
+		}
+		
+		//bala atinge parede
+		if(contact.getFixtureA().getUserData() instanceof Block && contact.getFixtureB().getUserData() instanceof Bullet){
+			Block block = (Block) contact.getFixtureA().getUserData();
+			Bullet bullet = (Bullet) contact.getFixtureB().getUserData();
+			
+			if(bullet instanceof BazookaBullet && (block instanceof BreakableBlock || block instanceof UnbreakableBlock)){
+				((BazookaBullet)bullet).explosionDamage();
+			}
+			
+			block.bulletCollided(contact, bullet);
+			
+		}
+		if(contact.getFixtureB().getUserData() instanceof Block && contact.getFixtureA().getUserData() instanceof Bullet){
+			Block block = (Block) contact.getFixtureB().getUserData();
+			Bullet bullet = (Bullet) contact.getFixtureA().getUserData();
+			
+			if(bullet instanceof BazookaBullet && (block instanceof BreakableBlock || block instanceof UnbreakableBlock)){
+				((BazookaBullet)bullet).explosionDamage();
+			}
+			
+			block.bulletCollided(contact, bullet);
+			
+		}
+	}
+
+	public void endContact(Contact contact) {
+		
+		//qualquer objeto com range do laser
+				if(contact.getFixtureA().getUserData() instanceof Laser){
+					Laser l = (Laser) contact.getFixtureA().getUserData();
+					l.removeRange(contact.getFixtureB().getBody());
+				}
+				if(contact.getFixtureB().getUserData() instanceof Laser){
+					Laser l = (Laser) contact.getFixtureB().getUserData();
+					l.removeRange(contact.getFixtureA().getBody());
+				}
+		
+	}
+
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		//flamethrower atinge algo
+		if(contact.getFixtureA().getUserData() instanceof Flamethrower.FlameParticle){
+			contact.setEnabled(false);
+			
+			if(contact.getFixtureB().getUserData() instanceof Player){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureA().getUserData();
+				Player pl = (Player) contact.getFixtureB().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.getId()){
+					pl.applyFlame(flame.ft.getPlayer().getAtk(), flame.ft.getPlayer());
+				}
+				
+			}
+			
+			if(contact.getFixtureB().getUserData() instanceof Block){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureA().getUserData();
+				Block pl = (Block) contact.getFixtureB().getUserData();
+				
+				if(pl instanceof BreakableBlock){
+					((BreakableBlock)pl).takeDamage(flame.ft.getDamage(), true);
+				}
+				
+				if(pl instanceof UnbreakableBlock)
+				flame.remove();
+				
+			}
+			
+			if(contact.getFixtureB().getUserData() instanceof TurretObject){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureA().getUserData();
+				TurretObject pl = (TurretObject) contact.getFixtureB().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.turret.player.getId()){
+					pl.takeDamage(flame.ft.getDamage());
+				}
+			}
+			
+			if(contact.getFixtureB().getUserData() instanceof BarrierObject){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureA().getUserData();
+				BarrierObject pl = (BarrierObject) contact.getFixtureB().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.barrier.player.getId()){
+					pl.takeDamage(flame.ft.getDamage());
+				}
+				
+				flame.remove();
+			}
+			
+		}
+		if(contact.getFixtureB().getUserData() instanceof Flamethrower.FlameParticle){
+			contact.setEnabled(false);
+			
+			if(contact.getFixtureA().getUserData() instanceof Player){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureB().getUserData();
+				Player pl = (Player) contact.getFixtureA().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.getId()){
+					pl.applyFlame(flame.ft.getPlayer().getAtk(), flame.ft.getPlayer());
+				}
+			
+			}
+			
+			if(contact.getFixtureA().getUserData() instanceof Block){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureB().getUserData();
+				Block pl = (Block) contact.getFixtureA().getUserData();
+				
+				if(pl instanceof BreakableBlock){
+					((BreakableBlock)pl).takeDamage(flame.ft.getDamage(), true);
+				}
+				
+				if(pl instanceof UnbreakableBlock)
+				flame.remove();
+			}
+			
+			if(contact.getFixtureA().getUserData() instanceof TurretObject){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureB().getUserData();
+				TurretObject pl = (TurretObject) contact.getFixtureA().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.turret.player.getId()){
+					pl.takeDamage(flame.ft.getDamage());
+				}
+			}
+			
+			if(contact.getFixtureA().getUserData() instanceof BarrierObject){
+				Flamethrower.FlameParticle flame = (Flamethrower.FlameParticle) contact.getFixtureB().getUserData();
+				BarrierObject pl = (BarrierObject) contact.getFixtureA().getUserData();
+				
+				if(flame.ft.getPlayer().getId() != pl.barrier.player.getId()){
+					pl.takeDamage(flame.ft.getDamage());
+				}
+				
+				flame.remove();
+			}
+		}
+
+	}
+
+	public void postSolve(Contact contact, ContactImpulse impulse) {
+		
+	}
+
+}
