@@ -761,11 +761,26 @@ public class MainMenu extends State{
 				}
 				if(selection[Util.getControllerID(controller)] == 2){
 					if(KambojaMain.getControllers().size() >= 2){
-						if(!exiting){
-							timer = 1;
-							exiting = true;
+						boolean noname = false;
+						for(PlayerController c : KambojaMain.getControllers()) {
+							if(c.getName().length() == 0) {
+								noname = true;
+								break;
+							}
 						}
-						sound_select();
+						
+						boolean typeropen = false;
+						
+						for(int i = 0; i < KambojaMain.getControllers().size(); i ++)
+							if(typer[i].isShowing()) typeropen = true;
+						
+						if(!noname && !typeropen) {
+							if(!exiting){
+								timer = 1;
+								exiting = true;
+							}
+							sound_select();
+						}
 					}
 				}
 			}
@@ -774,8 +789,9 @@ public class MainMenu extends State{
 			if(timer > 4){
 				if(Util.getControllerID(controller) == -1){
 					if(KambojaMain.getControllers().size() < 4){
-						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "PLAYER " + (KambojaMain.getControllers().size()+1));
+						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "");
 						KambojaMain.getControllers().add(pc);
+						typer[KambojaMain.getControllers().size() - 1].show();
 						new_player();
 					}
 				}
@@ -964,8 +980,9 @@ public class MainMenu extends State{
 		
 		if(keycode == Keys.ENTER){
 			if(KambojaMain.getControllers().size() < 4 && timer > 4 && !hasKeyboard){
-				KeyboardController kc = new KeyboardController(0, firstPlayerAvailable(),  "PLAYER " + (KambojaMain.getControllers().size()+1));
+				KeyboardController kc = new KeyboardController(0, firstPlayerAvailable(),  "");
 				KambojaMain.getControllers().add(kc);
+				typer[KambojaMain.getControllers().size()-1].show();
 				hasKeyboard = true;
 				new_player();
 			}

@@ -118,10 +118,11 @@ public class GameState extends State{
 	
 	PersistentParticleEffect bloodEffect;
 	PersistentParticleEffect shellEffect;
+	PersistentParticleEffect rockEffect;
 	
-	private ParticleEffect rock;
-	private ParticleEffectPool rockPool;
-	private ArrayList<PooledEffect> rockEffects;
+//	private ParticleEffect rock;
+//	private ParticleEffectPool rockPool;
+//	private ArrayList<PooledEffect> rockEffects;
 	
 	private ParticleEffect explosion;
 	private ParticleEffectPool explosionPool;
@@ -169,8 +170,6 @@ public class GameState extends State{
 		getTiledMap().dispose();
 		world.dispose();
 		b2dr.dispose();
-		//blood.dispose();
-		rock.dispose();
 		explosion.dispose();
 		if(islandBackground != null)
 		islandBackground.dispose();
@@ -334,20 +333,29 @@ public class GameState extends State{
 		bloodEffect.setMaxScale(1f/UNIT_SCALE * .3f);
 		
 		shellEffect = new PersistentParticleEffect(new Texture("imgs/weapons/shell.png"));
-		shellEffect.setMinVel(new Vector2(-0.05f, -0.05f));
-		shellEffect.setMaxVel(new Vector2(0.05f, 0.05f));
 		shellEffect.setMinLinDamp(10);
 		shellEffect.setMaxLinDamp(10);
 		shellEffect.setMinScale(1f/UNIT_SCALE);
 		shellEffect.setMaxScale(1f/UNIT_SCALE);
 		
+		Texture rocks[] = new Texture[4];
 		
+		for(int i = 0; i < 4; i ++)
+			rocks[i] = new Texture("particles/rock" + (i+1) + ".png");
 		
-		rock = new ParticleEffect();
-		rock.load(Gdx.files.internal("particles/rockExplosion.par"), Gdx.files.internal("particles"));
-		rock.scaleEffect(1f/UNIT_SCALE / 6f);
-		rockPool = new ParticleEffectPool(rock, 0, 10);
-		rockEffects = new ArrayList<PooledEffect>();
+		rockEffect = new PersistentParticleEffect(rocks);
+		rockEffect.setMinVel(new Vector2(-0.05f, -0.05f));
+		rockEffect.setMaxVel(new Vector2(0.05f, 0.05f));
+		rockEffect.setMinLinDamp(10);
+		rockEffect.setMaxLinDamp(10);
+		rockEffect.setMinScale(1f/UNIT_SCALE * .03f);
+		rockEffect.setMaxScale(1f/UNIT_SCALE * .03f);
+		
+//		rock = new ParticleEffect();
+//		rock.load(Gdx.files.internal("particles/rockExplosion.par"), Gdx.files.internal("particles"));
+//		rock.scaleEffect(1f/UNIT_SCALE / 6f);
+//		rockPool = new ParticleEffectPool(rock, 0, 10);
+//		rockEffects = new ArrayList<PooledEffect>();
 		
 		explosion = new ParticleEffect();
 		explosion.load(Gdx.files.internal("particles/explosion.par"), Gdx.files.internal("particles"));
@@ -567,14 +575,18 @@ public class GameState extends State{
 	}
 	
 	
-	public void showRock(Vector2 pos){
+	public void showRock(Vector2 worldCenter){
 		
-		ParticleEffect pe = rockPool.obtain();
-		pe.setPosition(pos.x, pos.y);
-		pe.reset();
+		rockEffect.setMinPos(worldCenter);
+		rockEffect.setMaxPos(worldCenter);
+		rockEffect.addParticle();
 		
-		if(!rockEffects.contains(pe))
-		rockEffects.add((PooledEffect) pe);
+//		ParticleEffect pe = rockPool.obtain();
+//		pe.setPosition(pos.x, pos.y);
+//		pe.reset();
+//		
+//		if(!rockEffects.contains(pe))
+//		rockEffects.add((PooledEffect) pe);
 	}
 	
 	public void showExplosion(Vector2 pos){
@@ -647,6 +659,7 @@ public class GameState extends State{
 		
 		bloodEffect.render(sb);
 		shellEffect.render(sb);
+		rockEffect.render(sb);
 		
 		sb.begin();
 
@@ -654,7 +667,9 @@ public class GameState extends State{
 			Block b = getBlocks().get(i);
 
 			if(! b.render(sb)){
+				for(int j = 0; j < 5; j ++)
 				showRock(b.getBody().getWorldCenter());
+				
 				removeBody(b.getBody());
 				getBlocks().remove(b);
 			}
@@ -677,14 +692,14 @@ public class GameState extends State{
 		
 		sb.begin();
 		
-		for(int i = rockEffects.size() - 1; i >= 0; i --){
-			ParticleEffect pe = rockEffects.get(i);
-			pe.draw(sb);
-			if(pe.isComplete()){
-				rockPool.free((PooledEffect) pe);
-				rockEffects.remove(i);
-			}
-		}
+//		for(int i = rockEffects.size() - 1; i >= 0; i --){
+//			ParticleEffect pe = rockEffects.get(i);
+//			pe.draw(sb);
+//			if(pe.isComplete()){
+//				rockPool.free((PooledEffect) pe);
+//				rockEffects.remove(i);
+//			}
+//		}
 		for(int i = explosionEffects.size() - 1; i >= 0; i --){
 			ParticleEffect pe = explosionEffects.get(i);
 			pe.draw(sb);
@@ -811,15 +826,16 @@ public class GameState extends State{
 		if(!isPause()){
 			bloodEffect.update(delta);
 			shellEffect.update(delta);
+			rockEffect.update(delta);
 			
-			for(int i = rockEffects.size() - 1; i >= 0; i --){
-				ParticleEffect pe = rockEffects.get(i);
-				pe.update(delta*2);
-				if(pe.isComplete()){
-					rockPool.free((PooledEffect) pe);
-					rockEffects.remove(i);
-				}
-			}
+//			for(int i = rockEffects.size() - 1; i >= 0; i --){
+//				ParticleEffect pe = rockEffects.get(i);
+//				pe.update(delta*2);
+//				if(pe.isComplete()){
+//					rockPool.free((PooledEffect) pe);
+//					rockEffects.remove(i);
+//				}
+//			}
 			for(int i = explosionEffects.size() - 1; i >= 0; i --){
 				ParticleEffect pe = explosionEffects.get(i);
 				pe.update(delta*3);
