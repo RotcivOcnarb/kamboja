@@ -10,6 +10,7 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -47,9 +48,10 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.BotPlayer;
 import com.mygdx.game.objects.Bullet;
-import com.mygdx.game.objects.MyContactListener;
 import com.mygdx.game.objects.GamePause;
 import com.mygdx.game.objects.Item;
+import com.mygdx.game.objects.MyContactListener;
+import com.mygdx.game.objects.PersistentParticleEffect;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
 import com.mygdx.game.objects.map.Block;
@@ -114,9 +116,7 @@ public class GameState extends State{
 	
 	private static ArrayList<Body> forRemoval;	
 	
-	private ParticleEffect blood;
-	private ParticleEffectPool bloodPool;
-	private ArrayList<PooledEffect> bloodEffects;
+	PersistentParticleEffect bloodEffect;
 	
 	private ParticleEffect rock;
 	private ParticleEffectPool rockPool;
@@ -168,7 +168,7 @@ public class GameState extends State{
 		getTiledMap().dispose();
 		world.dispose();
 		b2dr.dispose();
-		blood.dispose();
+		//blood.dispose();
 		rock.dispose();
 		explosion.dispose();
 		if(islandBackground != null)
@@ -320,11 +320,19 @@ public class GameState extends State{
 		
 		forRemoval.clear();
 		
-		blood = new ParticleEffect();
-		blood.load(Gdx.files.internal("particles/blood.par"), Gdx.files.internal("particles"));
-		blood.scaleEffect(1f/UNIT_SCALE / 2f);
-		bloodPool = new ParticleEffectPool(blood, 0, 20);
-		bloodEffects = new ArrayList<PooledEffect>();
+		Texture[] bloods = new Texture[5];
+		for(int i = 0; i < 5; i ++)
+			bloods[i] = new Texture("particles/blood" + (i+1) + ".png");
+		
+		bloodEffect = new PersistentParticleEffect(bloods);
+		bloodEffect.setMinVel(new Vector2(-0.05f, -0.05f));
+		bloodEffect.setMaxVel(new Vector2(0.05f, 0.05f));
+		bloodEffect.setMinLinDamp(10);
+		bloodEffect.setMaxLinDamp(10);
+		bloodEffect.setMinScale(1f/UNIT_SCALE * .3f);
+		bloodEffect.setMaxScale(1f/UNIT_SCALE * .3f);
+		
+		
 		
 		rock = new ParticleEffect();
 		rock.load(Gdx.files.internal("particles/rockExplosion.par"), Gdx.files.internal("particles"));
@@ -536,12 +544,12 @@ public class GameState extends State{
 	}
 	
 	public void showBlood(Vector2 worldCenter) {
-		ParticleEffect pe = bloodPool.obtain();
-		pe.setPosition(worldCenter.x, worldCenter.y);
-		pe.reset();
 		
-		if(!bloodEffects.contains(pe))
-		bloodEffects.add((PooledEffect) pe);
+		bloodEffect.setMinPos(worldCenter);
+		bloodEffect.setMaxPos(worldCenter);
+		
+		bloodEffect.addParticle();
+		
 	}
 	
 	public void showRock(Vector2 pos){
@@ -622,6 +630,8 @@ public class GameState extends State{
 		}
 		sb.end();
 		
+		bloodEffect.render(sb);
+		
 		sb.begin();
 
 		for(int i = getBlocks().size() - 1; i >= 0; i --){
@@ -647,15 +657,10 @@ public class GameState extends State{
 			}
 		}
 		
+		sb.end();
 		
-		for(int i = bloodEffects.size() - 1; i >= 0; i --){
-			ParticleEffect pe = bloodEffects.get(i);
-			pe.draw(sb);
-			if(pe.isComplete()){
-				bloodPool.free((PooledEffect) pe);
-				bloodEffects.remove(i);
-			}
-		}
+		sb.begin();
+		
 		for(int i = rockEffects.size() - 1; i >= 0; i --){
 			ParticleEffect pe = rockEffects.get(i);
 			pe.draw(sb);
@@ -788,14 +793,8 @@ public class GameState extends State{
 		}
 		
 		if(!isPause()){
-			for(int i = bloodEffects.size() - 1; i >= 0; i --){
-				ParticleEffect pe = bloodEffects.get(i);
-				pe.update(delta*2);
-				if(pe.isComplete()){
-					bloodPool.free((PooledEffect) pe);
-					bloodEffects.remove(i);
-				}
-			}
+			bloodEffect.update(delta);
+			
 			for(int i = rockEffects.size() - 1; i >= 0; i --){
 				ParticleEffect pe = rockEffects.get(i);
 				pe.update(delta*2);

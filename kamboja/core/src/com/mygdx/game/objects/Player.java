@@ -333,6 +333,8 @@ public class Player implements Steerable<Vector2>{
 	public void takeDamage(float amount, Player owner){
 		if(imunity <= 0){
 			life -= amount * def;
+			
+			state.showBlood(body.getWorldCenter());
 
 			hitTimer = 1f;
 			if(getLife() <= 0){
@@ -436,6 +438,7 @@ public class Player implements Steerable<Vector2>{
 
 		
 		if(isDead() && !throwBlood){
+			for(int i = 0; i < 5; i ++)
 			getState().showBlood(body.getWorldCenter());
 			throwBlood = true;
 		}
