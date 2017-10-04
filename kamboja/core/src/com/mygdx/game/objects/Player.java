@@ -74,6 +74,8 @@ public class Player implements Steerable<Vector2>{
 	private float opacity = 1;
 	private float flameTimer = 0;
 	private float flameAtk = 1;
+	private float gruntTimer = 0;
+
 	private Texture life_bar;
 	private Texture mana_bar;
 	private Texture life_case;
@@ -87,23 +89,26 @@ public class Player implements Steerable<Vector2>{
 	private TextureRegion player;
 	private Animation legsAnimation;
 	
+	private boolean dead = false;
+	private boolean throwBlood = false;
+	private boolean isFalling = false;
+	private boolean inputBlocked = false;	
+	private boolean keyboard = false;
+	public boolean said_ko = false;
+	
 	private Vector2 axisVel = new Vector2();
 	private BitmapFont font;
 	private GlyphLayout layout;
 	private GameState state;
-	private boolean dead = false;
-	private boolean throwBlood = false;
-	private boolean isFalling = false;
-	boolean keyboard = false;
 	private Weapon weapon;
 	private Shift shift;
 	private ShapeRenderer sr;
-	private boolean inputBlocked = false;	
 	private static Sound sprint;
 	private static Sound grunt[] = new Sound[5];
 	private float legTimer = 0;
 	private float legAngle = 0;
 	
+
 	static{
 		for(int i = 0; i < 5; i ++){
 			grunt[i] = Gdx.audio.newSound(Gdx.files.internal("audio/grunt"+(i+1)+".ogg"));
@@ -112,10 +117,7 @@ public class Player implements Steerable<Vector2>{
 		sprint = Gdx.audio.newSound(Gdx.files.internal("audio/run.ogg"));
 	}
 	
-	float gruntTimer = 0;
-	
-	public boolean said_ko = false;
-	
+
 	class PlayerFall{
 		
 		Player player;
@@ -151,9 +153,6 @@ public class Player implements Steerable<Vector2>{
 		}
 		return new TextureRegion(players[playerid], (posid % 5)*32, (posid/5)*32, 32, 32);
 	}
-	
-
-	
 	
 	public void setFalling(){
 		if(!isFalling){
@@ -331,10 +330,11 @@ public class Player implements Steerable<Vector2>{
 	        return difference;
 	}
 	
-	public void takeDamage(float amount, Player owner){
+	public void takeDamage(float amount, Player owner, boolean showBlood){
 		if(imunity <= 0){
 			life -= amount * def;
 			
+			if(showBlood)
 			state.showBlood(body.getWorldCenter());
 
 			hitTimer = 1f;
@@ -753,7 +753,7 @@ public class Player implements Steerable<Vector2>{
 			setAngle(new Vector2((float)Math.sin(getFallingTimer()*10), (float)Math.cos(getFallingTimer()*10)));
 			
 			if(getFallingTimer() <= 0){
-				takeDamage(1000, null);
+				takeDamage(1000, null, false);
 			}
 		}
 		
@@ -770,7 +770,7 @@ public class Player implements Steerable<Vector2>{
 		flameTimer -= delta;
 
 		if(flameTimer > 0){
-			takeDamage(Flamethrower.DAMAGE * flameAtk, flamePlayer);
+			takeDamage(Flamethrower.DAMAGE * flameAtk, flamePlayer, false);
 			state.screenshake(0.03f);
 		}
 		else{

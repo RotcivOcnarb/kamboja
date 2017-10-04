@@ -183,7 +183,7 @@ public class MyContactListener implements ContactListener{
 			
 			if(b.getID() != player.getID()){
 				if(!player.isDead()){
-					player.takeDamage(b.getDamage(), b.getPlayer());
+					player.takeDamage(b.getDamage(), b.getPlayer(), true);
 				}
 				else{
 					contact.setEnabled(false);
@@ -206,7 +206,7 @@ public class MyContactListener implements ContactListener{
 			
 			if(b.getID() != player.getID()){
 				if(!player.isDead()){
-					player.takeDamage(b.getDamage(), b.getPlayer());
+					player.takeDamage(b.getDamage(), b.getPlayer(), true);
 				}
 				else{
 					contact.setEnabled(false);

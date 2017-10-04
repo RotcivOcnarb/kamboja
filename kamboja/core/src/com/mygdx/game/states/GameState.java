@@ -10,7 +10,9 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -20,6 +22,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
@@ -119,11 +123,7 @@ public class GameState extends State{
 	PersistentParticleEffect bloodEffect;
 	PersistentParticleEffect shellEffect;
 	PersistentParticleEffect rockEffect;
-	
-//	private ParticleEffect rock;
-//	private ParticleEffectPool rockPool;
-//	private ArrayList<PooledEffect> rockEffects;
-	
+
 	private ParticleEffect explosion;
 	private ParticleEffectPool explosionPool;
 	private ArrayList<PooledEffect> explosionEffects;
@@ -141,6 +141,17 @@ public class GameState extends State{
 	private boolean said_three, said_two, said_one, said_start;
 	private IslandBackground islandBackground;
 	
+	//shader stuff
+	
+	SpriteBatch shaderBatch;
+	ShaderProgram shader;
+	FrameBuffer shaderBuffer;
+	Texture binocularMask;
+	Texture noiseTexture;
+	
+	Vector2 med = new Vector2();
+	Array<Body> bodies = new Array<Body>();
+	
 	public static void removeBody(Body b){
 		if(!forRemoval.contains(b)){
 			forRemoval.add(b);
@@ -149,10 +160,6 @@ public class GameState extends State{
 	
 	public GameState(Manager manager) {
 		super(manager);
-		
-		setBullets(new ArrayList<Bullet>());
-		setFlameParticles(new ArrayList<Body>());
-
 	}
 
 	public void addBullet(Bullet b){
@@ -209,6 +216,26 @@ public class GameState extends State{
 	}
 	
 	public void create() {
+		
+		//shader stuff
+		
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		shader = new ShaderProgram(
+				Gdx.files.internal("shaders/default.vs"),
+				Gdx.files.internal("shaders/old_movie.fs"));
+		ShaderProgram.pedantic = false;
+		shaderBatch = new SpriteBatch(300, shader);
+		
+		binocularMask = new Texture("shaders/binoculars2.png");
+		noiseTexture = new Texture("shaders/noisetex.jpg");
+		
+		if (shader.getLog().length()!=0)
+			System.out.println(shader.getLog());
+		
+		System.out.println(shader.isCompiled());
+		
+		setBullets(new ArrayList<Bullet>());
+		setFlameParticles(new ArrayList<Body>());
 		
 		gamepause = new GamePause(this);
 		
@@ -296,7 +323,7 @@ public class GameState extends State{
 		if(layout == null)
 		layout = new GlyphLayout();
 		
-		setTimer(0);
+		timer = 0;
 
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
@@ -472,7 +499,6 @@ public class GameState extends State{
 
 	}
 
-	
 	public void addItem(Vector2 pos, int id){
 		BodyDef def = new BodyDef();
 		def.position.set(pos);
@@ -574,19 +600,12 @@ public class GameState extends State{
 		shellEffect.addParticle();
 	}
 	
-	
 	public void showRock(Vector2 worldCenter){
 		
 		rockEffect.setMinPos(worldCenter);
 		rockEffect.setMaxPos(worldCenter);
 		rockEffect.addParticle();
-		
-//		ParticleEffect pe = rockPool.obtain();
-//		pe.setPosition(pos.x, pos.y);
-//		pe.reset();
-//		
-//		if(!rockEffects.contains(pe))
-//		rockEffects.add((PooledEffect) pe);
+
 	}
 	
 	public void showExplosion(Vector2 pos){
@@ -598,8 +617,63 @@ public class GameState extends State{
 		explosionEffects.add((PooledEffect) pe);
 	}
 
+	//Render stuff
+	
 	public void render(SpriteBatch sb) {
 
+		shaderBuffer.begin();
+		
+		Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1f);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		sb.setShader(null);
+		
+		drawBackgroundTiles(sb);
+		drawPersistentParticles(sb);
+		drawBlocks(sb);
+		drawItems(sb);
+		drawParticles(sb);
+		drawPlayersAndLight(sb);
+		drawCeilingTiles(sb);
+		drawUI(sb);
+		drawDebug(sb);
+		drawPause(sb);
+		
+		shaderBuffer.end();
+		
+		//shaderBuffer.getColorBufferTexture().bind(0);
+
+		
+		float amt = 0.5f;
+		
+		shader.begin();
+		shader.setUniformf("time", timer);
+		shader.setUniformf("flicker", 0.1f * amt);
+		shader.setUniformf("lightvariance", 0.05f * amt);
+		shader.setUniformf("blackandwhite", 1.0f * amt);
+		shader.setUniformf("oversaturation", 0.3f * amt);
+		shader.setUniformf("vignette", 1.0f * amt);
+		shader.setUniformf("scratches", 0.5f * (float)Math.pow(amt, 4));
+		shader.setUniformf("scratchsize", new Vector2(8, 200));
+		shader.setUniformf("splotches", 200 * (float)Math.pow(amt, 8));
+		
+		shaderBatch.setShader(shader);
+		
+		shaderBatch.setProjectionMatrix(Util.getNormalProjection());
+		shaderBatch.begin();
+		
+		shaderBatch.draw(shaderBuffer.getColorBufferTexture(),
+					0, 0,
+					Gdx.graphics.getWidth(),
+					Gdx.graphics.getHeight(),
+					0, 0,
+					Gdx.graphics.getWidth(),
+					Gdx.graphics.getHeight(),
+					false, true);
+		
+		shaderBatch.end();
+	}
+
+	public void drawBackgroundTiles(SpriteBatch sb){
 		
 		if(islandBackground != null){
 			islandBackground.render(sb, getCamera());
@@ -607,6 +681,7 @@ public class GameState extends State{
 		
 		sb.setProjectionMatrix(getCamera().combined);
 
+		
 		sb.begin();
 		
 		if(LIGHTS)
@@ -656,10 +731,15 @@ public class GameState extends State{
 			}
 		}
 		sb.end();
-		
+	}
+	
+	public void drawPersistentParticles(SpriteBatch sb){
 		bloodEffect.render(sb);
 		shellEffect.render(sb);
 		rockEffect.render(sb);
+	}
+	
+	public void drawBlocks(SpriteBatch sb){
 		
 		sb.begin();
 
@@ -676,6 +756,10 @@ public class GameState extends State{
 		}
 		sb.end();
 		
+	}
+	
+	public void drawItems(SpriteBatch sb){
+		
 		sb.begin();
 		
 		sb.setColor(1, 1, 1, 1);
@@ -689,17 +773,12 @@ public class GameState extends State{
 		}
 		
 		sb.end();
+	}
+	
+	public void drawParticles(SpriteBatch sb){
 		
 		sb.begin();
-		
-//		for(int i = rockEffects.size() - 1; i >= 0; i --){
-//			ParticleEffect pe = rockEffects.get(i);
-//			pe.draw(sb);
-//			if(pe.isComplete()){
-//				rockPool.free((PooledEffect) pe);
-//				rockEffects.remove(i);
-//			}
-//		}
+
 		for(int i = explosionEffects.size() - 1; i >= 0; i --){
 			ParticleEffect pe = explosionEffects.get(i);
 			pe.draw(sb);
@@ -709,7 +788,9 @@ public class GameState extends State{
 			}
 		}
 		sb.end();
-		
+	}
+	
+	public void drawPlayersAndLight(SpriteBatch sb){
 
 		for(Player p : getPlayers()){
 			p.render(sb);
@@ -730,14 +811,17 @@ public class GameState extends State{
 			p.renderGUI(sb);
 		}
 		
+	}
+	
+	public void drawCeilingTiles(SpriteBatch sb){
 		sb.setProjectionMatrix(getCamera().combined);
 		sb.begin();
-		bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("ceiling"));
+		TiledMapTileLayer bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("ceiling"));
 		if(bg != null){
 			for(int i = 0; i < mapWidth; i ++){
 				for(int j = 0; j < mapHeight; j ++){
 					
-					//tiles background
+					//tiles ceiling
 					Cell c = bg.getCell(i, j);
 					if(c != null){ 
 						TextureRegion tr = c.getTile().getTextureRegion();
@@ -753,7 +837,9 @@ public class GameState extends State{
 			}
 		}
 		sb.end();
-		
+	}
+	
+	public void drawUI(SpriteBatch sb){
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
 		
@@ -780,28 +866,33 @@ public class GameState extends State{
 		timeFont.draw(sb, time, (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight() - 30);
 		
 		sb.end();
-		
+	}
+	
+	public void drawDebug(SpriteBatch sb){
 		if(DEBUG)
 		b2dr.render(world, getCamera().combined);
-		
-			sb.begin();
-			Gdx.gl.glEnable(GL20.GL_BLEND);
-			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-				sr.begin(ShapeType.Filled);
-				sr.setColor(0, 0, 0, opacity);
-				sr.box(0, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);
-				sr.end();
-			Gdx.gl.glDisable(GL20.GL_BLEND);
-			sb.end();
-			
-			if(isPause()){
-				sb.setProjectionMatrix(Util.getNormalProjection());
-				gamepause.render(sb);
-				
-			}
 	}
-	Vector2 med = new Vector2();
-	Array<Body> bodies = new Array<Body>();
+	
+	public void drawPause(SpriteBatch sb){
+		
+		sb.begin();
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			sr.begin(ShapeType.Filled);
+			sr.setColor(0, 0, 0, opacity);
+			sr.box(0, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);
+			sr.end();
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		sb.end();
+		
+		if(isPause()){
+			sb.setProjectionMatrix(Util.getNormalProjection());
+			gamepause.render(sb);
+		}
+	}
+	
+	//Update
+	
 	public void update(float delta) {
 		Gdx.gl.glClearColor(0, 162/255f, 132/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -867,12 +958,12 @@ public class GameState extends State{
 		}
 		
 		if(!isPause())
-		setTimer(getTimer() + delta);
+			timer += delta;
 		
 		if(!isPause())
 		menuPos += (targetMenuPos - menuPos)/10.0f;
 		
-		if(getTimer() > 1){
+		if(timer > 1){
 			targetMenuPos = Gdx.graphics.getHeight() * 1;
 			if(!said_three){
 				if(GameState.SFX)
@@ -880,7 +971,7 @@ public class GameState extends State{
 				said_three = true;
 			}
 		}
-		if(getTimer() > 2){
+		if(timer > 2){
 			targetMenuPos = Gdx.graphics.getHeight() * 2;
 			if(!said_two){
 				if(GameState.SFX)
@@ -888,7 +979,7 @@ public class GameState extends State{
 				said_two = true;
 			}
 		}
-		if(getTimer() > 3){
+		if(timer > 3){
 			targetMenuPos = Gdx.graphics.getHeight() * 3;
 			if(!said_one){
 				if(GameState.SFX)
@@ -896,7 +987,7 @@ public class GameState extends State{
 				said_one = true;
 			}
 		}
-		if(getTimer() > 4){
+		if(timer > 4){
 			targetMenuPos = Gdx.graphics.getHeight() * 4;
 			if(!said_start){
 				if(GameState.SFX)
@@ -904,7 +995,7 @@ public class GameState extends State{
 				said_start = true;
 			}
 		}
-		if(getTimer() > 5){
+		if(timer > 5){
 			targetMenuPos = Gdx.graphics.getHeight() * 5;
 			if(!isPause())
 			inputBlocked = false;
@@ -1073,6 +1164,8 @@ public class GameState extends State{
 		
 	}
 
+	//Input
+	
 	public void connected(Controller controller) {
 		
 	}
@@ -1102,7 +1195,7 @@ public class GameState extends State{
 		
 		if(id != -1){
 			if(buttonCode == start){
-				if(getTimer() > 5 && !(isIntro() || isOutro())){
+				if(timer > 5 && !(isIntro() || isOutro())){
 					pauseUnpause();
 				}
 			}
@@ -1220,14 +1313,6 @@ public class GameState extends State{
 		this.outro = outro;
 	}
 
-	public float getTimer() {
-		return timer;
-	}
-
-	public void setTimer(float timer) {
-		this.timer = timer;
-	}
-
 	public ArrayList<Player> getPlayers() {
 		return players;
 	}
@@ -1298,6 +1383,10 @@ public class GameState extends State{
 
 	public void setBlocks(ArrayList<Block> blocks) {
 		this.blocks = blocks;
+	}
+
+	public float getTimer() {
+		return timer;
 	}
 
 	

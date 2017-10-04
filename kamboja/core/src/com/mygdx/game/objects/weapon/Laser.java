@@ -292,7 +292,7 @@ public class Laser extends Weapon{
 						if(closestFixture.getUserData() instanceof Player){
 							Player pl = (Player) closestFixture.getUserData();
 							if(pl.getID() != player.getID()){
-								pl.takeDamage(getDamage() * player.getAtk(), player);
+								pl.takeDamage(getDamage() * player.getAtk(), player, true);
 							}
 						}
 						else if(closestFixture.getUserData() instanceof Block){
@@ -367,7 +367,7 @@ public class Laser extends Weapon{
 					
 					if(stop == null){//se não tiver nada no caminho da dano pro player
 						Player p = (Player) bodyplayer.getUserData();
-						p.takeDamage(getDamage() * player.getAtk(), player);
+						p.takeDamage(getDamage() * player.getAtk(), player, true);
 					}
 					else{ //se tiver dá dano no bloco q está no caminho
 						if(stop.getUserData() instanceof BreakableBlock){
