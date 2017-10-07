@@ -120,9 +120,9 @@ public class MainMenu extends State{
 		//Creates the font
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dot_to_dot.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (300 * Gdx.graphics.getDensity());
+		param.size = (int) (100 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
 		param.borderWidth = 2;
 		param.borderColor = new Color(1, 0.9f, 0.9f, 1);
@@ -131,10 +131,10 @@ public class MainMenu extends State{
 		param.shadowOffsetY = 3;
 		//font = ftfg.generateFont(param);
 		//fonte de opções do menu
-		param.size = (int) (200 * Gdx.graphics.getDensity());
+		param.size = (int) (100 * Gdx.graphics.getDensity());
 		menuFont = ftfg.generateFont(param);
 		//fonte do menu dos controles
-		param.size = (int) (100 * Gdx.graphics.getDensity());
+		param.size = (int) (70 * Gdx.graphics.getDensity());
 		controllerFont = ftfg.generateFont(param);
 		ftfg.dispose();
 		
@@ -188,7 +188,7 @@ public class MainMenu extends State{
 		buffers = new FrameBuffer[options.length];
 		for(int i = 0; i < buffers.length; i ++){
 			layout.setText(menuFont, options[i]);
-			buffers[i] = new FrameBuffer(Format.RGBA8888, (int)layout.width, (int)menuFont.getAscent()*2, false);
+			buffers[i] = new FrameBuffer(Format.RGBA8888, (int)layout.width, (int)layout.height*2, false);
 		}
 		
 		//retangulos de colisão das opçoes de menu
@@ -196,7 +196,7 @@ public class MainMenu extends State{
 		bounds = new Rectangle2D[options.length];
 		for(int i = 0; i < bounds.length; i ++){
 			layout.setText(menuFont, options[i]);
-			bounds[i] = new Rectangle2D.Double(3f/4f*Gdx.graphics.getWidth() - layout.width/2f, Gdx.graphics.getHeight()/2 + (i-1) * 100, (int)layout.width, (int)menuFont.getAscent()*2);
+			bounds[i] = new Rectangle2D.Double(3f/4f*Gdx.graphics.getWidth() - layout.width/2f, Gdx.graphics.getHeight()/2 + (i-1) * 100, (int)layout.width, (int)layout.height*2);
 		}
 		
 		//matriz temporária

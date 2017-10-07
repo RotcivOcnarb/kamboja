@@ -149,9 +149,9 @@ public class MapSelect extends State{
 		
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dot_to_dot.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (200 * Gdx.graphics.getDensity());
+		param.size = (int) (100 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
 		param.borderWidth = 2;
 		param.borderColor = new Color(1, 0.9f, 0.9f, 1);

@@ -63,9 +63,9 @@ public class KeyboardTyper {
 		
 		sr = new ShapeRenderer();
 		
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dot_to_dot.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
-		param.size = (int) (50 * Gdx.graphics.getDensity());
+		param.size = (int) (35 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
 		param.borderWidth = 2;
 		param.borderColor = new Color(1, 0.9f, 0.9f, 1);

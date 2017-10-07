@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -146,8 +147,10 @@ public class GameState extends State{
 	SpriteBatch shaderBatch;
 	ShaderProgram shader;
 	FrameBuffer shaderBuffer;
+	
 	Texture binocularMask;
 	Texture noiseTexture;
+	Texture waterDisplacement;
 	
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
@@ -222,12 +225,14 @@ public class GameState extends State{
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		shader = new ShaderProgram(
 				Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/old_movie.fs"));
+				Gdx.files.internal("shaders/displacement.fs"));
 		ShaderProgram.pedantic = false;
 		shaderBatch = new SpriteBatch(300, shader);
 		
 		binocularMask = new Texture("shaders/binoculars2.png");
 		noiseTexture = new Texture("shaders/noisetex.jpg");
+		waterDisplacement = new Texture("shaders/water_displacement.jpg");
+		waterDisplacement.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		if (shader.getLog().length()!=0)
 			System.out.println(shader.getLog());
@@ -327,9 +332,9 @@ public class GameState extends State{
 
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dot_to_dot.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (300 * Gdx.graphics.getDensity());
+		param.size = (int) (100 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
 		param.borderWidth = 2;
 		param.borderColor = new Color(1, 0.9f, 0.9f, 1);
@@ -337,7 +342,7 @@ public class GameState extends State{
 		param.shadowOffsetX = 3;
 		param.shadowOffsetY = 3;
 		font = ftfg.generateFont(param);
-		param.size = (int) (150 * Gdx.graphics.getDensity());
+		param.size = (int) (50 * Gdx.graphics.getDensity());
 		timeFont = ftfg.generateFont(param);
 		
 		ftfg.dispose();
@@ -625,6 +630,8 @@ public class GameState extends State{
 		
 		Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		sb.setShader(null);
 		
 		drawBackgroundTiles(sb);
@@ -638,28 +645,32 @@ public class GameState extends State{
 		drawDebug(sb);
 		drawPause(sb);
 		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		
 		shaderBuffer.end();
-		
-		//shaderBuffer.getColorBufferTexture().bind(0);
 
-		
-		float amt = 0.5f;
-		
 		shader.begin();
+		
+		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
+		shaderBuffer.getColorBufferTexture().bind(0);
+	    shader.setUniformi("u_texture", 0); //passing first texture!!!
+
+	    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
+		waterDisplacement.bind(1);
+	    shader.setUniformi("displacement_map", 1); //passing second texture!!!
+	    
+	    
+		shader.setUniformf("intensity", 0.01f);
 		shader.setUniformf("time", timer);
-		shader.setUniformf("flicker", 0.1f * amt);
-		shader.setUniformf("lightvariance", 0.05f * amt);
-		shader.setUniformf("blackandwhite", 1.0f * amt);
-		shader.setUniformf("oversaturation", 0.3f * amt);
-		shader.setUniformf("vignette", 1.0f * amt);
-		shader.setUniformf("scratches", 0.5f * (float)Math.pow(amt, 4));
-		shader.setUniformf("scratchsize", new Vector2(8, 200));
-		shader.setUniformf("splotches", 200 * (float)Math.pow(amt, 8));
+		shader.setUniformf("x_t", 0.1f);
+		shader.setUniformf("y_t", 0);
 		
 		shaderBatch.setShader(shader);
 		
 		shaderBatch.setProjectionMatrix(Util.getNormalProjection());
 		shaderBatch.begin();
+		
+		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);  
 		
 		shaderBatch.draw(shaderBuffer.getColorBufferTexture(),
 					0, 0,
