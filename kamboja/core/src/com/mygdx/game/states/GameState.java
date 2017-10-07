@@ -225,7 +225,7 @@ public class GameState extends State{
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		shader = new ShaderProgram(
 				Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/displacement.fs"));
+				Gdx.files.internal("shaders/default.fs"));
 		ShaderProgram.pedantic = false;
 		shaderBatch = new SpriteBatch(300, shader);
 		
@@ -650,21 +650,21 @@ public class GameState extends State{
 		shaderBuffer.end();
 
 		shader.begin();
-		
-		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
-		shaderBuffer.getColorBufferTexture().bind(0);
-	    shader.setUniformi("u_texture", 0); //passing first texture!!!
-
-	    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
-		waterDisplacement.bind(1);
-	    shader.setUniformi("displacement_map", 1); //passing second texture!!!
-	    
-	    
-		shader.setUniformf("intensity", 0.01f);
-		shader.setUniformf("time", timer);
-		shader.setUniformf("x_t", 0.1f);
-		shader.setUniformf("y_t", 0);
-		
+//		
+//		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
+//		shaderBuffer.getColorBufferTexture().bind(0);
+//	    shader.setUniformi("u_texture", 0); //passing first texture!!!
+//
+//	    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
+//		waterDisplacement.bind(1);
+//	    shader.setUniformi("displacement_map", 1); //passing second texture!!!
+//	    
+//	    
+//		shader.setUniformf("intensity", 0.01f);
+//		shader.setUniformf("time", timer);
+//		shader.setUniformf("x_t", 0.1f);
+//		shader.setUniformf("y_t", 0);
+//		
 		shaderBatch.setShader(shader);
 		
 		shaderBatch.setProjectionMatrix(Util.getNormalProjection());
