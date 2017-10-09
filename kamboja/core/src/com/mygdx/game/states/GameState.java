@@ -229,7 +229,8 @@ public class GameState extends State{
 		ShaderProgram.pedantic = false;
 		shaderBatch = new SpriteBatch(300, shader);
 		
-		binocularMask = new Texture("shaders/binoculars2.png");
+		binocularMask = new Texture("shaders/blackobama.jpg");
+		binocularMask.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		noiseTexture = new Texture("shaders/noisetex.jpg");
 		waterDisplacement = new Texture("shaders/water_displacement.jpg");
 		waterDisplacement.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -650,21 +651,21 @@ public class GameState extends State{
 		shaderBuffer.end();
 
 		shader.begin();
-//		
+//	
 //		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
 //		shaderBuffer.getColorBufferTexture().bind(0);
 //	    shader.setUniformi("u_texture", 0); //passing first texture!!!
 //
 //	    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
-//		waterDisplacement.bind(1);
+//		binocularMask.bind(1);
 //	    shader.setUniformi("displacement_map", 1); //passing second texture!!!
 //	    
 //	    
-//		shader.setUniformf("intensity", 0.01f);
+//		shader.setUniformf("intensity", 0.1f);
 //		shader.setUniformf("time", timer);
 //		shader.setUniformf("x_t", 0.1f);
 //		shader.setUniformf("y_t", 0);
-//		
+		
 		shaderBatch.setShader(shader);
 		
 		shaderBatch.setProjectionMatrix(Util.getNormalProjection());

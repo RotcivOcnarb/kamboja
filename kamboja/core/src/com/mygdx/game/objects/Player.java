@@ -744,6 +744,8 @@ public class Player implements Steerable<Vector2>{
 		flameAtk = atk;
 	}
 	
+	float sptCooldown = 0.1f;
+	
 	public void update(float delta){
 		if(!isDead())
 		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd), true);
@@ -782,6 +784,13 @@ public class Player implements Steerable<Vector2>{
 		
 		setSprintCooldown(getSprintCooldown() - delta);
 		
+		if(sprintCooldown > sptCooldown - 0.3) {
+			body.setLinearDamping(0);
+		}
+		else {
+			body.setLinearDamping(30);
+		}
+		
 		mana += 1f * delta;
 		
 		if(mana > 100) mana = 100;
@@ -813,10 +822,7 @@ public class Player implements Steerable<Vector2>{
 			
 			if(Gdx.input.isKeyJustPressed(Keys.SPACE) && !isDead() && !inputBlocked){
 				if(getSprintCooldown() < 0){
-					body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(3, 3), body.getWorldCenter(), true);
-					setSprintCooldown(0.5f);
-					if(GameState.SFX)
-					sprint.play();
+					dash();
 					}
 			}
 
@@ -914,6 +920,15 @@ public class Player implements Steerable<Vector2>{
 		}
 	}
 	
+	public void dash() {
+		body.setLinearVelocity(0, 0);
+		body.setLinearVelocity(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse));
+		body.setLinearDamping(0);
+		setSprintCooldown(sptCooldown);
+		if(GameState.SFX)
+		sprint.play();
+	}
+	
 	public void connected(Controller controller) {
 		
 	}
@@ -950,6 +965,8 @@ public class Player implements Steerable<Vector2>{
 	public boolean buttonUp(Controller controller, int buttonCode) {
 		return false;
 	}
+	float dashImpulse = 1;
+	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
 		if(!isDead() && !inputBlocked){
 			int xAxis = 0;
@@ -968,10 +985,7 @@ public class Player implements Steerable<Vector2>{
 				if(axisCode == Gamecube.ANAL_R){
 					if(value > 0.7){
 						if(getSprintCooldown() < 0){
-							body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(3, 3), body.getWorldCenter(), true);
-							setSprintCooldown(0.5f);
-						if(GameState.SFX)
-						sprint.play();
+							dash();
 						}
 					}
 				}
@@ -989,10 +1003,7 @@ public class Player implements Steerable<Vector2>{
 				if(axisCode == XBox.AXIS_RIGHT_TRIGGER){
 					if(value < -0.7){
 						if(getSprintCooldown() < 0){
-							body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(3, 3), body.getWorldCenter(), true);
-							setSprintCooldown(0.5f);
-						if(GameState.SFX)
-						sprint.play();
+							dash();
 						}
 					}
 				}
@@ -1012,10 +1023,7 @@ public class Player implements Steerable<Vector2>{
 				if(axisCode == Playstation3.R2){
 					if(value < -0.7){
 						if(getSprintCooldown() < 0){
-							body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(3, 3), body.getWorldCenter(), true);
-							setSprintCooldown(0.5f);
-						if(GameState.SFX)
-						sprint.play();
+							dash();
 						}
 					}
 				}
