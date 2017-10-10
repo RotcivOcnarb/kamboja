@@ -23,6 +23,7 @@ import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
@@ -534,6 +535,11 @@ public class MapSelect extends State{
 				select = Playstation3.X;
 				backbtn = Playstation3.CIRCLE;
 				startbtn = Playstation3.START;
+			}
+			else{
+				select = GenericController.X;
+				backbtn = GenericController.TRIANGLE;
+				startbtn = GenericController.START;
 			}
 			
 			if(buttonCode == select){

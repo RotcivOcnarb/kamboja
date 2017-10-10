@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 
@@ -281,6 +282,9 @@ public class KeyboardTyper {
 			}
 			else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 				select = Playstation3.X;
+			}
+			else{
+				select = GenericController.X;
 			}
 			
 			if(buttonCode == select){

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 
@@ -102,6 +103,10 @@ public class MenuCursors {
 			else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 				ax = Playstation3.LEFT_X;
 				ay = Playstation3.LEFT_Y;
+			}
+			else{
+				ax = GenericController.LEFT_X;
+				ay = GenericController.LEFT_Y;
 			}
 	
 			if(axisCode == ax){ //X

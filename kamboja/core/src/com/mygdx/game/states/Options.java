@@ -18,6 +18,7 @@ import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.KeyboardController;
@@ -257,6 +258,10 @@ public class Options extends State{
 				if(controller.getName().equals(XBox.getID())){
 					select = XBox.BUTTON_A;
 					backbtn = XBox.BUTTON_B;
+				}
+				else{
+					select = GenericController.X;
+					backbtn = GenericController.TRIANGLE;
 				}
 				
 				if(buttonCode == select){

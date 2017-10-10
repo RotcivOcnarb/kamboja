@@ -48,6 +48,7 @@ import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.BotController;
@@ -1199,6 +1200,9 @@ public class GameState extends State{
 		}
 		else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 			start = Playstation3.START;
+		}
+		else{
+			start = GenericController.START;
 		}
 		
 		if(isPause()){

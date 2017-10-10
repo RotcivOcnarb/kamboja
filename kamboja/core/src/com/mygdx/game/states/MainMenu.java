@@ -28,6 +28,7 @@ import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
@@ -723,6 +724,10 @@ public class MainMenu extends State{
 				}
 			}
 		}
+		else{
+			select = GenericController.X;
+			start = GenericController.START;
+		}
 		
 		if(buttonCode == select){
 			if(Util.getControllerID(controller) != -1){
@@ -924,6 +929,56 @@ public class MainMenu extends State{
 				}
 			}
 			
+		}
+		else{
+			if(value == GenericController.BUTTON_DPAD_DOWN){
+				if(Util.getControllerID(controller) != -1){
+					//KambojaMain.getControllers().remove(Util.getControllerID(controller));
+					if(controllerSelecion[Util.getControllerID(controller)] == 0)
+						controllerSelecion[Util.getControllerID(controller)] = 1;
+					else
+						controllerSelecion[Util.getControllerID(controller)] = 0;
+				}
+				change_sound();
+			}
+			if(value == GenericController.BUTTON_DPAD_UP){
+				if(Util.getControllerID(controller) != -1){
+					//KambojaMain.getControllers().remove(Util.getControllerID(controller));
+					if(controllerSelecion[Util.getControllerID(controller)] == 0)
+						controllerSelecion[Util.getControllerID(controller)] = 1;
+					else
+						controllerSelecion[Util.getControllerID(controller)] = 0;
+				}
+				change_sound();
+			}
+			
+			if(Util.getControllerID(controller) != -1){
+				if(value == GenericController.BUTTON_DPAD_RIGHT){
+					if(controllerSelecion[Util.getControllerID(controller)] == 0){
+						KambojaMain.getControllers().get(Util.getControllerID(controller)).nextWeapon();
+					}
+					else{
+						int player = KambojaMain.getControllers().get(Util.getControllerID(controller)).getPlayer();
+						player = nextPlayer(player);
+						KambojaMain.getControllers().get(Util.getControllerID(controller)).setPlayer(player);
+					}
+					arrowScale[Util.getControllerID(controller) * 2 + 1] = 1.3f;
+					change_sound();
+				}
+				if(value == GenericController.BUTTON_DPAD_LEFT){
+					if(controllerSelecion[Util.getControllerID(controller)] == 0){
+						KambojaMain.getControllers().get(Util.getControllerID(controller)).previousWeapon();
+					}
+					else{
+						int player = KambojaMain.getControllers().get(Util.getControllerID(controller)).getPlayer();
+						player = previousPlayer(player);
+						KambojaMain.getControllers().get(Util.getControllerID(controller)).setPlayer(player);
+					}
+					
+					arrowScale[Util.getControllerID(controller) * 2] = 1.3f;
+					change_sound();
+				}
+			}
 		}
 		}
 		return false;

@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.shift.Barrier;
@@ -950,6 +951,19 @@ public class Player implements Steerable<Vector2>{
 			else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 				z = Playstation3.R1;
 			}
+			else{
+				z = GenericController.R1;
+				
+				if(buttonCode == GenericController.R2){
+					if(getSprintCooldown() < 0){
+						dash();
+					}
+					
+				}
+				if(buttonCode == GenericController.L2){
+					getWeapon().analog = 1;
+				}
+			}
 			
 			if(buttonCode == z){
 				if(getShift() != null)
@@ -963,6 +977,19 @@ public class Player implements Steerable<Vector2>{
 	}
 
 	public boolean buttonUp(Controller controller, int buttonCode) {
+		
+		if(controller.getName().equals(Gamecube.getID())){
+		}
+		if(controller.getName().equals(XBox.getID())){				
+		}
+		else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
+		}
+		else{
+			if(buttonCode == GenericController.L2){
+				getWeapon().analog = 0;
+			}
+		}
+		
 		return false;
 	}
 	float dashImpulse = 1;
@@ -1032,6 +1059,13 @@ public class Player implements Steerable<Vector2>{
 						getWeapon().analog = value;
 					}
 				}
+			}
+			else{
+				xAxis = GenericController.LEFT_X;
+				yAxis = GenericController.LEFT_Y;
+				
+				xCam = GenericController.RIGHT_X;
+				yCam = GenericController.RIGHT_Y;
 			}
 			
 			if(axisCode == xAxis){
