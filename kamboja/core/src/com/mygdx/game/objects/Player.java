@@ -108,6 +108,7 @@ public class Player implements Steerable<Vector2>{
 	private static Sound grunt[] = new Sound[5];
 	private float legTimer = 0;
 	private float legAngle = 0;
+	private float dashImpulse = 3;
 	
 
 	static{
@@ -785,14 +786,7 @@ public class Player implements Steerable<Vector2>{
 		getShift().update(delta);
 		
 		setSprintCooldown(getSprintCooldown() - delta);
-		
-		if(sprintCooldown > sptCooldown - 0.3) {
-			body.setLinearDamping(0);
-		}
-		else {
-			body.setLinearDamping(30);
-		}
-		
+
 		mana += 1f * delta;
 		
 		if(mana > 100) mana = 100;
@@ -923,9 +917,7 @@ public class Player implements Steerable<Vector2>{
 	}
 	
 	public void dash() {
-		body.setLinearVelocity(0, 0);
-		body.setLinearVelocity(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse));
-		body.setLinearDamping(0);
+		body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse), body.getWorldCenter(), true);
 		setSprintCooldown(sptCooldown);
 		if(GameState.SFX)
 		sprint.play();
@@ -993,7 +985,7 @@ public class Player implements Steerable<Vector2>{
 		
 		return false;
 	}
-	float dashImpulse = 1;
+
 	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
 		if(!isDead() && !inputBlocked){

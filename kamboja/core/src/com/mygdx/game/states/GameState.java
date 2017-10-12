@@ -387,8 +387,8 @@ public class GameState extends State{
 		rockEffect.setMaxScale(1f/UNIT_SCALE * .03f);
 		
 		skullEffect = new PersistentParticleEffect(new Texture("imgs/skull.png"));
-		skullEffect.setMinScale(1f/UNIT_SCALE * .03f);
-		skullEffect.setMaxScale(1f/UNIT_SCALE * .03f);
+		skullEffect.setMinScale(1f/UNIT_SCALE);
+		skullEffect.setMaxScale(1f/UNIT_SCALE);
 		
 		explosion = new ParticleEffect();
 		explosion.load(Gdx.files.internal("particles/explosion.par"), Gdx.files.internal("particles"));
