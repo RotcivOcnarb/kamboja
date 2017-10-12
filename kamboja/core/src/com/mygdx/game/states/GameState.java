@@ -125,6 +125,7 @@ public class GameState extends State{
 	PersistentParticleEffect bloodEffect;
 	PersistentParticleEffect shellEffect;
 	PersistentParticleEffect rockEffect;
+	PersistentParticleEffect skullEffect;
 
 	private ParticleEffect explosion;
 	private ParticleEffectPool explosionPool;
@@ -385,11 +386,9 @@ public class GameState extends State{
 		rockEffect.setMinScale(1f/UNIT_SCALE * .03f);
 		rockEffect.setMaxScale(1f/UNIT_SCALE * .03f);
 		
-//		rock = new ParticleEffect();
-//		rock.load(Gdx.files.internal("particles/rockExplosion.par"), Gdx.files.internal("particles"));
-//		rock.scaleEffect(1f/UNIT_SCALE / 6f);
-//		rockPool = new ParticleEffectPool(rock, 0, 10);
-//		rockEffects = new ArrayList<PooledEffect>();
+		skullEffect = new PersistentParticleEffect(new Texture("imgs/skull.png"));
+		skullEffect.setMinScale(1f/UNIT_SCALE * .03f);
+		skullEffect.setMaxScale(1f/UNIT_SCALE * .03f);
 		
 		explosion = new ParticleEffect();
 		explosion.load(Gdx.files.internal("particles/explosion.par"), Gdx.files.internal("particles"));
@@ -615,6 +614,14 @@ public class GameState extends State{
 
 	}
 	
+	public void showSkull(Vector2 worldCenter, float angle){
+		skullEffect.setMinPos(worldCenter);
+		skullEffect.setMaxPos(worldCenter);
+		skullEffect.setMinAngle(angle);
+		skullEffect.setMaxAngle(angle);
+		skullEffect.addParticle();
+	}
+	
 	public void showExplosion(Vector2 pos){
 		ParticleEffect pe = explosionPool.obtain();
 		pe.setPosition(pos.x, pos.y);
@@ -750,6 +757,8 @@ public class GameState extends State{
 		bloodEffect.render(sb);
 		shellEffect.render(sb);
 		rockEffect.render(sb);
+		skullEffect.render(sb);
+		
 	}
 	
 	public void drawBlocks(SpriteBatch sb){
@@ -931,15 +940,8 @@ public class GameState extends State{
 			bloodEffect.update(delta);
 			shellEffect.update(delta);
 			rockEffect.update(delta);
-			
-//			for(int i = rockEffects.size() - 1; i >= 0; i --){
-//				ParticleEffect pe = rockEffects.get(i);
-//				pe.update(delta*2);
-//				if(pe.isComplete()){
-//					rockPool.free((PooledEffect) pe);
-//					rockEffects.remove(i);
-//				}
-//			}
+			skullEffect.update(delta);
+
 			for(int i = explosionEffects.size() - 1; i >= 0; i --){
 				ParticleEffect pe = explosionEffects.get(i);
 				pe.update(delta*3);

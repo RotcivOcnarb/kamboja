@@ -347,6 +347,7 @@ public class Player implements Steerable<Vector2>{
 					}
 					setDead(true);
 					body.getFixtureList().get(0).setSensor(true);
+					getState().showSkull(body.getWorldCenter(), getAngle());
 				}
 			}
 			if(gruntTimer < 0){
