@@ -17,6 +17,8 @@ public class MenuCursors {
 	private static Vector2[] cursorPosition;
 	private static Vector2[] cursorVelocity;
 
+	float speed[] = new float[4];
+	
 	public MenuCursors() {
 		//texturas dos cursores
 		if(cursors == null){
@@ -69,12 +71,22 @@ public class MenuCursors {
 		}
 		
 		for(int i = 0; i < 4; i ++){
-			cursorPosition[i].add(cursorVelocity[i].cpy().scl(delta*70));
+			if(cursorVelocity[i].len() > 0.2) {
+				speed[i] += delta*20;
+				if(speed[i] > 10) speed[i] = 10;
+			}
+			else {
+				speed[i] = 0;
+			}
+			
+			cursorPosition[i].add(cursorVelocity[i].cpy().scl(delta*70*speed[i]));
 			if(cursorPosition[i].x < 0) cursorPosition[i].x = 0;
 			if(cursorPosition[i].x > Gdx.graphics.getWidth() - 32) cursorPosition[i].x = Gdx.graphics.getWidth() - 32;
 			if(cursorPosition[i].y < 0) cursorPosition[i].y = 0;
 			if(cursorPosition[i].y > Gdx.graphics.getHeight() - 32) cursorPosition[i].y = Gdx.graphics.getHeight() - 32;
 		}
+		
+		
 	}
 	
 	public Vector2 getPosition(int index){
@@ -110,15 +122,15 @@ public class MenuCursors {
 			}
 	
 			if(axisCode == ax){ //X
-				if(Math.abs(value) > 0.2)
-				cursorVelocity[id].x = value * 10;
+				if(Math.abs(value) > 0.2) 
+				cursorVelocity[id].x = value;
 				else
 				cursorVelocity[id].x = 0;
 				
 			}
 			else if(axisCode == ay){ //Y
 				if(Math.abs(value) > 0.2)
-				cursorVelocity[id].y = -value * 10;
+				cursorVelocity[id].y = -value;
 				else
 				cursorVelocity[id].y = 0;
 			}

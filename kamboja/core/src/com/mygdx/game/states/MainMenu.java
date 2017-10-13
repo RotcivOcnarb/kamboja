@@ -930,8 +930,12 @@ public class MainMenu extends State{
 			}
 			
 		}
+		if(controller.getName().equals(Gamecube.getID())){
+		
+		}
 		else{
 			if(value == GenericController.BUTTON_DPAD_DOWN){
+				System.out.println("generic down");
 				if(Util.getControllerID(controller) != -1){
 					//KambojaMain.getControllers().remove(Util.getControllerID(controller));
 					if(controllerSelecion[Util.getControllerID(controller)] == 0)
