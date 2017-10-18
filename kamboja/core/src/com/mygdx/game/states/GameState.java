@@ -126,6 +126,7 @@ public class GameState extends State{
 	PersistentParticleEffect shellEffect;
 	PersistentParticleEffect rockEffect;
 	PersistentParticleEffect skullEffect;
+	PersistentParticleEffect bloodSpill;
 
 	private ParticleEffect explosion;
 	private ParticleEffectPool explosionPool;
@@ -146,13 +147,9 @@ public class GameState extends State{
 	
 	//shader stuff
 	
-	SpriteBatch shaderBatch;
-	ShaderProgram shader;
-	FrameBuffer shaderBuffer;
-	
-	Texture binocularMask;
-	Texture noiseTexture;
-	Texture waterDisplacement;
+	ShaderProgram overlay;
+	FrameBuffer beforeBlood;
+	FrameBuffer afterBlood;
 	
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
@@ -224,23 +221,16 @@ public class GameState extends State{
 		
 		//shader stuff
 		
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-		shader = new ShaderProgram(
+		beforeBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		afterBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+
+		overlay = new ShaderProgram(
 				Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/default.fs"));
+				Gdx.files.internal("shaders/overlay.fs"));
 		ShaderProgram.pedantic = false;
-		shaderBatch = new SpriteBatch(300, shader);
-		
-		binocularMask = new Texture("shaders/blackobama.jpg");
-		binocularMask.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		noiseTexture = new Texture("shaders/noisetex.jpg");
-		waterDisplacement = new Texture("shaders/water_displacement.jpg");
-		waterDisplacement.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
-		if (shader.getLog().length()!=0)
-			System.out.println(shader.getLog());
-		
-		System.out.println(shader.isCompiled());
+	
+		if (overlay.getLog().length()!=0)
+			System.out.println(overlay.getLog());
 		
 		setBullets(new ArrayList<Bullet>());
 		setFlameParticles(new ArrayList<Body>());
@@ -366,6 +356,10 @@ public class GameState extends State{
 		bloodEffect.setMaxLinDamp(10);
 		bloodEffect.setMinScale(1f/UNIT_SCALE * .3f);
 		bloodEffect.setMaxScale(1f/UNIT_SCALE * .3f);
+		
+		bloodSpill = new PersistentParticleEffect(new Texture("particles/blood_spill.png"));
+		bloodSpill.setMinScale(1f/UNIT_SCALE);
+		bloodSpill.setMaxScale(1f/UNIT_SCALE);
 		
 		shellEffect = new PersistentParticleEffect(new Texture("imgs/weapons/shell.png"));
 		shellEffect.setMinLinDamp(10);
@@ -598,6 +592,14 @@ public class GameState extends State{
 		bloodEffect.addParticle();
 	}
 	
+	public void showBloodSpill(Vector2 worldCenter, float scale){
+		bloodSpill.setMinPos(worldCenter);
+		bloodSpill.setMaxPos(worldCenter);
+		bloodSpill.setMinScale(1f/UNIT_SCALE * scale);
+		bloodSpill.setMaxScale(1f/UNIT_SCALE * scale);
+		bloodSpill.addParticle();
+	}
+	
 	public void showShell(Vector2 worldCenter, Vector2 direction) {
 		shellEffect.setMinPos(worldCenter);
 		shellEffect.setMaxPos(worldCenter);
@@ -634,16 +636,34 @@ public class GameState extends State{
 	//Render stuff
 	
 	public void render(SpriteBatch sb) {
-
-		shaderBuffer.begin();
 		
-		Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1f);
+		
+		beforeBlood.begin();
+		Gdx.gl.glClearColor(0.0f, 0.6f, 0.9f, 0.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		sb.setShader(null);
 		
 		drawBackgroundTiles(sb);
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		beforeBlood.end();
+		
+//	
+//			Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
+//			shaderBuffer.getColorBufferTexture().bind(0);
+//		    shader.setUniformi("u_texture", 0); //passing first texture!!!
+//
+//		    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
+//			binocularMask.bind(1);
+//		    shader.setUniformi("displacement_map", 1); //passing second texture!!!
+//		    
+//		    
+//			shader.setUniformf("intensity", 0.1f);
+//			shader.setUniformf("time", timer);
+//			shader.setUniformf("x_t", 0.1f);
+//			shader.setUniformf("y_t", 0);
+
 		drawPersistentParticles(sb);
 		drawBlocks(sb);
 		drawItems(sb);
@@ -654,43 +674,11 @@ public class GameState extends State{
 		drawDebug(sb);
 		drawPause(sb);
 		
-		Gdx.gl.glDisable(GL20.GL_BLEND);
 		
-		shaderBuffer.end();
+		
+		
 
-		shader.begin();
-//	
-//		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
-//		shaderBuffer.getColorBufferTexture().bind(0);
-//	    shader.setUniformi("u_texture", 0); //passing first texture!!!
-//
-//	    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
-//		binocularMask.bind(1);
-//	    shader.setUniformi("displacement_map", 1); //passing second texture!!!
-//	    
-//	    
-//		shader.setUniformf("intensity", 0.1f);
-//		shader.setUniformf("time", timer);
-//		shader.setUniformf("x_t", 0.1f);
-//		shader.setUniformf("y_t", 0);
-		
-		shaderBatch.setShader(shader);
-		
-		shaderBatch.setProjectionMatrix(Util.getNormalProjection());
-		shaderBatch.begin();
-		
-		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);  
-		
-		shaderBatch.draw(shaderBuffer.getColorBufferTexture(),
-					0, 0,
-					Gdx.graphics.getWidth(),
-					Gdx.graphics.getHeight(),
-					0, 0,
-					Gdx.graphics.getWidth(),
-					Gdx.graphics.getHeight(),
-					false, true);
-		
-		shaderBatch.end();
+
 	}
 
 	public void drawBackgroundTiles(SpriteBatch sb){
@@ -754,11 +742,62 @@ public class GameState extends State{
 	}
 	
 	public void drawPersistentParticles(SpriteBatch sb){
+
+		afterBlood.begin();
+		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		bloodSpill.render(sb);
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		afterBlood.end();
+		
+		renderBloodOverlay(sb);
+		
 		bloodEffect.render(sb);
 		shellEffect.render(sb);
 		rockEffect.render(sb);
 		skullEffect.render(sb);
+	}
+	
+	public void renderBloodOverlay(SpriteBatch sb){
 		
+		overlay.begin();
+		sb.setShader(overlay);
+		
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
+		beforeBlood.getColorBufferTexture().bind(0);
+		overlay.setUniformi("beforeBlood", 0);
+		
+		Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
+		afterBlood.getColorBufferTexture().bind(1);
+		overlay.setUniformi("afterBlood", 1);
+		
+		sb.setProjectionMatrix(Util.getNormalProjection());
+		
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+		
+		sb.begin();
+		sb.draw(beforeBlood.getColorBufferTexture(),
+				0, 0,
+				Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
+				0, 0,
+				Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
+				false, true);
+		sb.end();
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		
+		overlay.end();
+		sb.setShader(null);
+
+		
+		sb.setProjectionMatrix(camera.combined);
 	}
 	
 	public void drawBlocks(SpriteBatch sb){
@@ -941,6 +980,7 @@ public class GameState extends State{
 			shellEffect.update(delta);
 			rockEffect.update(delta);
 			skullEffect.update(delta);
+			bloodSpill.update(delta);
 
 			for(int i = explosionEffects.size() - 1; i >= 0; i --){
 				ParticleEffect pe = explosionEffects.get(i);

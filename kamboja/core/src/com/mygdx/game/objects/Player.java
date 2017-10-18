@@ -109,7 +109,7 @@ public class Player implements Steerable<Vector2>{
 	private float legTimer = 0;
 	private float legAngle = 0;
 	private float dashImpulse = 3;
-	
+	private float spillTimer = 0;
 
 	static{
 		for(int i = 0; i < 5; i ++){
@@ -759,6 +759,19 @@ public class Player implements Steerable<Vector2>{
 			
 			if(getFallingTimer() <= 0){
 				takeDamage(1000, null, false);
+			}
+		}
+		
+		if(!dead){
+			spillTimer -= delta;
+			if(spillTimer < 0){
+				spillTimer = life/maxLife;
+				
+				if(life < maxLife){
+					if(body.getLinearVelocity().len() > 1){
+						getState().showBloodSpill(body.getWorldCenter(), ((maxLife - life)/maxLife) * 0.5f);
+					}
+				}
 			}
 		}
 		
