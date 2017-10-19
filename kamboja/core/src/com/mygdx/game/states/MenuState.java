@@ -3,12 +3,14 @@ package com.mygdx.game.states;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -30,15 +32,18 @@ public class MenuState extends State{
 	
 	Texture[] exps = new Texture[5];
 	
-	float timer;
-	float bolinhaTimer = 0;
+	float globalTimer;
+	float timer = 0;
 	
 	float alpha = 1;
+	float shaderIntensity = 0;
+	float intensityTarget = 0;
 	
-	boolean canIntro = false;
-
 	ArrayList<ParticleEffect> explosions;
 	ArrayList<ParticleEffect> bolinhas;
+	
+	ShaderProgram shader;
+	FrameBuffer shaderBuffer;
 	
 	public MenuState(Manager manager) {
 		super(manager);
@@ -64,6 +69,17 @@ public class MenuState extends State{
 		
 		sr = new ShapeRenderer();
 		
+		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
+				Gdx.files.internal("shaders/color_shift.fs"));
+		
+		ShaderProgram.pedantic = false;
+		
+		if(shader.getLog().length() > 0){
+			System.out.println(shader.getLog());
+		}
+		
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		
 	}
 
 	public void dispose() {
@@ -71,8 +87,11 @@ public class MenuState extends State{
 	}
 
 	public void render(SpriteBatch sb) {
-			
+					
 		
+		//desenha menu no frameBuffer
+		shaderBuffer.begin();
+
 		sb.begin();
 		
 		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -96,7 +115,7 @@ public class MenuState extends State{
 				sombra_letras.getWidth() * factor,
 				sombra_letras.getHeight() * factor,
 				1, 1,
-				(float)Math.sin(timer)*2f,
+				(float)Math.sin(globalTimer)*2f,
 				0, 0,
 				sombra_letras.getWidth(),
 				sombra_letras.getHeight(),
@@ -109,7 +128,7 @@ public class MenuState extends State{
 				armas.getWidth() * factor,
 				armas.getHeight() * factor,
 				1, 1,
-				(float)Math.sin(timer + 0.5f)*2f,
+				(float)Math.sin(globalTimer + 0.5f)*2f,
 				0, 0,
 				armas.getWidth(),
 				armas.getHeight(),
@@ -122,7 +141,7 @@ public class MenuState extends State{
 				placa_letras.getWidth() * factor,
 				placa_letras.getHeight() * factor,
 				1, 1,
-				(float)Math.sin(timer)*2f,
+				(float)Math.sin(globalTimer)*2f,
 				0, 0,
 				placa_letras.getWidth(),
 				placa_letras.getHeight(),
@@ -135,13 +154,36 @@ public class MenuState extends State{
 				fumaca.getWidth() * factor,
 				fumaca.getHeight() * factor,
 				1, 1,
-				(float)Math.sin(timer)*2f,
+				(float)Math.sin(globalTimer)*2f,
 				0, 0,
 				fumaca.getWidth(),
 				fumaca.getHeight(),
 				false, false);	
 		
 		sb.end();
+		
+		//desenha frame buffer com shader aplicado
+		
+		shaderBuffer.end();
+		
+		shader.begin();
+		shader.setUniformf("intensity", shaderIntensity);
+		
+		sb.setShader(shader);
+			sb.begin();
+				sb.draw(shaderBuffer.getColorBufferTexture(),
+						0, 0,
+						Gdx.graphics.getWidth(),
+						Gdx.graphics.getHeight(),
+						0, 0,
+						Gdx.graphics.getWidth(),
+						Gdx.graphics.getHeight(),
+						false, true);
+			sb.end();	
+		sb.setShader(null);
+		shader.end();
+		
+		//desenha blackscreen
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -155,33 +197,38 @@ public class MenuState extends State{
 	}
 
 	public void update(float delta) {
-		timer += delta;
-		bolinhaTimer += delta;
-		if(canIntro)
+		globalTimer += delta;
+		timer -= delta;
 		alpha -= delta;
 		
 		if(alpha <= 0) alpha = 0;
 		
-		if(bolinhaTimer > 0f){
-			bolinhaTimer = 0;
+		shaderIntensity += (intensityTarget - shaderIntensity) / 10.0f;
+		
+		if(timer < 0){
+			timer = (float)Math.random() * 0.5f;
+			intensityTarget = (float)(Math.random() * 0.3f) - 0.15f;
+		}
+		
+		float factor = Gdx.graphics.getHeight() / 1080f;
+		
 			
 			ParticleEffect bolinhaP = 
 					new ParticleEffect(
 							bolinha, new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() * (5f/8f)),
-						new Vector2(0, 0), new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f, (float)((Math.random() - 0.5) * 2) * 0.07f));
+						new Vector2(0, 0), new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f * factor, (float)((Math.random() - 0.5) * 2) * 0.07f * factor));
 
 			bolinhaP.setScale(0);
 			bolinhas.add(bolinhaP);
-			
-		}
+
 			
 			
 				ParticleEffect pep = new ParticleEffect(exps[(int)(Math.random()*5)],
 						new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() * (5f/8f)),
 						new Vector2(0, 0),
-						new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f, (float)((Math.random() - 0.5) * 2) * 0.07f));
+						new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f * factor, (float)((Math.random() - 0.5) * 2) * 0.07f * factor));
 				pep.setAlpha(0);
-				pep.setScale(0.7f);
+				pep.setScale(0.7f * factor);
 				explosions.add(pep);
 
 		
@@ -197,8 +244,22 @@ public class MenuState extends State{
 		
 		for(int i = bolinhas.size() - 1; i >= 0; i --){
 			ParticleEffect pe = bolinhas.get(i);
-			pe.setScale(pe.getCounter() * pe.getRandom());
+			pe.setScale(pe.getCounter() * pe.getRandom() * factor);
 			pe.update(delta);
+			
+			if(pe.position.x < 0 - pe.tex.getWidth()/2 * pe.getScale()){
+				bolinhas.remove(pe);
+			}
+			if(pe.position.x > Gdx.graphics.getWidth() + pe.tex.getWidth()/2 * pe.getScale()){
+				bolinhas.remove(pe);
+			}
+			
+			if(pe.position.y < 0 - pe.tex.getHeight()/2 * pe.getScale()){
+				bolinhas.remove(pe);
+			}
+			if(pe.position.y> Gdx.graphics.getHeight() + pe.tex.getHeight()/2 * pe.getScale()){
+				bolinhas.remove(pe);
+			}
 		}
 	}
 
@@ -240,13 +301,6 @@ public class MenuState extends State{
 
 	public void resize(int width, int height) {
 		
-	}
-	
-	public boolean keyDown(int keycode) {
-		if(keycode == Keys.SPACE){
-			canIntro = true;
-		}
-		return false;
 	}
 	
 	public class ParticleEffect{
