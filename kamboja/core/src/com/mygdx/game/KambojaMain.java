@@ -12,6 +12,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.codedisaster.steamworks.SteamAPI;
+import com.codedisaster.steamworks.SteamException;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.shift.Barrier;
@@ -163,7 +165,13 @@ public class KambojaMain extends ApplicationAdapter {
 			HashMap<String, String> configs = new HashMap<String, String>();
 			String s;
 			while((s = br.readLine()) != null){
-				configs.put(s.split("=")[0], s.split("=")[1]);
+				try{
+					configs.put(s.split("=")[0], s.split("=")[1]);
+				}
+				catch(ArrayIndexOutOfBoundsException e){
+					
+				}
+				//System.out.println(s);
 			}
 			
 			br.close();
@@ -211,7 +219,7 @@ public class KambojaMain extends ApplicationAdapter {
 			GameState.LIGHTS = configs.get("Lights").toLowerCase().equals("true");
 			GameState.DEBUG = configs.get("DebugMode").toLowerCase().equals("true");
 			GameState.DIFFICULTY = Integer.parseInt(configs.get("BotDifficulty"));
-			
+			GameState.VOLUME = Float.parseFloat(configs.get("SFXVolume"));
 			
 			
 		} catch (FileNotFoundException e) {
@@ -230,6 +238,7 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	float gcTimer = 0;
 	public void render () {
+		//SteamAPI.runCallbacks();
 		//summons the garbage collector every 30 seconds
 		//not really sure if it makes any difference but nah, whatever
 		gcTimer += Gdx.graphics.getDeltaTime();
@@ -246,5 +255,10 @@ public class KambojaMain extends ApplicationAdapter {
 		manager.update(Gdx.graphics.getDeltaTime());
 		manager.render(sb);
 
+	}
+	
+	@Override
+	public void dispose(){
+		super.dispose();
 	}
 }

@@ -64,7 +64,7 @@ public class DoublePistol extends Weapon{
 				float radius = 2;
 				float dif = 0.05f;
 				if(GameState.SFX)
-				shoot.play(0.6f, (float)Math.random()*dif + (1f - dif/2f), 0);
+				shoot.play(0.6f * GameState.VOLUME, (float)Math.random()*dif + (1f - dif/2f), 0);
 				shootTimer = 0;
 				BodyDef def = new BodyDef();
 				def.bullet = true;

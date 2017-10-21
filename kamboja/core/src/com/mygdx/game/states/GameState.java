@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -11,9 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -141,6 +140,7 @@ public class GameState extends State{
 	public static boolean BETA_ITEMS;
 	public static boolean SFX = true;
 	public static int DIFFICULTY = 0;
+	public static float VOLUME = 1;
 
 	private boolean said_three, said_two, said_one, said_start;
 	private IslandBackground islandBackground;
@@ -150,6 +150,8 @@ public class GameState extends State{
 	ShaderProgram overlay;
 	FrameBuffer beforeBlood;
 	FrameBuffer afterBlood;
+	
+	Music music;
 	
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
@@ -217,9 +219,16 @@ public class GameState extends State{
 		gamepause.dispose();
 	}
 	
+	boolean exitMap = false;
+	
 	public void create() {
 		
 		//shader stuff
+		
+		if(music == null){
+			music = Gdx.audio.newMusic(Gdx.files.internal("music/the_league_of_mice.ogg"));
+			music.setLooping(true);
+		}
 		
 		beforeBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		afterBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -395,6 +404,8 @@ public class GameState extends State{
 		
 		getBlocks().clear();
 		
+		
+		
 		TiledMapTileLayer bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("breakable"));
 		if(bg != null){
 			for(int i = 0; i < mapWidth; i ++){
@@ -412,6 +423,9 @@ public class GameState extends State{
 					
 				}
 			}
+		}
+		else{
+			System.out.println("no -breakable- layer found (you put the breakable blocks there)");
 		}
 		bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("unbreakable"));
 		if(bg != null){
@@ -431,6 +445,9 @@ public class GameState extends State{
 				}
 			}
 		}
+		else{
+			System.out.println("no -unbreakable- layer found (you put the unbreakable blocks there)");
+		}
 		bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("fall"));
 		if(bg != null){
 			for(int i = 0; i < mapWidth; i ++){
@@ -448,6 +465,9 @@ public class GameState extends State{
 					
 				}
 			}
+		}
+		else{
+			System.out.println("no -fall- layer found (you put the blocks who players can fall there)");
 		}
 		bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("water"));
 		if(bg != null){
@@ -467,34 +487,80 @@ public class GameState extends State{
 				}
 			}
 		}
+		else{
+			System.out.println("no -water- layer found (you put the blocks that the player can shoot through, but can not pass)");
+		}
 
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
 				createPlayer(i);
 		}
 		
+		
+
+		BodyDef def = new BodyDef();
+		def.type = BodyType.StaticBody;
+		def.position.set(mapWidth * tilesize / 2 / UNIT_SCALE, mapHeight * tilesize /2/ UNIT_SCALE);
+		
+		Body b = world.createBody(def);
+		PolygonShape s = new PolygonShape();
+		s.setAsBox((mapWidth*tilesize)/2f / UNIT_SCALE, tilesize / UNIT_SCALE, new Vector2(0, ((mapHeight * tilesize)/2f + tilesize)/UNIT_SCALE), 0);
+		b.createFixture(s, 1);
+
+		s.setAsBox((mapWidth*tilesize)/2f / UNIT_SCALE, tilesize / UNIT_SCALE, new Vector2(0, -((mapHeight * tilesize)/2f + tilesize)/UNIT_SCALE), 0);
+		b.createFixture(s, 1);
+
+		s.setAsBox(tilesize / UNIT_SCALE, (mapHeight*tilesize)/2f / UNIT_SCALE, new Vector2(((mapWidth * tilesize)/2f + tilesize)/UNIT_SCALE, 0), 0);
+		b.createFixture(s, 1);
+
+		s.setAsBox(tilesize / UNIT_SCALE, (mapHeight*tilesize)/2f / UNIT_SCALE, new Vector2(-((mapWidth * tilesize)/2f + tilesize)/UNIT_SCALE, 0), 0);
+		b.createFixture(s, 1);
+		
+		s.dispose();
+		
+		b.setUserData("BLOCK");
+		
 		if(LIGHTS){
 			handler = new RayHandler(world);
 			handler.setCombinedMatrix(getCamera().combined);
 	
-			float ambientLight = Float.parseFloat(getTiledMap().getProperties().get("ambientLight", String.class));
-			
-			handler.setAmbientLight(0, 0, 0, ambientLight);
+			try{
+				float ambientLight = Float.parseFloat(getTiledMap().getProperties().get("ambientLight", String.class));
+				handler.setAmbientLight(0, 0, 0, ambientLight);
+			}
+			catch(Exception e ){
+				System.out.println("[MUST] no -ambientLight- propertie found, add it to the map properties (0.0 to 1.0)");
+				exitMap = true;
+			}
 		}
 		
 		if(LIGHTS){
 			MapLayer ml = getTiledMap().getLayers().get("Light");
-			for(MapObject mo : ml.getObjects()){
-				if(mo.getProperties().get("type").equals("light")){
-					float x = mo.getProperties().get("x", Float.class);
-					float y = mo.getProperties().get("y", Float.class);
-					float width = mo.getProperties().get("width", Float.class);
-					float height = mo.getProperties().get("height", Float.class);
-					int rays = Integer.parseInt(mo.getProperties().get("rays", String.class));
-					float distance = Float.parseFloat(mo.getProperties().get("distance", String.class));
-					
-					new box2dLight.PointLight(handler, rays, new Color(1, 1, 1, 0.3f), distance, (x+width/2) / UNIT_SCALE, (y+height/2) / UNIT_SCALE);
+			if(ml != null){
+				for(MapObject mo : ml.getObjects()){
+					if(mo.getProperties().get("type").equals("light")){
+						float x = mo.getProperties().get("x", Float.class);
+						float y = mo.getProperties().get("y", Float.class);
+						float width = mo.getProperties().get("width", Float.class);
+						float height = mo.getProperties().get("height", Float.class);
+						int rays = Integer.parseInt(mo.getProperties().get("rays", String.class));
+						float distance = Float.parseFloat(mo.getProperties().get("distance", String.class));
+						
+						new box2dLight.PointLight(handler, rays, new Color(1, 1, 1, 0.3f), distance, (x+width/2) / UNIT_SCALE, (y+height/2) / UNIT_SCALE);
+					}
 				}
 			}
+			else{
+				System.out.println("no -Light- layer found (you put your lights there)\n"
+						+ "Lights should be objects with properties:\n"
+						+ "\ttype: \"light\" (no quotes)"
+						+ "\trays: amount of raycasts (default 50)\n"
+						+ "\tdistance: distance the light can travel");
+			}
+		}
+		
+		if(exitMap){
+			System.out.println("Fix the [MUST] errors and run again");
+			System.exit(1);
 		}
 
 	}
@@ -527,16 +593,31 @@ public class GameState extends State{
 		def.type = BodyType.DynamicBody;
 		
 		MapLayer ml = getTiledMap().getLayers().get("Player");
-		for(MapObject mo : ml.getObjects()){
-			if(mo.getProperties().get("type").equals("player"+id)){
-				float x = mo.getProperties().get("x", Float.class);
-				float y = mo.getProperties().get("y", Float.class);
-				float width = mo.getProperties().get("width", Float.class);
-				float height = mo.getProperties().get("height", Float.class);
-				float angle = Float.parseFloat(mo.getProperties().get("angle", String.class));
-				def.position.set(new Vector2((x+width/2) / UNIT_SCALE, (y+height/2) /UNIT_SCALE));
-				def.angle = angle;
+		if(ml != null){
+			boolean found = false;
+			for(MapObject mo : ml.getObjects()){
+				Object val = mo.getProperties().get("type");
+				if(val.equals("player"+id)){
+						float x = mo.getProperties().get("x", Float.class);
+						float y = mo.getProperties().get("y", Float.class);
+						float width = mo.getProperties().get("width", Float.class);
+						float height = mo.getProperties().get("height", Float.class);
+						float angle = mo.getProperties().get("angle", Float.class);
+						def.position.set(new Vector2((x+width/2) / UNIT_SCALE, (y+height/2) /UNIT_SCALE));
+						def.angle = angle;
+						found = true;
+				}
 			}
+			if(!found){
+				System.out.println("[MUST] no -Player " +id+ "- spawn found\n"
+						+ "Object must be created at layer -Player- with properties:\n"
+						+ "\ttype: \"player" + id);
+				exitMap = true;
+			}
+		}
+		else{
+			System.out.println("[MUST] no -Player- layer found (you put the player spawns there)");
+			exitMap = true;
 		}
 
 		Body body = world.createBody(def);
@@ -560,29 +641,7 @@ public class GameState extends State{
 		body.setUserData(player);
 		f.setUserData(player);
 		getPlayers().add(player);
-		
-
-		def = new BodyDef();
-		def.type = BodyType.StaticBody;
-		def.position.set(mapWidth * tilesize / 2 / UNIT_SCALE, mapHeight * tilesize /2/ UNIT_SCALE);
-		
-		Body b = world.createBody(def);
-		PolygonShape s = new PolygonShape();
-		s.setAsBox((mapWidth*tilesize)/2f / UNIT_SCALE, tilesize / UNIT_SCALE, new Vector2(0, ((mapHeight * tilesize)/2f + tilesize)/UNIT_SCALE), 0);
-		b.createFixture(s, 1);
-
-		s.setAsBox((mapWidth*tilesize)/2f / UNIT_SCALE, tilesize / UNIT_SCALE, new Vector2(0, -((mapHeight * tilesize)/2f + tilesize)/UNIT_SCALE), 0);
-		b.createFixture(s, 1);
-
-		s.setAsBox(tilesize / UNIT_SCALE, (mapHeight*tilesize)/2f / UNIT_SCALE, new Vector2(((mapWidth * tilesize)/2f + tilesize)/UNIT_SCALE, 0), 0);
-		b.createFixture(s, 1);
-
-		s.setAsBox(tilesize / UNIT_SCALE, (mapHeight*tilesize)/2f / UNIT_SCALE, new Vector2(-((mapWidth * tilesize)/2f + tilesize)/UNIT_SCALE, 0), 0);
-		b.createFixture(s, 1);
-		
-		s.dispose();
-		
-		b.setUserData("BLOCK");
+	
 
 	}
 	
@@ -1008,6 +1067,7 @@ public class GameState extends State{
 			if(opacity > 1){
 				opacity = 1;
 				manager.changeState(3);
+				music.stop();
 				return;
 			}
 		}
@@ -1022,7 +1082,7 @@ public class GameState extends State{
 			targetMenuPos = Gdx.graphics.getHeight() * 1;
 			if(!said_three){
 				if(GameState.SFX)
-				three.play();
+				three.play(VOLUME);
 				said_three = true;
 			}
 		}
@@ -1030,7 +1090,7 @@ public class GameState extends State{
 			targetMenuPos = Gdx.graphics.getHeight() * 2;
 			if(!said_two){
 				if(GameState.SFX)
-				two.play();
+				two.play(VOLUME);
 				said_two = true;
 			}
 		}
@@ -1038,7 +1098,7 @@ public class GameState extends State{
 			targetMenuPos = Gdx.graphics.getHeight() * 3;
 			if(!said_one){
 				if(GameState.SFX)
-				one.play();
+				one.play(VOLUME);
 				said_one = true;
 			}
 		}
@@ -1046,7 +1106,7 @@ public class GameState extends State{
 			targetMenuPos = Gdx.graphics.getHeight() * 4;
 			if(!said_start){
 				if(GameState.SFX)
-				start.play();
+				start.play(VOLUME);
 				said_start = true;
 			}
 		}
@@ -1056,6 +1116,10 @@ public class GameState extends State{
 			inputBlocked = false;
 			else
 			inputBlocked = true;
+			
+			if(!music.isPlaying()){
+				music.play();
+			}
 		}
 		
 		for(int i = 0; i < getPlayers().size(); i ++){
@@ -1063,10 +1127,10 @@ public class GameState extends State{
 			if(getPlayers().get(i).isDead() && !getPlayers().get(i).said_ko){
 				int r = (int)(Math.random()*3f);
 				if(GameState.SFX){
-				ko[r].play(1.0f);
-				ko[r].play(1.0f);
-				ko[r].play(1.0f);
-				ko[r].play(1.0f);
+				ko[r].play(VOLUME);
+				ko[r].play(VOLUME);
+				ko[r].play(VOLUME);
+				ko[r].play(VOLUME);
 				}
 
 				getPlayers().get(i).said_ko = true;

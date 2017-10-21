@@ -1,8 +1,12 @@
 package com.mygdx.game.states;
 
+import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.Robot;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.GL20;
@@ -17,6 +21,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
+import com.mygdx.game.controllers.Gamecube;
 
 public class MenuState extends State{
 	
@@ -31,7 +36,7 @@ public class MenuState extends State{
 	ShapeRenderer sr;
 	
 	Texture[] exps = new Texture[5];
-	
+		
 	float globalTimer;
 	float timer = 0;
 	
@@ -44,6 +49,8 @@ public class MenuState extends State{
 	
 	ShaderProgram shader;
 	FrameBuffer shaderBuffer;
+	
+	Music music;
 	
 	public MenuState(Manager manager) {
 		super(manager);
@@ -58,6 +65,10 @@ public class MenuState extends State{
 		fumaca = new Texture("menu/fumaca.png");
 		placa_letras = new Texture("menu/placa_letras.png");
 		sombra_letras = new Texture("menu/sombra_letras.png");
+		
+		music = Gdx.audio.newMusic(Gdx.files.internal("music/sylvan_spring.ogg"));
+		music.setLooping(true);
+		//music.play();
 		
 		explosions = new ArrayList<MenuState.ParticleEffect>();
 		
@@ -278,8 +289,10 @@ public class MenuState extends State{
 	public boolean buttonUp(Controller controller, int buttonCode) {
 		return false;
 	}
+	
 
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
+		
 		return false;
 	}
 

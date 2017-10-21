@@ -71,7 +71,7 @@ public class Bazooka extends Weapon{
 				screenshake(0.4f);
 				
 				if(GameState.SFX)
-				torpedo[(int)(Math.random()*2f)].play(0.5f);
+				torpedo[(int)(Math.random()*2f)].play(0.5f * GameState.VOLUME);
 				
 				shootTimer = 0;
 				BodyDef def = new BodyDef();

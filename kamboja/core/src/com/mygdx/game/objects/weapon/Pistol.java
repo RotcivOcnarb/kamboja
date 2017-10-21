@@ -62,7 +62,7 @@ public class Pistol extends Weapon{
 				
 				float dif = 0.05f;
 				if(GameState.SFX)
-				shoot.play(0.6f, (float)Math.random()*dif + (1f - dif/2f), 0);
+				shoot.play(0.6f * GameState.VOLUME, (float)Math.random()*dif + (1f - dif/2f), 0);
 				
 				float radius = 5;
 				

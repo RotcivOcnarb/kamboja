@@ -88,7 +88,7 @@ public class Player implements Steerable<Vector2>{
 	private Texture arrow;
 	private static Texture[] players;
 	private TextureRegion player;
-	private Animation legsAnimation;
+	private Animation<TextureRegion> legsAnimation;
 	
 	private boolean dead = false;
 	private boolean throwBlood = false;
@@ -208,7 +208,7 @@ public class Player implements Steerable<Vector2>{
 		}
 	
 		
-		legsAnimation = new Animation(1f,
+		legsAnimation = new Animation<TextureRegion>(1f,
 				legFrames[5],
 				legFrames[6],
 				legFrames[7],
@@ -712,7 +712,7 @@ public class Player implements Steerable<Vector2>{
 				float y = mo.getProperties().get("y", Float.class);
 				float width = mo.getProperties().get("width", Float.class);
 				float height = mo.getProperties().get("height", Float.class);
-				float pAngle = Float.parseFloat(mo.getProperties().get("angle", String.class));
+				float pAngle = mo.getProperties().get("angle", Float.class);
 				body.setTransform(new Vector2((x+width/2) / GameState.UNIT_SCALE, (y+height/2) / GameState.UNIT_SCALE), 0);
 
 				angle = new Vector2((float)Math.sin(Math.toRadians(pAngle)), (float)Math.cos(Math.toRadians(pAngle)));
@@ -933,7 +933,7 @@ public class Player implements Steerable<Vector2>{
 		body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse), body.getWorldCenter(), true);
 		setSprintCooldown(sptCooldown);
 		if(GameState.SFX)
-		sprint.play();
+		sprint.play(GameState.VOLUME);
 	}
 	
 	public void connected(Controller controller) {

@@ -50,7 +50,7 @@ public class Item implements Steerable<Vector2>{
 		this.id = id;
 		
 		if(GameState.SFX)
-		spawn[(int)(Math.random()*4)].play();
+		spawn[(int)(Math.random()*4)].play(GameState.VOLUME);
 		
 		switch(id){
 		case ATTACK:
@@ -80,19 +80,19 @@ public class Item implements Steerable<Vector2>{
 		switch(id){
 		case ATTACK:
 			if(GameState.SFX)
-			fire.play();
+			fire.play(GameState.VOLUME);
 			break;
 		case DEFFENSE:
 			if(GameState.SFX)
-			deffense.play();
+			deffense.play(GameState.VOLUME);
 			break;
 		case SPEED:
 			if(GameState.SFX)
-			blow.play();
+			blow.play(GameState.VOLUME);
 			break;
 		case LIFE:
 			if(GameState.SFX)
-			life.play();
+			life.play(GameState.VOLUME);
 			break;
 		}
 	}

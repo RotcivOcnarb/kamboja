@@ -80,6 +80,7 @@ public class Minigun extends Weapon{
 				overheat_flag = false;
 				try{
 				if(GameState.SFX)
+					minigun.setVolume(GameState.VOLUME * 0.2f);
 				minigun.play();
 				}
 				catch(GdxRuntimeException e){
@@ -129,7 +130,7 @@ public class Minigun extends Weapon{
 				if(reload < 0){
 					if(!overheat_flag){
 						if(GameState.SFX)
-						overheat.play();
+						overheat.play(GameState.VOLUME);
 						overheat_flag = true;
 					}
 					minigun.stop();

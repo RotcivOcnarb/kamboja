@@ -62,7 +62,7 @@ public class Mp5 extends Weapon{
 			if(shootTimer > 0.1f && reload > 0){
 				float radius = 2;
 				if(GameState.SFX)
-				shoot.play(0.7f);
+				shoot.play(0.7f * GameState.VOLUME);
 				
 				knockback(0.3f);
 				

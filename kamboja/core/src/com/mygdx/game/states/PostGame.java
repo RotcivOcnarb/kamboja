@@ -145,7 +145,7 @@ public class PostGame extends State{
 		if(Gdx.input.isKeyJustPressed(Keys.ENTER)){
 			manager.changeState(1);
 			if(GameState.SFX)
-			sound_select.play();
+			sound_select.play(GameState.VOLUME);
 			
 			return;
 		}

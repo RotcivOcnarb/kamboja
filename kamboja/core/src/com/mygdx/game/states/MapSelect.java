@@ -2,6 +2,8 @@ package com.mygdx.game.states;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -9,6 +11,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -38,12 +41,12 @@ public class MapSelect extends State{
 	private ShapeRenderer sr;
 	private Color tempC;
 	private float timer;
-	private Texture thumbs[];
-	private String mapNames[];
-	private String mapTitles[];
+	private ArrayList<Texture> thumbs;
+	private ArrayList<String> mapNames;
+	private ArrayList<String> mapTitles;
 	private Background background;
 		
-	private float size[];
+	private ArrayList<Float> size;
 	private boolean selected[];
 	private int mapSelected;
 	
@@ -111,38 +114,35 @@ public class MapSelect extends State{
 			}
 		}
 		
-		if(size == null)
-		size = new float[6];
+		size = new ArrayList<Float>();
+		thumbs = new ArrayList<Texture>();
+		mapTitles = new ArrayList<String>();
+		mapNames = new ArrayList<String>();
+		File folder = new File("maps");
 		
-		selected = new boolean[size.length];
-		
-		if(thumbs == null)
-		thumbs = new Texture[size.length];
-		thumbs[0] = new Texture("imgs/thumb_mansion.png");
-		thumbs[1] = new Texture("imgs/thumb_grass.png");
-		thumbs[2] = new Texture("imgs/thumb_cross.png");
-		thumbs[3] = new Texture("imgs/thumb_island.png");
-		thumbs[4] = new Texture("imgs/thumb_library.png");
-		thumbs[5] = new Texture("imgs/thumb_random.png");
-		
-		if(mapNames == null)
-		mapNames = new String[size.length];
-		mapNames[0] = "maps/mansion.tmx";
-		mapNames[1] = "maps/grass.tmx";
-		mapNames[2] = "maps/cross.tmx";
-		mapNames[3] = "maps/island.tmx";
-		mapNames[4] = "maps/library.tmx";
-		mapNames[5] = "";
-		
-		if(mapTitles == null){
-			mapTitles = new String[size.length];
-			mapTitles[0] = "Mansion";
-			mapTitles[1] = "Grass";
-			mapTitles[2] = "Cross";
-			mapTitles[3] = "Island";
-			mapTitles[4] = "Library";
-			mapTitles[5] = "Random";
+		for(File f : folder.listFiles()){
+			if(f.getName().endsWith(".tmx")){
+				
+				System.out.println("path " + f.getPath());
+				mapNames.add(f.getPath());
+				
+				String thumbnailPath = "maps/thumb_" + f.getName().split("\\.")[0] + ".png";
+				System.out.println(thumbnailPath);
+				thumbs.add(new Texture(new FileHandle(new File(thumbnailPath))));
+				
+				String mapTitle = f.getName().replaceFirst(f.getName().substring(0, 1), f.getName().substring(0, 1).toUpperCase());
+				System.out.println(mapTitle.split("\\.")[0]);
+				mapTitles.add(mapTitle.split("\\.")[0]);
+				
+				size.add(0f);
+			}
 		}
+		mapNames.add("");
+		thumbs.add(new Texture(new FileHandle(new File("maps/thumb_random.png"))));
+		mapTitles.add("Random");
+		size.add(0f);
+
+		selected = new boolean[size.size()];
 		
 		cursors = new MenuCursors();
 		
@@ -196,12 +196,12 @@ public class MapSelect extends State{
 	
 	public void change_sound(){
 		if(GameState.SFX)
-		change_sound.play(0.7f, (float)Math.random()*0.1f + 0.95f, 0);
+		change_sound.play(0.7f * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 	}
 	
 	public void sound_select(){
 		if(GameState.SFX)
-		sound_select.play(0.5f, (float)Math.random()*0.1f + 0.95f, 0);
+		sound_select.play(0.5f * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 	}
 
 	public void render(SpriteBatch sb) {
@@ -217,8 +217,8 @@ public class MapSelect extends State{
 			}
 			
 			if(botcont >= 4){
-				mapSelected = (int)(Math.random() * (size.length-1));
-				KambojaMain.setMapName(mapNames[mapSelected]);
+				mapSelected = (int)(Math.random() * (size.size()-1));
+				KambojaMain.setMapName(mapNames.get(mapSelected));
 				targetPos = -100;
 				startPos = 100;
 				exiting = true;
@@ -236,10 +236,11 @@ public class MapSelect extends State{
 		tempC.set(1, 1, 1, 1);
 		sb.setColor(tempC);
 		sb.begin();
-			for(int i = 0; i < size.length; i ++){
+			for(int i = 0; i < size.size(); i ++){
 				int x = i % 3;
 				int y = i / 3;
-				sb.draw(thumbs[i], 50 + th/6 + th/3*x - size[i]/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size[i]/2, size[i], size[i]);
+				if(i < thumbs.size())
+				sb.draw(thumbs.get(i), 50 + th/6 + th/3*x - size.get(i)/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size.get(i)/2, size.get(i), size.get(i));
 			}
 
 			sb.end();
@@ -249,8 +250,8 @@ public class MapSelect extends State{
 			font.draw(sb, "Select level", Gdx.graphics.getWidth()/4 * 3 - layout.width/2 + titleX, Gdx.graphics.getHeight() - 100);
 			
 			if(mapSelected >= 0){
-				layout.setText(font, mapTitles[mapSelected]);
-				font.draw(sb, mapTitles[mapSelected], Gdx.graphics.getWidth()/4 * 3 - layout.width/2 + titleX, Gdx.graphics.getHeight() - 200);
+				layout.setText(font, mapTitles.get(mapSelected));
+				font.draw(sb, mapTitles.get(mapSelected), Gdx.graphics.getWidth()/4 * 3 - layout.width/2 + titleX, Gdx.graphics.getHeight() - 200);
 			}
 			
 			
@@ -317,8 +318,8 @@ public class MapSelect extends State{
 			deathX += (Gdx.graphics.getWidth() + 100 -deathX)/10.0f;
 			itemsX+= (Gdx.graphics.getWidth() + 100 -itemsX)/10.0f;
 					
-			for(int i = 0; i < size.length; i ++){
-				size[i] += (-size[i])/10.0f;
+			for(int i = 0; i < size.size(); i ++){
+				size.set(i, size.get(i) + (-size.get(i))/10.0f); 
 			}
 			
 			if(timer < -1){
@@ -363,11 +364,11 @@ public class MapSelect extends State{
 		for(int j = 0; j < 4; j ++){
 			if(Controllers.getControllers().size-1 >= j){
 				p.setLocation(cursors.getPosition(j).x + 16, cursors.getPosition(j).y + 16);
-				for(int i = 0; i < size.length; i ++){
+				for(int i = 0; i < size.size(); i ++){
 					
 					int x = i % 3;
 					int y = i / 3;
-					Rectangle2D rect = new Rectangle2D.Double(50 + th/6 + th/3*x - size[i]/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size[i]/2, size[i], size[i]);
+					Rectangle2D rect = new Rectangle2D.Double(50 + th/6 + th/3*x - size.get(i)/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size.get(i)/2, size.get(i), size.get(i));
 				
 					if(rect.contains(p)){
 						selected[i] = true;
@@ -376,16 +377,16 @@ public class MapSelect extends State{
 			}
 		}
 		
-		for(int i = 0; i < size.length; i ++){
+		for(int i = 0; i < size.size(); i ++){
 			if(timer > i*0.1f + 0.5){
 				if(mapSelected != i){
 					if(!selected[i])
-						size[i] += (th/3f * 0.8f - size[i])/10.0f;
+						size.set(i, size.get(i) + (th/3f * 0.8f - size.get(i))/10.0f);
 					else
-						size[i] += (th/3f * 1f - size[i])/10.0f;
+						size.set(i, size.get(i) + (th/3f * 1f - size.get(i))/10.0f);
 				}
 				else{
-					size[i] += (th/3f * 0.5f - size[i])/10.0f;
+					size.set(i, size.get(i) + (th/3f * 0.5f - size.get(i))/10.0f);
 				}
 			}
 		}
@@ -476,16 +477,16 @@ public class MapSelect extends State{
 							if(id != -1){
 								float th = Gdx.graphics.getWidth()*0.5f;
 
-								for(int i = 0; i < size.length; i ++){
+								for(int i = 0; i < size.size(); i ++){
 
 									int x = i % 3;
 									int y = i / 3;
-									tempRect.setFrame(50 + th/6 + th/3*x - size[i]/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size[i]/2, size[i], size[i]);
+									tempRect.setFrame(50 + th/6 + th/3*x - size.get(i)/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size.get(i)/2, size.get(i), size.get(i));
 								
 									if(tempRect.contains(p)){
 										mapSelected = i;
-										KambojaMain.setMapName(mapNames[i]);
-										size[i] = (float) (th/3f*1.2);
+										KambojaMain.setMapName(mapNames.get(i));
+										size.set(i, (float) (th/3f*1.2));
 										targetPos = 0;
 										change_sound();
 									}
@@ -498,7 +499,7 @@ public class MapSelect extends State{
 								if(tempRect.contains(p)){
 									if(mapSelected == 5){
 										mapSelected = (int) (Math.random() * 4);
-										KambojaMain.setMapName(mapNames[mapSelected]);
+										KambojaMain.setMapName(mapNames.get(mapSelected));
 									}
 									targetPos = -100;
 									startPos = 100;
@@ -600,16 +601,16 @@ public class MapSelect extends State{
 					if(Util.getControllerID(controller) != -1){
 						float th = Gdx.graphics.getWidth()*0.5f;
 
-						for(int i = 0; i < size.length; i ++){
+						for(int i = 0; i < size.size(); i ++){
 
 							int x = i % 3;
 							int y = i / 3;
-							tempRect.setFrame(50 + th/6 + th/3*x - size[i]/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size[i]/2, size[i], size[i]);
+							tempRect.setFrame(50 + th/6 + th/3*x - size.get(i)/2, Gdx.graphics.getHeight()/2 - (th/3f)*(y-1) - size.get(i)/2, size.get(i), size.get(i));
 						
 							if(tempRect.contains(p)){
 								mapSelected = i;
-								KambojaMain.setMapName(mapNames[i]);
-								size[i] = (float) (th/3f*1.2);
+								KambojaMain.setMapName(mapNames.get(i));
+								size.set(i, (float) (th/3f*1.2));
 								targetPos = 0;
 								change_sound();
 							}
@@ -622,7 +623,7 @@ public class MapSelect extends State{
 						if(tempRect.contains(p)){
 							if(mapSelected == 5){
 								mapSelected = (int) (Math.random() * 4);
-								KambojaMain.setMapName(mapNames[mapSelected]);
+								KambojaMain.setMapName(mapNames.get(mapSelected));
 							}
 							
 							targetPos = -100;
@@ -649,7 +650,7 @@ public class MapSelect extends State{
 					tempRect.setFrame(Gdx.graphics.getWidth()/4 * 3 - 150, startPos, 300, 100);
 					if(mapSelected == 5){
 						mapSelected = (int) (Math.random() * 4);
-						KambojaMain.setMapName(mapNames[mapSelected]);
+						KambojaMain.setMapName(mapNames.get(mapSelected));
 					}
 					targetPos = -100;
 					startPos = 100;

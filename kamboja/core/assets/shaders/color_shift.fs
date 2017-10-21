@@ -5,7 +5,7 @@ uniform float intensity;
 void main()
 {
 
-	float dist = length(v_texCoords - vec2(0.5, 0.5)) + 1;
+	float dist = length(v_texCoords - vec2(0.5, 0.5)) + 1.0;
 	
 	float r = texture2D(u_texture, v_texCoords + vec2(0.01 * intensity * dist, 0.0)).x;
 	float g = texture2D(u_texture, v_texCoords + vec2(-0.01 * intensity * dist, 0.0)).y;

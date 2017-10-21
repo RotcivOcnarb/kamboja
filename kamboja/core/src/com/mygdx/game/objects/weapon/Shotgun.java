@@ -59,7 +59,7 @@ public class Shotgun extends Weapon{
 		if(analog > 0.7){
 			if(shootTimer > 1f){
 				if(GameState.SFX)
-				shoot.play(0.7f);
+				shoot.play(0.7f * GameState.VOLUME);
 				
 				knockback(1.5f);
 				screenshake(0.3f);

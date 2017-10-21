@@ -153,7 +153,8 @@ public class Flamethrower extends Weapon{
 			
 			try{
 			if(GameState.SFX)
-			flamethrower.play();
+				flamethrower.setVolume(GameState.VOLUME);
+				flamethrower.play();
 			}
 			catch(GdxRuntimeException e){
 			}

@@ -69,11 +69,11 @@ public class BarrierObject {
 		if(life <= 0){
 			canRemove = true;
 			if(GameState.SFX)
-			destroy.play(0.5f);
+			destroy.play(0.5f * GameState.VOLUME);
 		}
 		else{
 			if(GameState.SFX)
-			hit.play(0.5f, (float)Math.random()*0.1f + 0.95f, 0);
+			hit.play(0.5f * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 		}
 	}
 	

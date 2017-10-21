@@ -260,7 +260,6 @@ public class Options extends State{
 					backbtn = XBox.BUTTON_B;
 				}
 				else{
-					System.out.println("generic");
 					select = GenericController.X;
 					backbtn = GenericController.TRIANGLE;
 				}

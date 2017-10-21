@@ -45,7 +45,7 @@ public class BazookaBullet extends Bullet{
 	
 	public void explosionDamage(){
 		if(GameState.SFX)
-		explosion.play(0.5f);
+		explosion.play(0.5f * GameState.VOLUME);
 		
 		player.getState().showExplosion(body.getPosition());
 		

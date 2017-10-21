@@ -239,7 +239,7 @@ public class Laser extends Weapon{
 		if(analog > 0.7){
 			if(shootTimer > 1f){
 				if(GameState.SFX)
-				laser.play();
+				laser.play(GameState.VOLUME);
 				opacity = 1;
 				
 				knockback(0.7f);

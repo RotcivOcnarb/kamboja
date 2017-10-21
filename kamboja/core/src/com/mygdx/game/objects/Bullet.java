@@ -19,7 +19,7 @@ public class Bullet {
 	
 	Texture bulletTex;
 	
-	Animation bulletAnimation;
+	Animation<TextureRegion> bulletAnimation;
 	float radius;
 	protected boolean canRemove = false;
 	public Player player;
@@ -56,7 +56,7 @@ public class Bullet {
 		
 		bulletTex = defaultBulletTex;
 		
-		bulletAnimation = new Animation(1/50f, new TextureRegion(muzzleTex), new TextureRegion(bulletTex));
+		bulletAnimation = new Animation<TextureRegion>(1/50f, new TextureRegion(muzzleTex), new TextureRegion(bulletTex));
 
 		trail = new TrailRenderer(body, 100, 3 / GameState.UNIT_SCALE);
 		switch(id){
@@ -78,7 +78,7 @@ public class Bullet {
 	
 	public void setTexture(Texture tex){
 		bulletTex = tex;
-		bulletAnimation = new Animation(1/10f, new TextureRegion(muzzleTex), new TextureRegion(bulletTex));
+		bulletAnimation = new Animation<TextureRegion>(1/10f, new TextureRegion(muzzleTex), new TextureRegion(bulletTex));
 	}
 
 	public void remove(){

@@ -809,17 +809,17 @@ public class MainMenu extends State{
 	
 	public void change_sound(){
 		if(GameState.SFX)
-		change_sound.play(0.7f, (float)Math.random()*0.1f + 0.95f, 0);
+		change_sound.play(0.7f * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 	}
 	
 	public void new_player(){
 		if(GameState.SFX)
-		new_player.play(1, (float)Math.random()*0.1f + 0.95f, 0);
+		new_player.play(1 * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 	}
 	
 	public void sound_select(){
 		if(GameState.SFX)
-		sound_select.play(0.5f, (float)Math.random()*0.1f + 0.95f, 0);
+		sound_select.play(0.5f * GameState.VOLUME, (float)Math.random()*0.1f + 0.95f, 0);
 	}
 	
 	public int nextPlayer(int player){
