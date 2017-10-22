@@ -211,40 +211,34 @@ public class BotPlayer extends Player
   
   public Player getNearestPlayer()
   {
-    Player nearest = (Player)getState().getPlayers().get(0);
+    Player nearest = null;
     for (Player p : getState().getPlayers()) {
       if (p != this)
       {
 
-        if ((nearest != p) && (isDead())) {
-          nearest = p;
-
-        }
-        else if ((nearest == this) && (p != this)) {
-          nearest = p;
-
+        if(nearest == null){
+        	if(!p.isDead())
+        	nearest = p;
         }
         else if ((p.getPosition().cpy().sub(getPosition()).len2() < nearest.getPosition().cpy().sub(getPosition()).len2()) && 
           (!isDead()))
           nearest = p;
+        	
+        
       }
     }
     return nearest;
   }
   
   public Player getWeakestPlayer() {
-    Player weakest = (Player)getState().getPlayers().get(0);
+    Player weakest = null;
     for (Player p : getState().getPlayers()) {
       if (p != this)
       {
 
-        if ((weakest != p) && (isDead())) {
-          weakest = p;
-
-        }
-        else if ((weakest == this) && (p != this)) {
-          weakest = p;
-
+        if (weakest == null){
+        	if(!p.isDead())
+        		weakest = p;
         }
         else if ((p.getLife() < weakest.getLife()) && 
           (!isDead()))

@@ -1,5 +1,6 @@
 package com.mygdx.game.objects;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ai.steer.Steerable;
@@ -13,10 +14,12 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
@@ -52,8 +55,13 @@ public class Player implements Steerable<Vector2>{
 	protected Vector2 angle = new Vector2();
 	protected float maxLife = 70;
 	protected float life = maxLife;
+	protected float stamina = 0;
+	protected int maxStamina = 10;
 	protected float mana = 100;
 	protected float speed = 10;
+	
+	float staminaWrnScl = 2;
+	float staminaWrnAlpha = 0;
 
 	private int id;
 	private int buff = -1;
@@ -86,6 +94,7 @@ public class Player implements Steerable<Vector2>{
 	private Texture aim;
 	private Texture atkTex, defTex, spdTex;
 	private Texture arrow;
+	private Texture stamina_on, stamina_off;
 	private static Texture[] players;
 	private TextureRegion player;
 	private Animation<TextureRegion> legsAnimation;
@@ -110,6 +119,12 @@ public class Player implements Steerable<Vector2>{
 	private float legAngle = 0;
 	private float dashImpulse = 3;
 	private float spillTimer = 0;
+	
+	ParticleEffect fire;
+	ParticleEffect wind;
+	ParticleEffect shield;
+	
+	ShaderProgram shader;
 
 	static{
 		for(int i = 0; i < 5; i ++){
@@ -191,6 +206,30 @@ public class Player implements Steerable<Vector2>{
 		this.setState(state);
 		body.setLinearDamping(30);
 		body.setFixedRotation(true);
+		
+		stamina = 0;
+		
+		stamina_off = new Texture("player/stamina_off.png");
+		stamina_on = new Texture("player/stamina_on.png");
+		
+		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"), Gdx.files.internal("shaders/motion_blur.fs"));
+		ShaderProgram.pedantic = false;
+		
+		if(shader.getLog().length() > 0){
+			System.out.println(shader.getLog());
+		}
+				
+		fire = new ParticleEffect();
+		fire.load(Gdx.files.internal("particles/firebuff.par"), Gdx.files.internal("particles"));
+		fire.scaleEffect(1f/GameState.UNIT_SCALE / 3f);
+		
+		wind = new ParticleEffect();
+		wind.load(Gdx.files.internal("particles/fast.par"), Gdx.files.internal("particles"));
+		wind.scaleEffect(1f/GameState.UNIT_SCALE / 3f);
+		
+		shield = new ParticleEffect();
+		shield.load(Gdx.files.internal("particles/shield.par"), Gdx.files.internal("particles"));
+		shield.scaleEffect(1f/GameState.UNIT_SCALE / 3f);
 		
 		if(players == null){
 			players = new Texture[KambojaMain.getPlayerSkinsSize()];
@@ -395,6 +434,19 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - legAngle);
+		
+		shader.begin();
+		sb.setShader(shader);
+		
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		shader.setUniformf("angle", (float)Math.toRadians(
+				body.getLinearVelocity().cpy().scl(1, -1).angle() - angle.cpy().scl(1, -1).angle() + 90
+				));
+		shader.setUniformf("intensity", body.getLinearVelocity().len() * 0.001f * (buff == Item.SPEED && buffTimer > 0 ? 1f : 0f));
+		shader.setUniformf("transparency", opacity);
+		
 		sb.draw(player,
 				body.getWorldCenter().x - player.getRegionWidth()/2 / GameState.UNIT_SCALE,
 				body.getWorldCenter().y - player.getRegionHeight()/2 / GameState.UNIT_SCALE,
@@ -405,6 +457,88 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - getAngle());
+		sb.end();
+	
+		shader.end();
+		sb.setShader(null);
+	
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		
+		sb.begin();
+		
+		sb.setColor(1, 1, 1, 0.4f);
+		float mag = 0.5f;
+		float scl = 0.3f;
+		for(int i = 0; i < maxStamina; i ++){
+			
+			Vector2 posAng = getPosition().cpy().add((float)Math.cos(i * (Math.PI*2)/maxStamina) * mag, (float)Math.sin(i * (Math.PI*2)/maxStamina) * mag);
+			
+			sb.draw(stamina_off,
+					posAng.x - (stamina_off.getWidth() / GameState.UNIT_SCALE * scl) /2,
+					posAng.y - (stamina_off.getHeight() / GameState.UNIT_SCALE * scl)/2,
+					stamina_off.getWidth() / GameState.UNIT_SCALE * scl,
+					stamina_off.getHeight() / GameState.UNIT_SCALE * scl);
+		}
+		sb.setColor(1, 1, 1, 1);
+		
+		for(int i = 0; i <(int)stamina; i ++){
+			
+			Vector2 posAng = getPosition().cpy().add((float)Math.cos(i * (Math.PI*2)/maxStamina) * mag, (float)Math.sin(i * (Math.PI*2)/maxStamina) * mag);
+			
+			sb.draw(stamina_on,
+					posAng.x - (stamina_on.getWidth() / GameState.UNIT_SCALE * scl) /2,
+					posAng.y - (stamina_on.getHeight() / GameState.UNIT_SCALE * scl)/2,
+					stamina_on.getWidth() / GameState.UNIT_SCALE * scl,
+					stamina_on.getHeight() / GameState.UNIT_SCALE * scl);
+		}
+		
+		Vector2 posAng = getPosition().cpy().add((float)Math.cos((int)(stamina-1) * (Math.PI*2)/maxStamina) * mag, (float)Math.sin((int)(stamina-1) * (Math.PI*2)/maxStamina) * mag);
+		
+		sb.setColor(1, 1, 1, staminaWrnAlpha);
+		
+		sb.draw(stamina_on,
+				posAng.x - (stamina_on.getWidth() / GameState.UNIT_SCALE * scl * staminaWrnScl) /2,
+				posAng.y - (stamina_on.getHeight() / GameState.UNIT_SCALE * scl * staminaWrnScl)/2,
+				stamina_on.getWidth() / GameState.UNIT_SCALE * scl * staminaWrnScl,
+				stamina_on.getHeight() / GameState.UNIT_SCALE * scl * staminaWrnScl);
+
+		sb.setColor(1, 1, 1, 1);
+		
+		if(buff == Item.ATTACK && buffTimer >= 0){
+			if(fire.isComplete()){
+				fire.reset();
+			}
+		}
+		else{
+			fire.allowCompletion();
+		}
+		
+		if(buff == Item.SPEED && buffTimer >= 0){
+			if(wind.isComplete()){
+				wind.reset();
+			}
+		}
+		else{
+			wind.allowCompletion();
+		}
+		
+		if(buff == Item.DEFFENSE && buffTimer >= 0){
+			if(shield.isComplete()){
+				shield.reset();
+			}
+		}
+		else{
+			shield.allowCompletion();
+		}
+		
+		sb.setColor(1, 1, 1, opacity);
+		fire.draw(sb);
+		wind.draw(sb);
+		shield.draw(sb);
+		
+		sb.setColor(1, 1, 1, 1);
+		
 		sb.end();
 
 		getWeapon().render(sb);
@@ -481,16 +615,16 @@ public class Player implements Steerable<Vector2>{
 
 		switch(getId()){
 		case 0:
-			font.setColor(0, 0, 1, 0.5f);
+			font.setColor(0, 0, 1, 1f);
 			break;
 		case 1:
-			font.setColor(1, 0, 0, 0.5f);
+			font.setColor(1, 0, 0, 1f);
 			break;
 		case 2:
-			font.setColor(0, 1, 0, 0.5f);
+			font.setColor(0, 1, 0, 1f);
 			break;
 		case 3:
-			font.setColor(1, 1, 0, 0.5f);
+			font.setColor(1, 1, 0, 1f);
 		}
 		
 		if(!isDead()){
@@ -546,150 +680,52 @@ public class Player implements Steerable<Vector2>{
 				}
 			}
 		break;
-		}
-		
+		}	
 	}
-	
 	uiTransparency += (targetUiTransparency - uiTransparency)/10.0f;
-	
-	dLife += (getLife() - dLife)/10.0f;
-	float lifeWidth = (int) (dLife/maxLife * life_bar.getWidth());
-	if(lifeWidth < 0) lifeWidth = 0;
 
-	dMana += (getMana() - dMana)/10.0f;
-	float manaWidth = (int) (dMana/100f * mana_bar.getWidth());
-	if(manaWidth < 0) manaWidth = 0;
-	
 	Gdx.gl.glEnable(GL20.GL_BLEND);
 	Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-	sb.setColor(1, 1, 1, uiTransparency);
-	sb.begin();
-	sr.begin(ShapeType.Filled);
-	sr.setProjectionMatrix(Util.getNormalProjection());
-	sr.setColor(0, 1, 0, uiTransparency);
-		switch(getId()){
-			case 0:
-				sr.rect(50, Gdx.graphics.getHeight() - life_bar.getHeight()*4 - 50, lifeWidth*4, life_amount.getRegionHeight()*4);
-				break;
-			case 1:
-				sr.rect(Gdx.graphics.getWidth() - life_bar.getWidth()*4 - 50, Gdx.graphics.getHeight() - life_bar.getHeight()*4 - 50, lifeWidth*4, life_amount.getRegionHeight()*4);
-				break;
-			case 2:
-				sr.rect(Gdx.graphics.getWidth() - life_bar.getWidth()*4 - 50, 50, lifeWidth*4, life_amount.getRegionHeight()*4);
-				break;
-			case 3:
-				sr.rect(50, 50, lifeWidth*4, life_amount.getRegionHeight()*4);
-				break;
-		}
-	sr.end();
-	sr.begin(ShapeType.Filled);
-	sr.setProjectionMatrix(Util.getNormalProjection());
-	sr.setColor(0, 0, 1, uiTransparency);
-		switch(getId()){
-			case 0:
-				sr.rect(50, Gdx.graphics.getHeight() - mana_bar.getHeight()*4 - 110, manaWidth*4, mana_amount.getRegionHeight()*4);
-				break;
-			case 1:
-				sr.rect(Gdx.graphics.getWidth() - mana_bar.getWidth()*4 - 50, Gdx.graphics.getHeight() - mana_bar.getHeight()*4 - 110, manaWidth*4, mana_amount.getRegionHeight()*4);
-				break;
-			case 2:
-				sr.rect(Gdx.graphics.getWidth() - mana_bar.getWidth()*4 - 50, 110, manaWidth*4, mana_amount.getRegionHeight()*4);
-				break;
-			case 3:
-				sr.rect(50, 110, manaWidth*4, mana_amount.getRegionHeight()*4);
-				break;
-		}
-	sr.end();
-	sb.end();
+	
+	switch(getId()){
+	case 0:
+		font.setColor(0, 0, 1, uiTransparency);
+		break;
+	case 1:
+		font.setColor(1, 0, 0, uiTransparency);
+		break;
+	case 2:
+		font.setColor(0, 1, 0, uiTransparency);
+		break;
+	case 3:
+		font.setColor(1, 1, 0, uiTransparency);
+	}
 	
 	sb.begin();
 	switch(getId()){
 		case 0:
-			sb.draw(life_case, 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42, life_case.getWidth()*4, life_case.getHeight()*4);
-			sb.draw(mana_case, 42, Gdx.graphics.getHeight() - mana_case.getHeight()*4 - 100, mana_case.getWidth()*4, mana_case.getHeight()*4);
-			font.draw(sb, "Deaths: " + getDeaths(), 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 100 - 20);
-			font.draw(sb, "Kills: " + getKills(), 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 100 - 50);
-			switch(getBuff()){
-			case Item.ATTACK:
-				sb.draw(atkTex, 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			case Item.DEFFENSE:
-				sb.draw(defTex, 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			case Item.SPEED:
-				sb.draw(spdTex, 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			}
-			if(getShift() != null)
-			sb.draw(getShift().getIcon(), 42 + 270, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
+			font.draw(sb, "Deaths: " + getDeaths(), 42, Gdx.graphics.getHeight() - 20);
+			font.draw(sb, "Kills: " + getKills(), 42, Gdx.graphics.getHeight() - 50);
 			break;
 		case 1:
-			sb.draw(life_case, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42, life_case.getWidth()*4, life_case.getHeight()*4);
-			sb.draw(mana_case, Gdx.graphics.getWidth() - mana_case.getWidth()*4 - 42, Gdx.graphics.getHeight() - mana_case.getHeight()*4 - 100, mana_case.getWidth()*4, life_case.getHeight()*4);
-
-			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 100 - 20);
-			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 100 - 50);
-			switch(getBuff()){
-			case Item.ATTACK:
-				sb.draw(atkTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			case Item.DEFFENSE:
-				sb.draw(defTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			case Item.SPEED:
-				sb.draw(spdTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
-				break;
-			}
-			if(getShift() != null)
-				sb.draw(getShift().getIcon(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 270, Gdx.graphics.getHeight() - life_case.getHeight()*4 - 42 - 140, 64, 64);
+			layout.setText(font, "Deaths: " + getDeaths());
+			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - 42 - layout.width, Gdx.graphics.getHeight() - 20);
+			layout.setText(font, "Kills: " + getKills());
+			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - 42 - layout.width, Gdx.graphics.getHeight() - 50);
 			break;
 		case 2:
-			sb.draw(life_case, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, 42, life_case.getWidth()*4, life_case.getHeight()*4);
-			sb.draw(mana_case, Gdx.graphics.getWidth() - mana_case.getWidth()*4 - 42, 100, mana_case.getWidth()*4, mana_case.getHeight()*4);
-
-			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, 100 + 100);
-			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42, 100 + 130);
-			switch(getBuff()){
-			case Item.ATTACK:
-				sb.draw(atkTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, 42 + 130, 64, 64);
-				break;
-			case Item.DEFFENSE:
-				sb.draw(defTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, 42 + 130, 64, 64);
-				break;
-			case Item.SPEED:
-				sb.draw(spdTex, Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 200, 42 + 130, 64, 64);
-				break;
-			}
-			if(getShift() != null)
-				sb.draw(getShift().getIcon(), Gdx.graphics.getWidth() - life_case.getWidth()*4 - 42 + 270, 42 + 130, 64, 64);
-
+			layout.setText(font, "Deaths: " + getDeaths());
+			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - 42 - layout.width, layout.height + 20);
+			layout.setText(font, "Kills: " + getKills());
+			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - 42 - layout.width, layout.height + 50);
 			break;
 		case 3:
-			sb.draw(life_case, 42, 42, life_case.getWidth()*4, life_case.getHeight()*4);
-			sb.draw(mana_case, 42, 100, mana_case.getWidth()*4, mana_case.getHeight()*4);
-
-			font.draw(sb, "Deaths: " + getDeaths(),  42, 100 + 100);
-			font.draw(sb, "Kills: " + getKills(),  42, 100 + 130);
-			switch(getBuff()){
-			case Item.ATTACK:
-				sb.draw(atkTex, 42 + 200, 42 + 130, 64, 64);
-				break;
-			case Item.DEFFENSE:
-				sb.draw(defTex, 42 + 200, 42 + 130, 64, 64);
-				break;
-			case Item.SPEED:
-				sb.draw(spdTex, 42 + 200, 42 + 130, 64, 64);
-				break;
-			}
-			if(getShift() != null)
-				sb.draw(getShift().getIcon(), 42 + 270, 42 + 130, 64, 64);
-			
+			font.draw(sb, "Deaths: " + getDeaths(),  42, layout.height + 20);
+			font.draw(sb, "Kills: " + getKills(),  42, layout.height + 50);
 			break;
 	}
 	
-	
 	sb.end();
-	
 	Gdx.gl.glDisable(GL20.GL_BLEND);
 	
 	}
@@ -762,6 +798,13 @@ public class Player implements Steerable<Vector2>{
 			}
 		}
 		
+		fire.update(delta);
+		fire.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
+		wind.update(delta);
+		wind.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
+		shield.update(delta);
+		shield.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
+		
 		if(!dead){
 			spillTimer -= delta;
 			if(spillTimer < 0){
@@ -783,8 +826,7 @@ public class Player implements Steerable<Vector2>{
 		if(calculateDifferenceBetweenAngles(getAngle(), legAngle) < -30){
 			legAngle = getAngle() - 30;
 		}
-		
-		
+
 		flameTimer -= delta;
 
 		if(flameTimer > 0){
@@ -794,6 +836,20 @@ public class Player implements Steerable<Vector2>{
 		else{
 			flameAtk = 1;
 		}
+		
+		int lastStamina = (int) stamina;
+		
+		stamina += delta;
+		if(stamina > maxStamina) stamina = maxStamina;
+		
+		if((int) stamina != lastStamina){
+			staminaWrnAlpha = 1;
+			staminaWrnScl = 1;
+		}
+		
+		staminaWrnAlpha += (0 - staminaWrnAlpha)/10.0f;
+		staminaWrnScl += (2 - staminaWrnScl)/10.0f;
+		
 		
 		if(getShift() != null)
 		getShift().update(delta);
@@ -930,10 +986,13 @@ public class Player implements Steerable<Vector2>{
 	}
 	
 	public void dash() {
-		body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse), body.getWorldCenter(), true);
-		setSprintCooldown(sptCooldown);
-		if(GameState.SFX)
-		sprint.play(GameState.VOLUME);
+		if(stamina >= 1){
+			body.applyLinearImpulse(body.getLinearVelocity().cpy().nor().scl(dashImpulse, dashImpulse), body.getWorldCenter(), true);
+			setSprintCooldown(sptCooldown);
+			if(GameState.SFX)
+			sprint.play(GameState.VOLUME);
+			stamina --;
+		}
 	}
 	
 	public void connected(Controller controller) {

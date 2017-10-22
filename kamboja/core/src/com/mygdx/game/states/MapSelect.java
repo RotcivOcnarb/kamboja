@@ -497,7 +497,7 @@ public class MapSelect extends State{
 								tempRect.setFrame(Gdx.graphics.getWidth()/4 * 3 - 150, startPos, 300, 100);
 								
 								if(tempRect.contains(p)){
-									if(mapSelected == 5){
+									if(mapSelected == mapNames.size() - 1){
 										mapSelected = (int) (Math.random() * 4);
 										KambojaMain.setMapName(mapNames.get(mapSelected));
 									}
@@ -621,7 +621,7 @@ public class MapSelect extends State{
 						tempRect.setFrame(Gdx.graphics.getWidth()/4 * 3 - 150, startPos, 300, 100);
 						
 						if(tempRect.contains(p)){
-							if(mapSelected == 5){
+							if(mapSelected == mapNames.size() - 1){
 								mapSelected = (int) (Math.random() * 4);
 								KambojaMain.setMapName(mapNames.get(mapSelected));
 							}
@@ -648,7 +648,7 @@ public class MapSelect extends State{
 				if(mapSelected != -1){
 					
 					tempRect.setFrame(Gdx.graphics.getWidth()/4 * 3 - 150, startPos, 300, 100);
-					if(mapSelected == 5){
+					if(mapSelected == mapNames.size() - 1){
 						mapSelected = (int) (Math.random() * 4);
 						KambojaMain.setMapName(mapNames.get(mapSelected));
 					}
