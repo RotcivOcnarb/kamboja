@@ -78,7 +78,7 @@ public class MainMenu extends State{
 	private boolean exiting; //if it is exiting the current state
 	private boolean optionsE; //if it is exiting the current state and heading to the Options state
 	
-	private KeyboardTyper[] typer; //the little keyboard players can write its name
+	private KeyboardTyper[] typer; //the little keyboard players can write its names
 	
 	public MainMenu(Manager manager) {
 		super(manager);
