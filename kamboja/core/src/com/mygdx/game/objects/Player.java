@@ -1,6 +1,7 @@
 package com.mygdx.game.objects;
 
-import com.badlogic.gdx.Game;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ai.steer.Steerable;
@@ -21,7 +22,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector2;
@@ -70,8 +70,6 @@ public class Player implements Steerable<Vector2>{
 	private int kills;
 	private float angle_walking = 0;
 	private float sprintCooldown = 0;
-	private float dLife = getLife();
-	private float dMana = getMana();
 	private float hitTimer = 0;
 	private float spd = 1;
 	private float atk = 1;
@@ -85,15 +83,8 @@ public class Player implements Steerable<Vector2>{
 	private float flameAtk = 1;
 	private float gruntTimer = 0;
 
-	private Texture life_bar;
-	private Texture mana_bar;
-	private Texture life_case;
-	private Texture mana_case;
-	private TextureRegion life_amount;
-	private TextureRegion mana_amount;
 	private Texture aim;
 	private Texture atkTex, defTex, spdTex;
-	private Texture arrow;
 	private Texture stamina_on, stamina_off;
 	private static Texture[] players;
 	private TextureRegion player;
@@ -123,6 +114,8 @@ public class Player implements Steerable<Vector2>{
 	ParticleEffect fire;
 	ParticleEffect wind;
 	ParticleEffect shield;
+	
+	ArrayList<Ghost> ghosts;
 	
 	ShaderProgram shader;
 
@@ -184,15 +177,10 @@ public class Player implements Steerable<Vector2>{
 	
 	public void dispose(){
 		aim.dispose();
-		arrow.dispose();
 		getWeapon().dispose();
 		atkTex.dispose();
 		defTex.dispose();
 		spdTex.dispose();
-		life_bar.dispose();
-		mana_bar.dispose();
-		life_case.dispose();
-		mana_case.dispose();
 		font.dispose();
 		sr.dispose();
 		if(getShift() != null){
@@ -211,6 +199,8 @@ public class Player implements Steerable<Vector2>{
 		
 		stamina_off = new Texture("player/stamina_off.png");
 		stamina_on = new Texture("player/stamina_on.png");
+		
+		ghosts = new ArrayList<Ghost>();
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"), Gdx.files.internal("shaders/motion_blur.fs"));
 		ShaderProgram.pedantic = false;
@@ -276,7 +266,6 @@ public class Player implements Steerable<Vector2>{
 		}
 
 		player = getTexture(KambojaMain.getControllers().get(id).player, 0);
-		arrow = new Texture("imgs/arrow.png");
 
 		switch(KambojaMain.getControllers().get(id).weapon){
 		case 0:
@@ -326,16 +315,7 @@ public class Player implements Steerable<Vector2>{
 		defTex = new Texture("imgs/shield.png");
 
 		spdTex = new Texture("imgs/speed.png");
-		
-		
-		life_bar = new Texture("imgs/life_bar.png");
-		mana_bar = new Texture("imgs/mana_bar.png");
-		life_case = new Texture("imgs/life_case.png");
-		mana_case = new Texture("imgs/mana_case.png");
-		
-		life_amount = new TextureRegion(life_bar, 0, 0, life_bar.getWidth(), life_bar.getHeight());
-		mana_amount = new TextureRegion(mana_bar, 0, 0, mana_bar.getWidth(), mana_bar.getHeight());
-		
+				
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
@@ -384,6 +364,7 @@ public class Player implements Steerable<Vector2>{
 					deaths++;
 					if(owner != null){
 						owner.kills ++;
+						owner.ghosts.add(new Ghost(getID(), getPosition()));
 					}
 					setDead(true);
 					body.getFixtureList().get(0).setSensor(true);
@@ -395,7 +376,6 @@ public class Player implements Steerable<Vector2>{
 				grunt[(int)(Math.random()*5)].play();
 				gruntTimer = 0.5f;
 			}
-			//imunity = 0.2f;
 		}
 	}
 	
@@ -461,11 +441,33 @@ public class Player implements Steerable<Vector2>{
 	
 		shader.end();
 		sb.setShader(null);
+
+		Gdx.gl.glDisable(GL20.GL_BLEND);
 	
 		
-		Gdx.gl.glDisable(GL20.GL_BLEND);
-		
 		sb.begin();
+		
+		for(int i = ghosts.size() - 1; i >= 0; i --){
+			Ghost g = ghosts.get(i);
+			
+			switch(g.color){
+			case 0:
+				sb.setColor(0.7f, 0.7f, 1f, opacity);
+				break;
+			case 1:
+				sb.setColor(1f, 0.7f, 0.7f, opacity);
+				break;
+			case 2:
+				sb.setColor(0.7f, 1f, 0.7f, opacity);
+				break;
+			case 3:
+				sb.setColor(1f, 1f, 0.7f, opacity);
+				break;
+				
+			}
+			
+			g.render(sb);
+		}
 		
 		sb.setColor(1, 1, 1, 0.4f);
 		float mag = 0.5f;
@@ -560,17 +562,9 @@ public class Player implements Steerable<Vector2>{
 			break;
 		case 3:
 			sb.setColor(1, 1, 0, 1);
+			break;
 		}
-		if(!isDead()){
-		sb.draw(arrow,
-				body.getWorldCenter().x - arrow.getWidth()/2 / GameState.UNIT_SCALE,
-				body.getWorldCenter().y - arrow.getWidth()/2 / GameState.UNIT_SCALE,
-				arrow.getWidth()/2 /GameState.UNIT_SCALE,
-				arrow.getWidth()/2 /GameState.UNIT_SCALE,
-				arrow.getWidth() /GameState.UNIT_SCALE,
-				arrow.getWidth() /GameState.UNIT_SCALE,
-				1, 1, 270 - angle.angle(), 0, 0, arrow.getWidth(), arrow.getHeight(), false, false);
-		}
+		
 		sb.setColor(1, 1, 1, 1);
 		
 
@@ -637,99 +631,7 @@ public class Player implements Steerable<Vector2>{
 		
 		
 	}
-	
-	public float uiTransparency = 1;
-	public float targetUiTransparency = 1;
-	
-	public void renderGUI(SpriteBatch sb) {
-	sb.setProjectionMatrix(Util.getNormalProjection());
-	
-	targetUiTransparency = 1;
-	
-	for(Player p : getState().getPlayers()){
-		
-		float rx = (p.getPosition().x - getState().getCamera().position.x)/getState().getCamera().zoom + Gdx.graphics.getWidth()/2;
-		float ry = (p.getPosition().y - getState().getCamera().position.y)/getState().getCamera().zoom + Gdx.graphics.getHeight()/2;
-		
-		switch(getId()){
-		case 0:
-			if(rx < life_bar.getWidth() + 400){
-				if(ry > Gdx.graphics.getHeight() - life_bar.getHeight() - 200){
-					targetUiTransparency = 0.2f;
-				}
-			}
-		break;
-		case 1:
-			if(rx > Gdx.graphics.getWidth() - life_bar.getWidth() - 400){
-				if(ry > Gdx.graphics.getHeight() - life_bar.getHeight() - 200){
-					targetUiTransparency = 0.2f;
-				}
-			}
-		break;
-		case 2:
-			if(rx> Gdx.graphics.getWidth() - life_bar.getWidth() - 400){
-				if(ry < life_bar.getHeight() + 200){
-					targetUiTransparency = 0.2f;
-				}
-			}
-		break;
-		case 3:
-			if(rx < life_bar.getWidth() + 400){
-				if(ry < life_bar.getHeight() + 200){
-					targetUiTransparency = 0.2f;
-				}
-			}
-		break;
-		}	
-	}
-	uiTransparency += (targetUiTransparency - uiTransparency)/10.0f;
 
-	Gdx.gl.glEnable(GL20.GL_BLEND);
-	Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-	
-	switch(getId()){
-	case 0:
-		font.setColor(0, 0, 1, uiTransparency);
-		break;
-	case 1:
-		font.setColor(1, 0, 0, uiTransparency);
-		break;
-	case 2:
-		font.setColor(0, 1, 0, uiTransparency);
-		break;
-	case 3:
-		font.setColor(1, 1, 0, uiTransparency);
-	}
-	
-	sb.begin();
-	switch(getId()){
-		case 0:
-			font.draw(sb, "Deaths: " + getDeaths(), 42, Gdx.graphics.getHeight() - 20);
-			font.draw(sb, "Kills: " + getKills(), 42, Gdx.graphics.getHeight() - 50);
-			break;
-		case 1:
-			layout.setText(font, "Deaths: " + getDeaths());
-			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - 42 - layout.width, Gdx.graphics.getHeight() - 20);
-			layout.setText(font, "Kills: " + getKills());
-			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - 42 - layout.width, Gdx.graphics.getHeight() - 50);
-			break;
-		case 2:
-			layout.setText(font, "Deaths: " + getDeaths());
-			font.draw(sb, "Deaths: " + getDeaths(), Gdx.graphics.getWidth() - 42 - layout.width, layout.height + 20);
-			layout.setText(font, "Kills: " + getKills());
-			font.draw(sb, "Kills: " + getKills(), Gdx.graphics.getWidth() - 42 - layout.width, layout.height + 50);
-			break;
-		case 3:
-			font.draw(sb, "Deaths: " + getDeaths(),  42, layout.height + 20);
-			font.draw(sb, "Kills: " + getKills(),  42, layout.height + 50);
-			break;
-	}
-	
-	sb.end();
-	Gdx.gl.glDisable(GL20.GL_BLEND);
-	
-	}
-	
 	public void revive(){
 		
 		setDead(false);
@@ -796,6 +698,12 @@ public class Player implements Steerable<Vector2>{
 			if(getFallingTimer() <= 0){
 				takeDamage(1000, null, false);
 			}
+		}
+		
+		for(int i = ghosts.size() - 1; i >= 0; i --){
+			Ghost g = ghosts.get(i);
+			g.update(delta);
+			g.setTargetPosition(getPosition());
 		}
 		
 		fire.update(delta);

@@ -926,10 +926,7 @@ public class GameState extends State{
 		
 		if(LIGHTS)
 		handler.updateAndRender();
-		
-		for(Player p : getPlayers()){
-			p.renderGUI(sb);
-		}
+
 		
 	}
 	

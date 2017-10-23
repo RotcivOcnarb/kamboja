@@ -310,9 +310,11 @@ public class BotPlayer extends Player
 //      botState = BotPlayer.BotState.HIDING;
 //    }
     
-    if ((life > 0.5 * maxLife) && (getNearestItem() != null) && 
-      (((Vector2)target.getPosition()).cpy().sub(getPosition()).len() > getNearestItem().getPosition().cpy().sub(getPosition()).len())) {
-      botState = BotPlayer.BotState.NEAREST_ITEM;
+    if(target != null){
+	    if ((life > 0.5 * maxLife) && (getNearestItem() != null) && 
+	      (((Vector2)target.getPosition()).cpy().sub(getPosition()).len() > getNearestItem().getPosition().cpy().sub(getPosition()).len())) {
+	      botState = BotPlayer.BotState.NEAREST_ITEM;
+	    }
     }
   }
   
