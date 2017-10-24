@@ -16,13 +16,15 @@ public class SenderInfoLoop implements Runnable{
 	
 	DatagramSocket server;
 	int port;
+	JTextArea area;
 	
 	public int getPort(){
 		return port;
 	}
 	
-	public SenderInfoLoop(int port) {
+	public SenderInfoLoop(JTextArea area, int port) {
 		this.port = port;
+		this.area = area;
 		try {
 			server = new DatagramSocket();
 		} catch (IOException e) {
@@ -36,11 +38,13 @@ public class SenderInfoLoop implements Runnable{
 			try{
 			switch(mode){
 			case DataIdentifier.PLAYER_SELECT:
+								
 				
-				DatagramSocket ds = new DatagramSocket();
 				//manda as informações de todos os manos pra todos os ips da sala
 				for(MultiplayerController target : ServerWindow.mpc){
 					for(MultiplayerController mc : ServerWindow.mpc){
+						
+						DatagramSocket ds = new DatagramSocket();
 						
 						byte[] bytes = new byte[9 + mc.getName().getBytes().length];
 						bytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
@@ -74,6 +78,10 @@ public class SenderInfoLoop implements Runnable{
 			
 		}
 		
+	}
+	
+	public void print(String s){
+		area.append("\n" + s);
 	}
 
 }

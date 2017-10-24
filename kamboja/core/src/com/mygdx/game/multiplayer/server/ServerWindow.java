@@ -93,16 +93,20 @@ public class ServerWindow extends JFrame implements WindowListener{
 		}
 	}
 	
-	ReceiveInfoLoop loop;
+	ReceiveInfoLoop receiver;
+	SenderInfoLoop sender;
 	public void startServer(JTextArea area){
 		
-		loop = new ReceiveInfoLoop(area, 3224);
-		
-		thread = new Thread(loop);
+		receiver = new ReceiveInfoLoop(area, 3224);
+		thread = new Thread(receiver);
 		thread.start();
 		
+		sender = new SenderInfoLoop(area, 3224);
+		Thread thread2 = new Thread(sender);
+		thread2.start();
+		
 		try {
-			area.append("Server started at IP " + Inet4Address.getLocalHost().getHostAddress() + " and port " + loop.getPort());
+			area.append("Server started at IP " + Inet4Address.getLocalHost().getHostAddress() + " and port " + receiver.getPort());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -118,7 +122,7 @@ public class ServerWindow extends JFrame implements WindowListener{
 	}
 
 	public void windowClosing(WindowEvent arg0) {
-		loop.dispose();
+		receiver.dispose();
 	}
 
 	public void windowDeactivated(WindowEvent arg0) {
