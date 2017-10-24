@@ -48,6 +48,7 @@ public class MainMenuReceiver implements Runnable{
 	public void run() {
 
 		while(!stop){
+			System.out.println("");
 			
 			try{
 				byte[] msg = new byte[256];
@@ -80,6 +81,7 @@ public class MainMenuReceiver implements Runnable{
 						if(mc == null){
 							KambojaMain.getControllers().add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier, index));
 							mainMenu.new_player();
+							System.out.println("Player detected");
 						}
 						else{
 							mc.setPlayer(skin);
