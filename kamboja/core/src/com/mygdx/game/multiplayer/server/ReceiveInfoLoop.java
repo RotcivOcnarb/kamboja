@@ -109,6 +109,11 @@ public class ReceiveInfoLoop implements Runnable{
 							
 							MultiplayerController pl = getMultiplayerController(identifier);
 							if(pl != null){
+								
+								if(pl.getPlayer() != skin || pl.getWeapon() != weapon || !pl.getName().equals(new String(name).trim())) {
+									print("Player updated to:\n\tSkin: " + skin + "\n\tWeapon: " + weapon + "\n\tName: " + new String(name).trim());
+								}
+								
 								pl.setPlayer(skin);
 								pl.setWeapon(weapon);
 								pl.setName(new String(name).trim());
