@@ -24,7 +24,7 @@ public class SenderInfoLoop implements Runnable{
 	public SenderInfoLoop(int port) {
 		this.port = port;
 		try {
-			server = new DatagramSocket(port);
+			server = new DatagramSocket();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
