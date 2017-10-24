@@ -31,6 +31,7 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.multiplayer.client.MainMenuSender;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.KeyboardController;
@@ -80,12 +81,18 @@ public class MainMenu extends State{
 	
 	private KeyboardTyper[] typer; //the little keyboard players can write its names
 	
+	//MULTIPLAYER STUFF
+	
+	Thread thread;
+	MainMenuSender sender; 
+	
 	public MainMenu(Manager manager) {
 		super(manager);
 	}
 	
 	public void dispose(){
 		sr.dispose();
+		sender.stop();
 		menuFont.dispose();
 		controllerFont.dispose();
 		logoMain.dispose();
@@ -110,6 +117,10 @@ public class MainMenu extends State{
 		timer = -1; //timer geral do estado
 		exiting = false; //se tá saindo
 		optionsE = false; //se tá indo pro menu de opçoes
+		
+		sender = new MainMenuSender(this);
+		thread = new Thread(sender);
+		thread.start();
 
 		tempC = new Color();
 		sr = new ShapeRenderer();
@@ -795,6 +806,7 @@ public class MainMenu extends State{
 				if(Util.getControllerID(controller) == -1){
 					if(KambojaMain.getControllers().size() < 4){
 						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "");
+						sender.connectPlayer(pc);
 						KambojaMain.getControllers().add(pc);
 						typer[KambojaMain.getControllers().size() - 1].show();
 						new_player();
@@ -1015,6 +1027,7 @@ public class MainMenu extends State{
 					}
 					
 					BotController bc = new BotController(pl);
+					sender.connectPlayer(bc);
 					KambojaMain.getControllers().add(bc);
 					new_player();
 				}
@@ -1040,6 +1053,7 @@ public class MainMenu extends State{
 		if(keycode == Keys.ENTER){
 			if(KambojaMain.getControllers().size() < 4 && timer > 4 && !hasKeyboard){
 				KeyboardController kc = new KeyboardController(0, firstPlayerAvailable(),  "");
+				sender.connectPlayer(kc);
 				KambojaMain.getControllers().add(kc);
 				typer[KambojaMain.getControllers().size()-1].show();
 				hasKeyboard = true;

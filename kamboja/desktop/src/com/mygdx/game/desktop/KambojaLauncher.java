@@ -5,6 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -14,6 +18,7 @@ import javax.swing.JPanel;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.multiplayer.DataIdentifier;
 
 public class KambojaLauncher {
 	public static void main (String[] arg) {
@@ -64,8 +69,31 @@ public class KambojaLauncher {
 			config.backgroundFPS = 60;
 			config.resizable = false;
 			
-
+		KambojaMain.HOST_IP = JOptionPane.showInputDialog("Digite o IP do servidor: ");
+		KambojaMain.PORT = Integer.parseInt(JOptionPane.showInputDialog("Digite a porta a ser utilizada"));
+			
+		//mandar uma confirmação pro servidor q tu conectou
+		
+		try{
+		InetAddress addr = InetAddress.getByName(KambojaMain.HOST_IP);
+		byte[] msgBytes = new byte[1 + addr.getAddress().length];
+		msgBytes[0] = DataIdentifier.SERVER_CONNECT;
+		for(int i = 0; i < addr.getAddress().length; i ++){
+			msgBytes[1 + i] = addr.getAddress()[i];
+		}
+		
+		DatagramPacket pkg;
+		pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
+		DatagramSocket ds = new DatagramSocket();
+		ds.send(pkg);
+		ds.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 		new LwjglApplication(new KambojaMain(), config);
+		
 		}
 	}
 	

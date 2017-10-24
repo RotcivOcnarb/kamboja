@@ -34,10 +34,10 @@ public class ServerWindow extends JFrame implements WindowListener{
 		
 		add(area);
 	}
-	SendInfoLoop loop;
+	ReceiveInfoLoop loop;
 	public void startServer(JTextArea area){
 		
-		loop = new SendInfoLoop(area, 3224);
+		loop = new ReceiveInfoLoop(area, 3224);
 		
 		thread = new Thread(loop);
 		thread.start();

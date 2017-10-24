@@ -44,6 +44,9 @@ public class KambojaMain extends ApplicationAdapter {
 	private static boolean items = true; 
 	public static final double SENSITIVITY = 1.5f;
 	
+	public static String HOST_IP;
+	public static int PORT;
+	
 	/**Lists all the controllers connected currently (of people that pressed "start", keyboard and bots
 	 * included)
 	 * 
