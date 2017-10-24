@@ -103,7 +103,7 @@ public class ReceiveInfoLoop implements Runnable{
 							}
 							
 							break;
-						case DataIdentifier.PLAYER_MAIN_MENU_INFO:
+						case DataIdentifier.SERVER_PLAYER_MAIN_MENU_INFO:
 							
 							skin = pack.getData()[1];
 							weapon = pack.getData()[2];

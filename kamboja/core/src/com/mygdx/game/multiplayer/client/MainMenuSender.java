@@ -96,7 +96,7 @@ public class MainMenuSender implements Runnable{
 						try{
 							
 							byte[] msgBytes = new byte[8 + controller.getName().getBytes().length];
-							msgBytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
+							msgBytes[0] = DataIdentifier.SERVER_PLAYER_MAIN_MENU_INFO;
 							msgBytes[1] = (byte)controller.getPlayer();
 							msgBytes[2] = (byte)controller.getWeapon();
 							for(int i = 0; i < 5; i ++){

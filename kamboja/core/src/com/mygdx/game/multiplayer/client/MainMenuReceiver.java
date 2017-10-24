@@ -61,7 +61,7 @@ public class MainMenuReceiver implements Runnable{
 				
 					switch(pack.getData()[0]){
 					
-					case DataIdentifier.PLAYER_MAIN_MENU_INFO:
+					case DataIdentifier.CLIENT_PLAYER_MAIN_MENU_INFO:
 						
 						int skin = pack.getData()[1];
 						int weapon = pack.getData()[2];
