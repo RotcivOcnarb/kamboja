@@ -43,7 +43,7 @@ public class MainMenuSender implements Runnable{
 	public void connectPlayer(PlayerController pc){
 		try {
 			
-			byte[] msgBytes = new byte[3 + pc.getName().getBytes().length];
+			byte[] msgBytes = new byte[8 + pc.getName().getBytes().length];
 			msgBytes[0] = DataIdentifier.PLAYER_CONNECTED;
 			msgBytes[1] = (byte)pc.getPlayer();
 			msgBytes[2] = (byte)pc.getWeapon();
@@ -94,7 +94,7 @@ public class MainMenuSender implements Runnable{
 					PlayerController controller = KambojaMain.getControllers().get(j);
 					if(!(controller instanceof MultiplayerController)){
 						try{
-							byte[] msgBytes = new byte[3 + controller.getName().getBytes().length];
+							byte[] msgBytes = new byte[8 + controller.getName().getBytes().length];
 							msgBytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
 							msgBytes[1] = (byte)controller.getPlayer();
 							msgBytes[2] = (byte)controller.getWeapon();
