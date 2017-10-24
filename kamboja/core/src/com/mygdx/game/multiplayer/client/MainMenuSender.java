@@ -87,9 +87,7 @@ public class MainMenuSender implements Runnable{
 			//-Nome
 			//-Skin
 			//-Arma
-			System.out.println("aa");
 			if(KambojaMain.getControllers() != null) {
-				System.out.println("bb");
 				//TODO: esse carinha aqui não tá enviando os pacotes quando o cliente e o server estão na mesma máquina
 				for(int j = KambojaMain.getControllers().size() - 1; j >= 0; j --){
 					System.out.println("cc");
@@ -113,7 +111,6 @@ public class MainMenuSender implements Runnable{
 							pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 						
 							ds.send(pkg);
-							System.out.println("FIM JOSGO");
 						}
 						catch(Exception e){
 							e.printStackTrace();

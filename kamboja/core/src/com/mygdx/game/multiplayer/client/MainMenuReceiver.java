@@ -34,7 +34,7 @@ public class MainMenuReceiver implements Runnable{
 		this.mainMenu = mainMenu;
 		try {
 			
-			server = new DatagramSocket(KambojaMain.PORT);
+			server = new DatagramSocket();
 			addr = InetAddress.getByName(KambojaMain.HOST_IP);
 
 		
