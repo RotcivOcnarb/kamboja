@@ -96,10 +96,11 @@ public class ReceiveInfoLoop implements Runnable{
 							}
 							
 							MultiplayerController pl = getMultiplayerController(pack.getAddress(), skin);
-							
-							pl.setPlayer(skin);
-							pl.setWeapon(weapon);
-							pl.setName(new String(name).trim());
+							if(pl != null){
+								pl.setPlayer(skin);
+								pl.setWeapon(weapon);
+								pl.setName(new String(name).trim());
+							}
 							
 							break;
 						default:

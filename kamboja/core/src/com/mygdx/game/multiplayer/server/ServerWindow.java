@@ -71,14 +71,18 @@ public class ServerWindow extends JFrame implements WindowListener{
 	public void paint(Graphics g){
 		super.paint(g);
 		
-		for(int i = 0; i < mpc.size(); i ++){
-			
+		for(int i = 0; i < 4; i ++){
+			if(i < mpc.size()){
 			lbl[i].setText(
 					"Nome: " + mpc.get(i).getName() + " - " +
 					"Skin: " + mpc.get(i).getPlayer() + " - " +		
 					"Weapon: " + mpc.get(i).getWeapon() + " - " +
 					"Host: " + mpc.get(i).getAddress().getHostAddress()
 					);
+			}
+			else{
+				lbl[i].setText("");
+			}
 		}
 	}
 	
