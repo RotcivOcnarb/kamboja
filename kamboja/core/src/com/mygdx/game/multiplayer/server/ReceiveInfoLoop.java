@@ -111,7 +111,6 @@ public class ReceiveInfoLoop implements Runnable{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				System.out.println("players connected: " + ServerWindow.mpc.size());
 			}
 		
 		
