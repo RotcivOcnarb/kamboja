@@ -29,6 +29,7 @@ public class ServerWindow extends JFrame implements WindowListener{
 		janela.setLocationRelativeTo(null);
 		janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		janela.setVisible(true);
+
 	}
 	
 	Thread thread;

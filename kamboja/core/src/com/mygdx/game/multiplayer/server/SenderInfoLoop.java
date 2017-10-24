@@ -42,13 +42,16 @@ public class SenderInfoLoop implements Runnable{
 				for(MultiplayerController target : ServerWindow.mpc){
 					for(MultiplayerController mc : ServerWindow.mpc){
 						
-						byte[] bytes = new byte[4 + mc.getName().getBytes().length];
+						byte[] bytes = new byte[9 + mc.getName().getBytes().length];
 						bytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
 						bytes[1] = (byte)mc.getPlayer();
 						bytes[2] = (byte)mc.getWeapon();
 						bytes[3] = (byte)ServerWindow.mpc.indexOf(mc);
+						for(int i = 0; i < 5; i ++){
+							bytes[4 + i] = mc.getIdentifier()[i];
+						}
 						for(int i = 0; i < mc.getName().getBytes().length; i ++){
-							bytes[4 + i] = mc.getName().getBytes()[i];
+							bytes[9 + i] = mc.getName().getBytes()[i];
 						}
 						
 						DatagramPacket pkg;

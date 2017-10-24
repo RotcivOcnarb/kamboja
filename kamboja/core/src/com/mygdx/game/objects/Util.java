@@ -26,5 +26,16 @@ public class Util {
 		}
 		return -1;
 	}
+	
+	
+	public static boolean compareID(byte[] id1, byte[] id2){
+		for(int i = 0; i < 5; i ++){
+			if(Byte.compare(id1[i], id2[i]) != 0){
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 }

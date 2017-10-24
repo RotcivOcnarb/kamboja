@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 
 import com.mygdx.game.multiplayer.DataIdentifier;
 import com.mygdx.game.multiplayer.MultiplayerController;
+import com.mygdx.game.objects.Util;
 
 public class ReceiveInfoLoop implements Runnable{
 
@@ -57,6 +58,13 @@ public class ReceiveInfoLoop implements Runnable{
 							
 							print("IP " + ip + " CONNECTED");
 							
+							for(int i = ServerWindow.mpc.size() - 1; i >= 0; i --){
+								MultiplayerController mc = ServerWindow.mpc.get(i);
+								if(mc.getAddress().getHostAddress().equals(pack.getAddress().getHostAddress())){
+									ServerWindow.mpc.remove(mc);
+								}
+							}
+							
 							break;
 						case DataIdentifier.SERVER_DISCONNECT:
 							ip = pack.getAddress().getHostAddress();
@@ -77,8 +85,9 @@ public class ReceiveInfoLoop implements Runnable{
 							for(int i = 0; i < name.length; i ++){
 								name[i] = pack.getData()[i + 8];
 							}
-						
-							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier));
+							MultiplayerController mc = new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier, ServerWindow.mpc.size());
+							
+							ServerWindow.mpc.add(mc);
 							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name).trim());
 							
 							break;
@@ -89,9 +98,12 @@ public class ReceiveInfoLoop implements Runnable{
 							for(int i = 0; i < 5; i ++){
 								identifier[i] = pack.getData()[1 + i];
 							}
+							mc = getMultiplayerController(identifier);
 							
-							ServerWindow.mpc.remove(getMultiplayerController(identifier));
-							print("Controller disconected from IP: " + pack.getAddress().getHostAddress());
+							if(mc != null){
+								ServerWindow.mpc.remove(mc);
+								print("Controller disconected from IP: " + pack.getAddress().getHostAddress());
+							}
 							
 							break;
 						case DataIdentifier.PLAYER_MAIN_MENU_INFO:
@@ -135,23 +147,14 @@ public class ReceiveInfoLoop implements Runnable{
 	
 	public MultiplayerController getMultiplayerController(byte[] identifier){
 		for(MultiplayerController mc : ServerWindow.mpc){
-			if(compareID(mc.getIdentifier(), identifier)){
+			if(Util.compareID(mc.getIdentifier(), identifier)){
 				return mc;
 			}
 		}
 		
 		return null;
 	}
-	
-	public boolean compareID(byte[] id1, byte[] id2){
-		for(int i = 0; i < 5; i ++){
-			if(Byte.compare(id1[i], id2[i]) != 0){
-				return false;
-			}
-		}
-		
-		return true;
-	}
+
 	
 	public void dispose(){
 		server.close();

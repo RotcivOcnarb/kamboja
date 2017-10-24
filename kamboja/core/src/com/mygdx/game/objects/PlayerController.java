@@ -10,13 +10,19 @@ public class PlayerController {
 	int player;
 	String name;
 	byte[] identifier = new byte[5];
+	int index;
 	
-	public PlayerController(int weapon, Controller controller, int player, String name, byte[] identifier){
+	public PlayerController(int weapon, Controller controller, int player, String name, byte[] identifier, int index){
 		this.weapon = weapon;
 		this.identifier = identifier;
 		this.controller = controller;
 		this.player = player;
 		this.name = name;
+		this.index = index;
+	}
+	
+	public int getIndex(){
+		return index;
 	}
 	
 	public static byte[] generateIdentifier(){

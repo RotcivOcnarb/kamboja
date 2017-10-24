@@ -310,6 +310,7 @@ public class KambojaMain extends ApplicationAdapter {
 			
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 			
+			for(int i = 0; i < 10; i ++)
 			ds.send(pkg);
 			
 			ds.close();
