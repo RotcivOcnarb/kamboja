@@ -574,6 +574,7 @@ public class MainMenu extends State{
 							
 						
 						if(recTemp.contains(pointer)){
+							sender.disconnectPlayer(id);
 							KambojaMain.getControllers().remove(id);
 							//cursorVelocity[id].set(0, 0);
 							typer[id].hide();
@@ -747,6 +748,7 @@ public class MainMenu extends State{
 				int id = Util.getControllerID(controller);
 				recTemp.setRect(Gdx.graphics.getWidth()/4 * id  + mg/2, controlPos[id] - 90, Gdx.graphics.getWidth()/4 - mg, 40);
 				if(recTemp.contains(pointer)){
+					sender.disconnectPlayer(Util.getControllerID(controller));
 					KambojaMain.getControllers().remove(Util.getControllerID(controller));
 					//cursorVelocity[id].set(0, 0);
 					typer[id].hide();

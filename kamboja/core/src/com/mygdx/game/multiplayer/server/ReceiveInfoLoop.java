@@ -11,14 +11,13 @@ import java.net.SocketException;
 import javax.swing.JTextArea;
 
 import com.mygdx.game.multiplayer.DataIdentifier;
+import com.mygdx.game.multiplayer.MultiplayerController;
 
 public class ReceiveInfoLoop implements Runnable{
 
-	public static final int PLAYER_SELECT = 0;
-	public static final int MAP_SELECT = 1;
-	public static final int GAME_STATE = 2;
+
 	
-	int mode = PLAYER_SELECT;
+	int mode = DataIdentifier.PLAYER_SELECT;
 	
 	DatagramSocket server;
 	JTextArea area;
@@ -58,6 +57,12 @@ public class ReceiveInfoLoop implements Runnable{
 							print("IP " + ip + " CONNECTED");
 							
 							break;
+						case DataIdentifier.SERVER_DISCONNECT:
+							ip = pack.getAddress().getHostAddress();
+							
+							print("IP " + ip + " DISCONNECTED");
+							
+							break;
 							
 						case DataIdentifier.PLAYER_CONNECTED:
 							
@@ -68,7 +73,31 @@ public class ReceiveInfoLoop implements Runnable{
 								name[i] = pack.getData()[i + 3];
 							}
 						
+							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name), pack.getAddress()));
 							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name));
+							
+							break;
+						case DataIdentifier.PLAYER_DISCONNECTED:
+
+							int index = pack.getData()[1];
+							
+							ServerWindow.mpc.remove(index);
+							print("Controller disconected from IP: " + pack.getAddress().getHostAddress() + " at index " + index);
+							
+							break;
+						case DataIdentifier.PLAYER_MAIN_MENU_INFO:
+							
+							skin = pack.getData()[1];
+							weapon = pack.getData()[2];
+							index = pack.getData()[3];
+							name = new byte[pack.getData().length - 4];
+							for(int i = 0; i < name.length; i ++){
+								name[i] = pack.getData()[i + 4];
+							}
+							
+							ServerWindow.mpc.get(index).setPlayer(skin);
+							ServerWindow.mpc.get(index).setWeapon(weapon);
+							ServerWindow.mpc.get(index).setName(new String(name));
 							
 							break;
 						default:

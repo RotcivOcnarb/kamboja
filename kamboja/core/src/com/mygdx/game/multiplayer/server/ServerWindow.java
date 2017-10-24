@@ -1,18 +1,28 @@
 package com.mygdx.game.multiplayer.server;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JScrollBar;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import com.mygdx.game.multiplayer.MultiplayerController;
 
 public class ServerWindow extends JFrame implements WindowListener{
 	private static final long serialVersionUID = 1L;
 
+	public static ArrayList<MultiplayerController> mpc;
+	
+	JLabel lbl[] = new JLabel[4];
+	
 	public static void main(String args[]){
 		JFrame janela = new ServerWindow();
 		janela.setSize(800, 600);
@@ -24,6 +34,9 @@ public class ServerWindow extends JFrame implements WindowListener{
 	Thread thread;
 
 	public ServerWindow() {
+		
+		mpc = new ArrayList<MultiplayerController>();
+		
 		setLayout(null);
 		addWindowListener(this);
 		
@@ -37,11 +50,38 @@ public class ServerWindow extends JFrame implements WindowListener{
 		area.setSize(600, 600);
 		area.setEditable(false);
 		
+		for(int i = 0; i < 4; i ++){
+			
+			lbl[i] = new JLabel();
+			
+			lbl[i].setLocation(600, i * 30);
+			lbl[i].setSize(200, 30);
+			lbl[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			
+			add(lbl[i]);
+		}
+		
 		startServer(area);
 		
 		sc.add(area);
 		add(sc);
 	}
+	
+	@Override
+	public void paint(Graphics g){
+		super.paint(g);
+		
+		for(int i = 0; i < mpc.size(); i ++){
+			
+			lbl[i].setText(
+					"Nome: " + mpc.get(i).getName() + " - " +
+					"Skin: " + mpc.get(i).getPlayer() + " - " +		
+					"Weapon: " + mpc.get(i).getWeapon() + " - " +
+					"Host: " + mpc.get(i).getAddress().getHostAddress()
+					);
+		}
+	}
+	
 	ReceiveInfoLoop loop;
 	public void startServer(JTextArea area){
 		

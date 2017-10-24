@@ -191,7 +191,6 @@ public class KambojaMain extends ApplicationAdapter {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Package sent");
 	
 		//Loads the config.ini file and sets all the parameters
 		try {
@@ -297,5 +296,29 @@ public class KambojaMain extends ApplicationAdapter {
 	@Override
 	public void dispose(){
 		super.dispose();
+		
+		try {
+			InetAddress addr;
+			addr = InetAddress.getByName(KambojaMain.HOST_IP);
+			DatagramSocket ds = new DatagramSocket();
+			
+			byte[] msgBytes = new byte[1];
+			msgBytes[0] = DataIdentifier.PLAYER_DISCONNECTED;
+			System.out.println(new String(msgBytes));
+
+			DatagramPacket pkg;
+			
+			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
+			
+			ds.send(pkg);
+			
+			ds.close();
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
