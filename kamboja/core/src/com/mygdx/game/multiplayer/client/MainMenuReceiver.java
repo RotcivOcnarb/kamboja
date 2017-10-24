@@ -3,8 +3,8 @@ package com.mygdx.game.multiplayer.client;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class MainMenuReceiver implements Runnable{
 	boolean stop = false;
 		
 	MainMenu mainMenu;
-	DatagramSocket server;
+	MulticastSocket server;
 	InetAddress addr;
 	
 	public void stop(){
@@ -34,13 +34,16 @@ public class MainMenuReceiver implements Runnable{
 		this.mainMenu = mainMenu;
 		try {
 			
-			server = new DatagramSocket();
+			
+			server = new MulticastSocket(KambojaMain.PORT);
 			addr = InetAddress.getByName(KambojaMain.HOST_IP);
 
 		
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

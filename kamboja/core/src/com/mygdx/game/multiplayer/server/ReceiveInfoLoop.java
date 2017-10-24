@@ -2,12 +2,8 @@ package com.mygdx.game.multiplayer.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.MulticastSocket;
 import java.net.SocketException;
-import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 
@@ -21,7 +17,7 @@ public class ReceiveInfoLoop implements Runnable{
 	
 	int mode = DataIdentifier.PLAYER_SELECT;
 	
-	DatagramSocket server;
+	MulticastSocket server;
 	JTextArea area;
 	int port;
 	
@@ -33,7 +29,8 @@ public class ReceiveInfoLoop implements Runnable{
 		this.area = area;
 		this.port = port;
 		try {
-			server = new DatagramSocket(port);
+			server = new MulticastSocket(port);
+			server.setReuseAddress(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
