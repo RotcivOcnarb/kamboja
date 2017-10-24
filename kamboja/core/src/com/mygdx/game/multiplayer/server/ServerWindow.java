@@ -19,7 +19,7 @@ import com.mygdx.game.multiplayer.MultiplayerController;
 public class ServerWindow extends JFrame implements WindowListener{
 	private static final long serialVersionUID = 1L;
 
-	public static ArrayList<MultiplayerController> mpc;
+	public static volatile ArrayList<MultiplayerController> mpc;
 	
 	JLabel lbl[] = new JLabel[4];
 	
