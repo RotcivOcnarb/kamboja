@@ -50,7 +50,6 @@ public class MainMenuSender implements Runnable{
 			for(int i = 0; i < pc.getName().getBytes().length; i ++){
 				msgBytes[3 + i] = pc.getName().getBytes()[i];
 			}
-			
 			DatagramPacket pkg;
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 			ds.send(pkg);
