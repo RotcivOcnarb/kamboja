@@ -98,8 +98,11 @@ public class MainMenuSender implements Runnable{
 							msgBytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
 							msgBytes[1] = (byte)controller.getPlayer();
 							msgBytes[2] = (byte)controller.getWeapon();
+							for(int i = 0; i < 5; i ++){
+								msgBytes[3 + i] = controller.getIdentifier()[i];
+							}
 							for(int i = 0; i < controller.getName().getBytes().length; i ++){
-								msgBytes[3 + i] = controller.getName().getBytes()[i];
+								msgBytes[8 + i] = controller.getName().getBytes()[i];
 							}
 							
 							DatagramPacket pkg;

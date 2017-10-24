@@ -73,10 +73,17 @@ public class ServerWindow extends JFrame implements WindowListener{
 		
 		for(int i = 0; i < 4; i ++){
 			if(i < mpc.size()){
+				String ID = "";
+				
+				for(int j = 0; j < 5; j ++){
+					ID += mpc.get(i).getIdentifier()[i] + "";
+				}
+				
 			lbl[i].setText(
 					"Nome: " + mpc.get(i).getName() + " - " +
 					"Skin: " + mpc.get(i).getPlayer() + " - " +		
 					"Weapon: " + mpc.get(i).getWeapon() + " - " +
+					"ID: " + ID + " - " +
 					"Host: " + mpc.get(i).getAddress().getHostAddress()
 					);
 			}
