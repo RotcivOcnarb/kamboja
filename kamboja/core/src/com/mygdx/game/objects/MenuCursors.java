@@ -62,7 +62,8 @@ public class MenuCursors {
 	
 	public void update(float delta){
 		int cont = 0;
-		for(PlayerController pc : KambojaMain.getControllers()){
+		for(int i = KambojaMain.getControllers().size() - 1; i >= 0; i --){
+			PlayerController pc = KambojaMain.getControllers().get(i);
 			if(pc instanceof KeyboardController){
 				cursorPosition[cont].x = Gdx.input.getX();
 				cursorPosition[cont].y = Gdx.graphics.getHeight() - Gdx.input.getY();
