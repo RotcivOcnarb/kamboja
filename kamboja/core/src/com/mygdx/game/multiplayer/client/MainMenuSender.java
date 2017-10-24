@@ -57,7 +57,6 @@ public class MainMenuSender implements Runnable{
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 			ds.send(pkg);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -75,7 +74,6 @@ public class MainMenuSender implements Runnable{
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 			ds.send(pkg);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -84,14 +82,12 @@ public class MainMenuSender implements Runnable{
 		
 		while(!stop){
 			
-			
-			//TODO: definir mensagem
-			
 			//Mandar para cada não-multiplayer-controller
 			//-Nome
 			//-Skin
 			//-Arma
 			if(KambojaMain.getControllers() != null) {
+				//TODO: esse carinha aqui não tá enviando os pacotes quando o cliente e o server estão na mesma máquina
 				for(int j = KambojaMain.getControllers().size() - 1; j >= 0; j --){
 					PlayerController controller = KambojaMain.getControllers().get(j);
 					if(!(controller instanceof MultiplayerController)){
