@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -88,9 +89,11 @@ public class KambojaLauncher {
 		ds.send(pkg);
 		ds.close();
 		}
-		catch(Exception e){
+		catch(IOException e){
 			e.printStackTrace();
 		}
+		
+		System.out.println("Package sent");
 		
 		new LwjglApplication(new KambojaMain(), config);
 		

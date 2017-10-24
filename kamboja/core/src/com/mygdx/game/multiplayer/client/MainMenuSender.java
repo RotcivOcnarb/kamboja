@@ -87,37 +87,30 @@ public class MainMenuSender implements Runnable{
 			//-Nome
 			//-Skin
 			//-Arma
-			
-			for(PlayerController controller : KambojaMain.getControllers()){
-				
-				if(!(controller instanceof MultiplayerController)){
-
-					try{
-						byte[] msgBytes = new byte[3 + controller.getName().getBytes().length];
-						msgBytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
-						msgBytes[1] = (byte)controller.getPlayer();
-						msgBytes[2] = (byte)controller.getWeapon();
-						for(int i = 0; i < controller.getName().getBytes().length; i ++){
-							msgBytes[3 + i] = controller.getName().getBytes()[i];
-						}
+			if(KambojaMain.getControllers() != null) {
+				for(PlayerController controller : KambojaMain.getControllers()){
+					if(!(controller instanceof MultiplayerController)){
+						try{
+							byte[] msgBytes = new byte[3 + controller.getName().getBytes().length];
+							msgBytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
+							msgBytes[1] = (byte)controller.getPlayer();
+							msgBytes[2] = (byte)controller.getWeapon();
+							for(int i = 0; i < controller.getName().getBytes().length; i ++){
+								msgBytes[3 + i] = controller.getName().getBytes()[i];
+							}
+							
+							DatagramPacket pkg;
+							pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
 						
-						DatagramPacket pkg;
-						pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
-					
-						ds.send(pkg);
+							ds.send(pkg);
+						}
+						catch(Exception e){
+							e.printStackTrace();
+						}
 					}
-					catch(Exception e){
-						e.printStackTrace();
-					}
-					
 				}
-				
 			}
-			
-			
-			
 		}
-		
 	}
 
 }
