@@ -173,11 +173,8 @@ public class KambojaMain extends ApplicationAdapter {
 					addr = InetAddress.getByName(KambojaMain.HOST_IP);
 					DatagramSocket ds = new DatagramSocket();
 					
-					byte[] msgBytes = new byte[1 + addr.getAddress().length];
+					byte[] msgBytes = new byte[1];
 					msgBytes[0] = DataIdentifier.SERVER_CONNECT;
-					for(int i = 0; i < addr.getAddress().length; i ++){
-						msgBytes[1 + i] = addr.getAddress()[i];
-					}
 					System.out.println(new String(msgBytes));
 
 					DatagramPacket pkg;

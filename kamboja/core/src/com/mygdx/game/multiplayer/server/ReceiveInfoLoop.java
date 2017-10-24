@@ -53,14 +53,7 @@ public class ReceiveInfoLoop implements Runnable{
 	
 					switch(pack.getData()[0]){
 						case DataIdentifier.SERVER_CONNECT:
-							
-							byte[] addr = new byte[pack.getData().length - 1];
-							for(int i = 0; i < addr.length; i ++){
-								addr[i] = pack.getData()[i+1];
-							}
-		
-							
-							String ip = InetAddress.getByAddress(addr).getHostAddress();
+							String ip = pack.getAddress().getHostAddress();
 							
 							print("IP " + ip + " CONNECTED");
 							
