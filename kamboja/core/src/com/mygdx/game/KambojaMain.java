@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,6 +17,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
+import com.mygdx.game.multiplayer.DataIdentifier;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.shift.Barrier;
@@ -158,6 +162,28 @@ public class KambojaMain extends ApplicationAdapter {
 		sb = new SpriteBatch();
 		manager = new Manager();
 		manager.create();
+		
+		//mandar uma confirmação pro servidor q tu conectou
+		
+				try{
+				InetAddress addr = InetAddress.getByName(KambojaMain.HOST_IP);
+				byte[] msgBytes = new byte[1 + addr.getAddress().length];
+				msgBytes[0] = DataIdentifier.SERVER_CONNECT;
+				for(int i = 0; i < addr.getAddress().length; i ++){
+					msgBytes[1 + i] = addr.getAddress()[i];
+				}
+				
+				DatagramPacket pkg;
+				pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
+				DatagramSocket ds = new DatagramSocket();
+				ds.send(pkg);
+				ds.close();
+				}
+				catch(IOException e){
+					e.printStackTrace();
+				}
+				
+				System.out.println("Package sent");
 	
 		//Loads the config.ini file and sets all the parameters
 		try {

@@ -73,27 +73,7 @@ public class KambojaLauncher {
 		KambojaMain.HOST_IP = JOptionPane.showInputDialog("Digite o IP do servidor: ");
 		KambojaMain.PORT = Integer.parseInt(JOptionPane.showInputDialog("Digite a porta a ser utilizada"));
 			
-		//mandar uma confirmação pro servidor q tu conectou
 		
-		try{
-		InetAddress addr = InetAddress.getByName(KambojaMain.HOST_IP);
-		byte[] msgBytes = new byte[1 + addr.getAddress().length];
-		msgBytes[0] = DataIdentifier.SERVER_CONNECT;
-		for(int i = 0; i < addr.getAddress().length; i ++){
-			msgBytes[1 + i] = addr.getAddress()[i];
-		}
-		
-		DatagramPacket pkg;
-		pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
-		DatagramSocket ds = new DatagramSocket();
-		ds.send(pkg);
-		ds.close();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		
-		System.out.println("Package sent");
 		
 		new LwjglApplication(new KambojaMain(), config);
 		
