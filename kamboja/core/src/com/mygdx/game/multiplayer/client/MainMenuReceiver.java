@@ -48,12 +48,13 @@ public class MainMenuReceiver implements Runnable{
 	public void run() {
 
 		while(!stop){
-			System.out.println("");
-			
 			try{
+				System.out.println("waiting for package");
 				byte[] msg = new byte[256];
 				DatagramPacket pack = new DatagramPacket(msg, msg.length);
 				server.receive(pack);
+
+				System.out.println("pack received");
 				
 					switch(pack.getData()[0]){
 					

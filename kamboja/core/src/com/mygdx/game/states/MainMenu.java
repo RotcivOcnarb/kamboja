@@ -95,7 +95,7 @@ public class MainMenu extends State{
 	public void dispose(){
 		sr.dispose();
 		sender.stop();
-		receiver.stop();
+		//receiver.stop();
 		menuFont.dispose();
 		controllerFont.dispose();
 		logoMain.dispose();
@@ -128,6 +128,7 @@ public class MainMenu extends State{
 		receiver = new MainMenuReceiver(this);
 		Thread thread2 = new Thread(receiver);
 		thread2.start();
+		System.out.println("receiver thread start");
 
 		tempC = new Color();
 		sr = new ShapeRenderer();
