@@ -23,8 +23,11 @@ public class ServerWindow extends JFrame implements WindowListener{
 	
 	JLabel lbl[] = new JLabel[4];
 	
+	JLabel lbl_sents;
+	
+	static JFrame janela;
 	public static void main(String args[]){
-		JFrame janela = new ServerWindow();
+		janela = new ServerWindow();
 		janela.setSize(1280, 600);
 		janela.setLocationRelativeTo(null);
 		janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,11 +35,17 @@ public class ServerWindow extends JFrame implements WindowListener{
 
 	}
 	
+	public static ServerWindow getInstance(){
+		return (ServerWindow) janela;
+	}
+	
 	Thread thread;
 
 	public ServerWindow() {
 		
 		mpc = new ArrayList<MultiplayerController>();
+		
+		
 		
 		setLayout(null);
 		addWindowListener(this);
@@ -56,15 +65,30 @@ public class ServerWindow extends JFrame implements WindowListener{
 			lbl[i] = new JLabel();
 			
 			lbl[i].setLocation(600, i * 30);
-			lbl[i].setSize(1280 - 600, 30);
+			lbl[i].setSize(1200 - 600, 30);
 			lbl[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			
 			add(lbl[i]);
 		}
 		
+		lbl_sents = new JLabel("0");
+		lbl_sents.setLocation(600, 500);
+		lbl_sents.setSize(1200 - 600, 30);
+		lbl_sents.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+		
+		add(lbl_sents);
+		
 		startServer(area);
 		sc.add(area);
 		add(sc);
+	}
+	
+	public void addSent(){
+		if(lbl_sents != null){
+			int cont = Integer.parseInt(lbl_sents.getText());
+			cont++;
+			lbl_sents.setText(cont + "");
+		}
 	}
 	
 	@Override
