@@ -39,12 +39,12 @@ public class SenderInfoLoop implements Runnable{
 			switch(mode){
 			case DataIdentifier.PLAYER_SELECT:
 								
-				
+				DatagramSocket ds = new DatagramSocket();
 				//manda as informações de todos os manos pra todos os ips da sala
 				for(MultiplayerController target : ServerWindow.mpc){
 					for(MultiplayerController mc : ServerWindow.mpc){
 						
-						DatagramSocket ds = new DatagramSocket();
+						
 						
 						byte[] bytes = new byte[9 + mc.getName().getBytes().length];
 						bytes[0] = DataIdentifier.PLAYER_MAIN_MENU_INFO;
@@ -63,9 +63,10 @@ public class SenderInfoLoop implements Runnable{
 					
 						ds.send(pkg);
 						
+						
 					}
 				}
-				
+				ds.close();
 				
 				break;
 			}
