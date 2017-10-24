@@ -40,7 +40,7 @@ public class KambojaMain extends ApplicationAdapter {
 	private SpriteBatch sb;
 	private Manager manager; //the list of states
 	
-	private static ArrayList<PlayerController> controllers; //all controllers connectes
+	private static volatile ArrayList<PlayerController> controllers; //all controllers connectes
 	private static int deathsNumber = 5;
 	private static int gameTime = 60 * 5;
 	private static ArrayList<Player> postGamePlayers;

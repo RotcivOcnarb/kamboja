@@ -40,16 +40,16 @@ public class ServerWindow extends JFrame implements WindowListener{
 		
 		setLayout(null);
 		addWindowListener(this);
-		
-		JScrollPane sc = new JScrollPane(null);
-		sc.setLayout(null);
-		sc.setLocation(0, 0);
-		sc.setSize(600, 600);
-		
+
 		JTextArea area = new JTextArea();
 		area.setLocation(0, 0);
 		area.setSize(600, 600);
 		area.setEditable(false);
+		
+		JScrollPane sc = new JScrollPane(area);
+		sc.setLayout(null);
+		sc.setLocation(0, 0);
+		sc.setSize(600, 600);
 		
 		for(int i = 0; i < 4; i ++){
 			
@@ -63,7 +63,6 @@ public class ServerWindow extends JFrame implements WindowListener{
 		}
 		
 		startServer(area);
-		
 		sc.add(area);
 		add(sc);
 	}

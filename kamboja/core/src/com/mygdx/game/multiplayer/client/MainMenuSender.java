@@ -87,7 +87,7 @@ public class MainMenuSender implements Runnable{
 			//-Nome
 			//-Skin
 			//-Arma
-			System.out.println("aa");
+			
 			if(KambojaMain.getControllers() != null) {
 				//TODO: esse carinha aqui não tá enviando os pacotes quando o cliente e o server estão na mesma máquina
 				for(int j = KambojaMain.getControllers().size() - 1; j >= 0; j --){
