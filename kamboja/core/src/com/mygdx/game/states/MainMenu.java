@@ -31,6 +31,7 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.multiplayer.client.MainMenuReceiver;
 import com.mygdx.game.multiplayer.client.MainMenuSender;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
@@ -85,6 +86,7 @@ public class MainMenu extends State{
 	
 	Thread thread;
 	MainMenuSender sender; 
+	MainMenuReceiver receiver;
 	
 	public MainMenu(Manager manager) {
 		super(manager);
@@ -93,6 +95,7 @@ public class MainMenu extends State{
 	public void dispose(){
 		sr.dispose();
 		sender.stop();
+		receiver.stop();
 		menuFont.dispose();
 		controllerFont.dispose();
 		logoMain.dispose();
@@ -121,6 +124,10 @@ public class MainMenu extends State{
 		sender = new MainMenuSender(this);
 		thread = new Thread(sender);
 		thread.start();
+		
+		receiver = new MainMenuReceiver(this);
+		Thread thread2 = new Thread(receiver);
+		thread2.start();
 
 		tempC = new Color();
 		sr = new ShapeRenderer();
