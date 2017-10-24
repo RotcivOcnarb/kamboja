@@ -6,6 +6,8 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class ServerWindow extends JFrame implements WindowListener{
@@ -25,6 +27,11 @@ public class ServerWindow extends JFrame implements WindowListener{
 		setLayout(null);
 		addWindowListener(this);
 		
+		JScrollPane sc = new JScrollPane(null);
+		sc.setLayout(null);
+		sc.setLocation(0, 0);
+		sc.setSize(600, 600);
+		
 		JTextArea area = new JTextArea();
 		area.setLocation(0, 0);
 		area.setSize(600, 600);
@@ -32,7 +39,8 @@ public class ServerWindow extends JFrame implements WindowListener{
 		
 		startServer(area);
 		
-		add(area);
+		sc.add(area);
+		add(sc);
 	}
 	ReceiveInfoLoop loop;
 	public void startServer(JTextArea area){

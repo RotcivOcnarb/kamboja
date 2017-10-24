@@ -44,46 +44,50 @@ public class ReceiveInfoLoop implements Runnable{
 	
 	public void run() {
 
-		try{
+		
 			while(true){
-				byte[] msg = new byte[256];
-				DatagramPacket pack = new DatagramPacket(msg, msg.length);
-				server.receive(pack);
-
-				switch(pack.getData()[0]){
-					case DataIdentifier.SERVER_CONNECT:
-						
-						byte[] addr = new byte[pack.getData().length - 1];
-						for(int i = 0; i < addr.length; i ++){
-							addr[i] = pack.getData()[i+1];
-						}
+				try{
+					byte[] msg = new byte[256];
+					DatagramPacket pack = new DatagramPacket(msg, msg.length);
+					server.receive(pack);
 	
+					switch(pack.getData()[0]){
+						case DataIdentifier.SERVER_CONNECT:
+							
+							byte[] addr = new byte[pack.getData().length - 1];
+							for(int i = 0; i < addr.length; i ++){
+								addr[i] = pack.getData()[i+1];
+							}
+		
+							
+							String ip = InetAddress.getByAddress(addr).getHostAddress();
+							
+							print("IP " + ip + " CONNECTED");
+							
+							break;
+							
+						case DataIdentifier.PLAYER_CONNECTED:
+							
+							int skin = pack.getData()[1];
+							int weapon = pack.getData()[2];
+							byte[] name = new byte[pack.getData().length - 3];
+							for(int i = 0; i < name.length; i ++){
+								name[i] = pack.getData()[i + 3];
+							}
 						
-						String ip = InetAddress.getByAddress(addr).getHostAddress();
-						
-						print("IP " + ip + " CONNECTED");
-						
-						break;
-						
-					case DataIdentifier.PLAYER_CONNECTED:
-						
-						int skin = pack.getData()[1];
-						int weapon = pack.getData()[2];
-						byte[] name = new byte[pack.getData().length - 3];
-						for(int i = 0; i < name.length; i ++){
-							name[i] = pack.getData()[i + 3];
-						}
+							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name));
+							
+							break;
+						default:
+							print("Identifier unknown");
+					}
+				}catch(SocketException e){
 					
-						print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name));
-						
-						break;
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-		}catch(SocketException e){
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 		
 	}
 	
