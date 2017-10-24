@@ -1045,6 +1045,8 @@ public class MainMenu extends State{
 				for(int i = KambojaMain.getControllers().size() - 1; i >= 0; i --){
 					PlayerController pc = KambojaMain.getControllers().get(i);
 					if(pc instanceof BotController){
+						sender.disconnectPlayer(i);
+						
 						KambojaMain.getControllers().remove(pc);
 						break;
 					}
