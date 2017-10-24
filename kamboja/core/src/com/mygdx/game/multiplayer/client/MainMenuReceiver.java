@@ -22,8 +22,8 @@ public class MainMenuReceiver implements Runnable{
 
 	boolean stop = false;
 		
-	MainMenu mainMenu;
-	MulticastSocket server;
+	volatile MainMenu mainMenu;
+	volatile MulticastSocket server;
 	InetAddress addr;
 	
 	public void stop(){
@@ -52,12 +52,9 @@ public class MainMenuReceiver implements Runnable{
 
 		while(!stop){
 			try{
-				System.out.println("waiting for package");
 				byte[] msg = new byte[256];
 				DatagramPacket pack = new DatagramPacket(msg, msg.length);
 				server.receive(pack);
-
-				System.out.println("pack received");
 				
 					switch(pack.getData()[0]){
 					

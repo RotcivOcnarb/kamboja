@@ -111,6 +111,9 @@ public class MainMenuSender implements Runnable{
 						
 							ds.send(pkg);
 						}
+						catch(ArrayIndexOutOfBoundsException e){
+							
+						}
 						catch(Exception e){
 							e.printStackTrace();
 						}
