@@ -574,7 +574,7 @@ public class MainMenu extends State{
 							
 						
 						if(recTemp.contains(pointer)){
-							sender.disconnectPlayer(id);
+							sender.disconnectPlayer(KambojaMain.getControllers().get(id).getIdentifier());
 							KambojaMain.getControllers().remove(id);
 							//cursorVelocity[id].set(0, 0);
 							typer[id].hide();
@@ -748,7 +748,7 @@ public class MainMenu extends State{
 				int id = Util.getControllerID(controller);
 				recTemp.setRect(Gdx.graphics.getWidth()/4 * id  + mg/2, controlPos[id] - 90, Gdx.graphics.getWidth()/4 - mg, 40);
 				if(recTemp.contains(pointer)){
-					sender.disconnectPlayer(Util.getControllerID(controller));
+					sender.disconnectPlayer(KambojaMain.getControllers().get(Util.getControllerID(controller)).getIdentifier());
 					KambojaMain.getControllers().remove(Util.getControllerID(controller));
 					//cursorVelocity[id].set(0, 0);
 					typer[id].hide();
@@ -1045,7 +1045,7 @@ public class MainMenu extends State{
 				for(int i = KambojaMain.getControllers().size() - 1; i >= 0; i --){
 					PlayerController pc = KambojaMain.getControllers().get(i);
 					if(pc instanceof BotController){
-						sender.disconnectPlayer(i);
+						sender.disconnectPlayer(KambojaMain.getControllers().get(i).getIdentifier());
 						
 						KambojaMain.getControllers().remove(pc);
 						break;

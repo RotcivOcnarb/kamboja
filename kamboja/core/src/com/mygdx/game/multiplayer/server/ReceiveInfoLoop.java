@@ -84,10 +84,14 @@ public class ReceiveInfoLoop implements Runnable{
 							break;
 						case DataIdentifier.PLAYER_DISCONNECTED:
 
-							int index = pack.getData()[1];
+							identifier = new byte[5];
 							
-							ServerWindow.mpc.remove(index);
-							print("Controller disconected from IP: " + pack.getAddress().getHostAddress() + " at index " + index);
+							for(int i = 0; i < 5; i ++){
+								identifier[i] = pack.getData()[1 + i];
+							}
+							
+							ServerWindow.mpc.remove(getMultiplayerController(identifier));
+							print("Controller disconected from IP: " + pack.getAddress().getHostAddress());
 							
 							break;
 						case DataIdentifier.PLAYER_MAIN_MENU_INFO:
@@ -126,12 +130,22 @@ public class ReceiveInfoLoop implements Runnable{
 	
 	public MultiplayerController getMultiplayerController(byte[] identifier){
 		for(MultiplayerController mc : ServerWindow.mpc){
-			if(mc.getIdentifier().equals(identifier)){
+			if(compareID(mc.getIdentifier(), identifier)){
 				return mc;
 			}
 		}
 		
 		return null;
+	}
+	
+	public boolean compareID(byte[] id1, byte[] id2){
+		for(int i = 0; i < 5; i ++){
+			if(Byte.compare(id1[i], id2[i]) != 0){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	public void dispose(){

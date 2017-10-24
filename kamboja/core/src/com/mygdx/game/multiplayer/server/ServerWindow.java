@@ -76,7 +76,7 @@ public class ServerWindow extends JFrame implements WindowListener{
 				String ID = "";
 				
 				for(int j = 0; j < 5; j ++){
-					ID += mpc.get(i).getIdentifier()[i] + "";
+					ID += mpc.get(i).getIdentifier()[j] + "";
 				}
 				
 			lbl[i].setText(

@@ -62,12 +62,14 @@ public class MainMenuSender implements Runnable{
 		}
 	}
 	
-	public void disconnectPlayer(int playerid){
+	public void disconnectPlayer(byte[] identifier){
 		try {
 			
-			byte[] msgBytes = new byte[2];
+			byte[] msgBytes = new byte[6];
 			msgBytes[0] = DataIdentifier.PLAYER_DISCONNECTED;
-			msgBytes[1] = (byte)playerid;
+			for(int i = 0; i < 5; i ++){
+				msgBytes[1 + i] = identifier[i];
+			}
 			
 			DatagramPacket pkg;
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);
