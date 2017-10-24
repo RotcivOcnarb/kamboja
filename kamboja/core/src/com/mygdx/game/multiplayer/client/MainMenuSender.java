@@ -87,7 +87,8 @@ public class MainMenuSender implements Runnable{
 			//-Skin
 			//-Arma
 			if(KambojaMain.getControllers() != null) {
-				for(PlayerController controller : KambojaMain.getControllers()){
+				for(int j = KambojaMain.getControllers().size() - 1; j >= 0; j --){
+					PlayerController controller = KambojaMain.getControllers().get(j);
 					if(!(controller instanceof MultiplayerController)){
 						try{
 							byte[] msgBytes = new byte[3 + controller.getName().getBytes().length];
