@@ -47,8 +47,11 @@ public class MainMenuSender implements Runnable{
 			msgBytes[0] = DataIdentifier.PLAYER_CONNECTED;
 			msgBytes[1] = (byte)pc.getPlayer();
 			msgBytes[2] = (byte)pc.getWeapon();
+			for(int i = 0; i < 5; i ++){
+				msgBytes[3 + i] = pc.getIdentifier()[i];
+			}
 			for(int i = 0; i < pc.getName().getBytes().length; i ++){
-				msgBytes[3 + i] = pc.getName().getBytes()[i];
+				msgBytes[8 + i] = pc.getName().getBytes()[i];
 			}
 			DatagramPacket pkg;
 			pkg = new DatagramPacket(msgBytes, msgBytes.length, addr, KambojaMain.PORT);

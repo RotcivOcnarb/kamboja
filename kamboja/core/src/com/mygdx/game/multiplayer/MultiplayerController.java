@@ -9,8 +9,8 @@ public class MultiplayerController extends PlayerController{
 
 	InetAddress host;
 	
-	public MultiplayerController(int weapon, int player, String name, InetAddress host) {
-		super(weapon, null, player, name);
+	public MultiplayerController(int weapon, int player, String name, InetAddress host, byte[] identifier) {
+		super(weapon, null, player, name, identifier);
 		this.host = host;
 	}
 	

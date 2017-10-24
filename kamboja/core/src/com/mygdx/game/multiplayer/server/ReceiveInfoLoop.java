@@ -69,12 +69,16 @@ public class ReceiveInfoLoop implements Runnable{
 							
 							int skin = pack.getData()[1];
 							int weapon = pack.getData()[2];
-							byte[] name = new byte[pack.getData().length - 3];
+							byte[] identifier = new byte[5];
+							for(int i = 0; i < 5; i ++){
+								identifier[i] = pack.getData()[i + 3];
+							}
+							byte[] name = new byte[pack.getData().length - 8];
 							for(int i = 0; i < name.length; i ++){
-								name[i] = pack.getData()[i + 3];
+								name[i] = pack.getData()[i + 8];
 							}
 						
-							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress()));
+							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier));
 							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name).trim());
 							
 							break;
@@ -90,12 +94,16 @@ public class ReceiveInfoLoop implements Runnable{
 							
 							skin = pack.getData()[1];
 							weapon = pack.getData()[2];
-							name = new byte[pack.getData().length - 3];
+							identifier = new byte[5];
+							for(int i = 0; i < 5; i ++){
+								identifier[i] = pack.getData()[i + 3];
+							}
+							name = new byte[pack.getData().length - 8];
 							for(int i = 0; i < name.length; i ++){
-								name[i] = pack.getData()[i + 3];
+								name[i] = pack.getData()[i + 8];
 							}
 							
-							MultiplayerController pl = getMultiplayerController(pack.getAddress(), skin);
+							MultiplayerController pl = getMultiplayerController(identifier);
 							if(pl != null){
 								pl.setPlayer(skin);
 								pl.setWeapon(weapon);
@@ -116,13 +124,10 @@ public class ReceiveInfoLoop implements Runnable{
 		
 	}
 	
-	public MultiplayerController getMultiplayerController(InetAddress addr, int skin){
+	public MultiplayerController getMultiplayerController(byte[] identifier){
 		for(MultiplayerController mc : ServerWindow.mpc){
-			if(mc.getAddress().getHostAddress().equals(addr.getHostAddress())){
-				if(mc.getPlayer() == skin){
-					return mc;
-				}
-
+			if(mc.getIdentifier().equals(identifier)){
+				return mc;
 			}
 		}
 		

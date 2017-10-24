@@ -9,12 +9,26 @@ public class PlayerController {
 	Controller controller;
 	int player;
 	String name;
+	byte[] identifier = new byte[5];
 	
-	public PlayerController(int weapon, Controller controller, int player, String name){
+	public PlayerController(int weapon, Controller controller, int player, String name, byte[] identifier){
 		this.weapon = weapon;
+		this.identifier = identifier;
 		this.controller = controller;
 		this.player = player;
 		this.name = name;
+	}
+	
+	public static byte[] generateIdentifier(){
+		byte[] identifier = new byte[5];
+		for(int i = 0; i < 5; i ++){
+			identifier[i] = (byte)(Math.random() * 127);
+		}
+		return identifier;
+	}
+	
+	public byte[] getIdentifier(){
+		return identifier;
 	}
 
 	public int getWeapon() {

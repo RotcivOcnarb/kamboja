@@ -807,7 +807,7 @@ public class MainMenu extends State{
 			if(timer > 4){
 				if(Util.getControllerID(controller) == -1){
 					if(KambojaMain.getControllers().size() < 4){
-						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "");
+						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "", PlayerController.generateIdentifier());
 						sender.connectPlayer(pc);
 						KambojaMain.getControllers().add(pc);
 						typer[KambojaMain.getControllers().size() - 1].show();
@@ -1028,7 +1028,7 @@ public class MainMenu extends State{
 						pl = (int) (Math.random() * 5);
 					}
 					
-					BotController bc = new BotController(pl);
+					BotController bc = new BotController(pl, PlayerController.generateIdentifier());
 					sender.connectPlayer(bc);
 					KambojaMain.getControllers().add(bc);
 					new_player();
@@ -1056,7 +1056,7 @@ public class MainMenu extends State{
 		
 		if(keycode == Keys.ENTER){
 			if(KambojaMain.getControllers().size() < 4 && timer > 4 && !hasKeyboard){
-				KeyboardController kc = new KeyboardController(0, firstPlayerAvailable(),  "");
+				KeyboardController kc = new KeyboardController(0, firstPlayerAvailable(),  "", PlayerController.generateIdentifier());
 				sender.connectPlayer(kc);
 				KambojaMain.getControllers().add(kc);
 				typer[KambojaMain.getControllers().size()-1].show();
