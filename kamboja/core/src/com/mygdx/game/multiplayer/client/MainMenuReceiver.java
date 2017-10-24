@@ -100,7 +100,7 @@ public class MainMenuReceiver implements Runnable{
 						}
 						Collections.sort(KambojaMain.getControllers(), new Comparator<PlayerController>(){
 							public int compare(PlayerController arg0, PlayerController arg1) {
-								return arg1.getIndex() - arg0.getIndex();
+								return arg0.getIndex() - arg1.getIndex();
 							}
 						});
 						
