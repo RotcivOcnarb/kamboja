@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 
@@ -73,8 +74,8 @@ public class ReceiveInfoLoop implements Runnable{
 								name[i] = pack.getData()[i + 3];
 							}
 						
-							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name), pack.getAddress()));
-							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name));
+							ServerWindow.mpc.add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress()));
+							print("Controller connected: Skin: " + skin + " Weapon: " + weapon + " Name: " + new String(name).trim());
 							
 							break;
 						case DataIdentifier.PLAYER_DISCONNECTED:
@@ -89,15 +90,16 @@ public class ReceiveInfoLoop implements Runnable{
 							
 							skin = pack.getData()[1];
 							weapon = pack.getData()[2];
-							index = pack.getData()[3];
-							name = new byte[pack.getData().length - 4];
+							name = new byte[pack.getData().length - 3];
 							for(int i = 0; i < name.length; i ++){
-								name[i] = pack.getData()[i + 4];
+								name[i] = pack.getData()[i + 3];
 							}
 							
-							ServerWindow.mpc.get(index).setPlayer(skin);
-							ServerWindow.mpc.get(index).setWeapon(weapon);
-							ServerWindow.mpc.get(index).setName(new String(name));
+							MultiplayerController pl = getMultiplayerController(pack.getAddress(), skin);
+							
+							pl.setPlayer(skin);
+							pl.setWeapon(weapon);
+							pl.setName(new String(name).trim());
 							
 							break;
 						default:
@@ -111,6 +113,19 @@ public class ReceiveInfoLoop implements Runnable{
 			}
 		
 		
+	}
+	
+	public MultiplayerController getMultiplayerController(InetAddress addr, int skin){
+		for(MultiplayerController mc : ServerWindow.mpc){
+			if(mc.getAddress().getHostAddress().equals(addr.getHostAddress())){
+				if(mc.getPlayer() == skin){
+					return mc;
+				}
+
+			}
+		}
+		
+		return null;
 	}
 	
 	public void dispose(){

@@ -25,7 +25,7 @@ public class ServerWindow extends JFrame implements WindowListener{
 	
 	public static void main(String args[]){
 		JFrame janela = new ServerWindow();
-		janela.setSize(800, 600);
+		janela.setSize(1280, 600);
 		janela.setLocationRelativeTo(null);
 		janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		janela.setVisible(true);
@@ -55,7 +55,7 @@ public class ServerWindow extends JFrame implements WindowListener{
 			lbl[i] = new JLabel();
 			
 			lbl[i].setLocation(600, i * 30);
-			lbl[i].setSize(200, 30);
+			lbl[i].setSize(1280 - 600, 30);
 			lbl[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			
 			add(lbl[i]);
