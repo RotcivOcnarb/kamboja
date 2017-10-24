@@ -73,16 +73,25 @@ public class MainMenuReceiver implements Runnable{
 						}
 						
 						MultiplayerController mc = null;
+						boolean internal = false;
 						for(PlayerController pc : KambojaMain.getControllers()){
 							if(Util.compareID(identifier, pc.getIdentifier())){
-								if(pc instanceof MultiplayerController)
-								mc = (MultiplayerController) pc;
+								if(pc instanceof MultiplayerController){
+									mc = (MultiplayerController) pc;
+									break;
+								}
+								else{
+									internal = true;
+									break;
+								}
 							}
 						}
 						if(mc == null){
-							KambojaMain.getControllers().add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier, index));
-							mainMenu.new_player();
-							System.out.println("Player detected");
+							if(!internal){
+								KambojaMain.getControllers().add(new MultiplayerController(weapon, skin, new String(name).trim(), pack.getAddress(), identifier, index));
+								mainMenu.new_player();
+								System.out.println("Player detected");
+							}
 						}
 						else{
 							mc.setPlayer(skin);
