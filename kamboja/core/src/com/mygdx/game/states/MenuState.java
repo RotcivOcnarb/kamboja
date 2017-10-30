@@ -603,13 +603,13 @@ public class MenuState extends State{
 				timerWrong = 0.5f;
 				break;
 			case 3:
-				outro = true;
+				timerWrong = 0.5f;
 				break;
 			case 4:
-				outro = true;
+				timerWrong = 0.5f;
 				break;
 			case 5:
-				outro = true;
+				timerWrong = 0.5f;
 				break;
 			}
 			
