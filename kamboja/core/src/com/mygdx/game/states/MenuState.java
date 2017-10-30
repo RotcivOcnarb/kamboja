@@ -1,11 +1,9 @@
 package com.mygdx.game.states;
 
-import java.awt.AWTException;
-import java.awt.MouseInfo;
-import java.awt.Robot;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -22,6 +20,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
+import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.easing.Back;
 
 public class MenuState extends State{
 	
@@ -32,17 +33,35 @@ public class MenuState extends State{
 	Texture fumaca;
 	Texture placa_letras;
 	Texture sombra_letras;
+	Texture fumaca_tras;
+	Texture fumaca_frente;
 	
 	ShapeRenderer sr;
 	
+	Texture engrenagens[] = new Texture[6];
+	Vector2 eng_pos[] = new Vector2[6];
+	float eng_angle[] = new float[6];
+	float eng_size[] = new float[6];
+	Texture options[] = new Texture[6];
+	
+
+	boolean outro;
+	boolean intro;
+	float outro_vel;
+	
+	float timerWrong;
+	
+	int opt;
+	
 	Texture[] exps = new Texture[5];
+	
+	float timeStamp;
 		
 	float globalTimer;
-	float timer = 0;
-	
-	float alpha = 1;
-	float shaderIntensity = 0;
-	float intensityTarget = 0;
+	float timer;
+	float alpha;
+	float shaderIntensity;
+	float intensityTarget;
 	
 	ArrayList<ParticleEffect> explosions;
 	ArrayList<ParticleEffect> bolinhas;
@@ -58,6 +77,17 @@ public class MenuState extends State{
 
 	public void create() {
 		
+		outro = false;
+		intro = true;
+		outro_vel = 0;
+		timerWrong = 0;
+		opt = 0;
+		timeStamp = 0;
+		timer = 0;
+		alpha = 1;
+		shaderIntensity = 0;
+		intensityTarget = 0;
+		
 		background = new Texture("menu/background.png");
 		bolinha = new Texture("menu/bolinha.png");
 		explosao = new Texture("menu/explosão.png");
@@ -65,6 +95,33 @@ public class MenuState extends State{
 		fumaca = new Texture("menu/fumaca.png");
 		placa_letras = new Texture("menu/placa_letras.png");
 		sombra_letras = new Texture("menu/sombra_letras.png");
+		fumaca_tras = new Texture("menu/fumaca_back.png");
+		fumaca_frente = new Texture("menu/fumaca_front.png");
+		
+		for(int i = 0; i < 6; i ++){
+			engrenagens[i] = new Texture("menu/E" + (i+1) + ".png");
+		}
+		
+		eng_pos[0] = new Vector2(-981, 1009);
+		eng_pos[1] = new Vector2(-677, 969);
+		eng_pos[2] = new Vector2(-424, 1158);
+		eng_pos[3] = new Vector2(0, 1083);
+		eng_pos[4] = new Vector2(443, 1083);
+		eng_pos[5] = new Vector2(867, 1003);
+		
+		eng_size[0] = 169;
+		eng_size[1] = 97;
+		eng_size[2] = 171;
+		eng_size[3] = 216;
+		eng_size[4] = 171.5f;
+		eng_size[5] = 217.5f;
+		
+		options[0] = new Texture("menu/VERSUS.png");
+		options[1] = new Texture("menu/COOP_off.png");
+		options[2] = new Texture("menu/ONLINE_off.png");
+		options[3] = new Texture("menu/HELP.png");
+		options[4] = new Texture("menu/OPTIONS.png");
+		options[5] = new Texture("menu/CREDITS.png");
 		
 		music = Gdx.audio.newMusic(Gdx.files.internal("music/sylvan_spring.ogg"));
 		music.setLooping(true);
@@ -173,6 +230,111 @@ public class MenuState extends State{
 		
 		sb.end();
 		
+		sb.begin();
+		
+		sb.draw(fumaca_tras,
+				(Gdx.graphics.getWidth() - fumaca_tras.getWidth()*factor )/2f, -engrenagens[3].getHeight()/2*factor,
+				fumaca_tras.getWidth()*factor/2,
+				fumaca_tras.getHeight()*factor/2,
+				fumaca_tras.getWidth() * factor,
+				fumaca_tras.getHeight() * factor,
+				1, 1,
+				0,
+				0, 0,
+				fumaca_tras.getWidth(),
+				fumaca_tras.getHeight(),
+				false, false);	
+		
+		
+		
+		for(int i = 0; i < 6; i ++){
+			float fx = 0;
+			if(i == 5) fx = 8;
+			sb.draw(engrenagens[i],
+					eng_pos[i].x*factor - engrenagens[i].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
+					Gdx.graphics.getHeight() - eng_pos[i].y*factor - engrenagens[i].getHeight()*factor/2,
+					engrenagens[i].getWidth()*factor/2,
+					engrenagens[i].getHeight()*factor/2,
+					engrenagens[i].getWidth()*factor,
+					engrenagens[i].getHeight()*factor,
+					1, 1,
+					fx + eng_angle[i],
+					0, 0,
+					engrenagens[i].getWidth(),
+					engrenagens[i].getHeight(),
+					false, false);	
+		}
+		
+		Texture t1 = options[opt];
+		Texture t2 = options[(opt+2) % 6];
+		
+		if(opt % 2 == 0){
+			t1 = options[opt]; 
+			
+			if(SUM_ANGLE < 0){
+				t2 = options[(opt+1) % 6];
+			}
+			else{
+				t2 = options[(opt-1 + 6) % 6];
+			}
+			
+			
+		}
+		else{
+			t2 = options[opt]; 
+			if(SUM_ANGLE < 0){
+				t1 = options[(opt+1) % 6];
+			}
+			else{
+				t1 = options[(opt-1 + 6) % 6];
+			}
+		}
+		
+			sb.draw(t1,
+				eng_pos[3].x*factor - options[opt].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
+				Gdx.graphics.getHeight() - eng_pos[3].y*factor - options[opt].getHeight()*factor/2,
+				options[opt].getWidth()*factor/2,
+				options[opt].getHeight()*factor/2,
+				options[opt].getWidth()*factor,
+				options[opt].getHeight()*factor,
+				1, 1,
+				eng_angle[3],
+				0, 0,
+				options[opt].getWidth(),
+				options[opt].getHeight(),
+				false, false);
+			
+			sb.draw(t2,
+					eng_pos[3].x*factor - options[opt].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
+					Gdx.graphics.getHeight() - eng_pos[3].y*factor - options[opt].getHeight()*factor/2,
+					options[opt].getWidth()*factor/2,
+					options[opt].getHeight()*factor/2,
+					options[opt].getWidth()*factor,
+					options[opt].getHeight()*factor,
+					1, 1,
+					eng_angle[3] + 180,
+					0, 0,
+					options[opt].getWidth(),
+					options[opt].getHeight(),
+					false, false);
+		
+			sb.draw(fumaca_frente,
+					(Gdx.graphics.getWidth() - fumaca_frente.getWidth()*factor )/2f, -engrenagens[3].getHeight()/2*factor,
+					fumaca_frente.getWidth()*factor/2,
+					fumaca_frente.getHeight()*factor/2,
+					fumaca_frente.getWidth() * factor,
+					fumaca_frente.getHeight() * factor,
+					1, 1,
+					0,
+					0, 0,
+					fumaca_frente.getWidth(),
+					fumaca_frente.getHeight(),
+					false, false);	
+			
+		sb.end();
+		
+		
+		
 		//desenha frame buffer com shader aplicado
 		
 		shaderBuffer.end();
@@ -210,9 +372,65 @@ public class MenuState extends State{
 	public void update(float delta) {
 		globalTimer += delta;
 		timer -= delta;
-		alpha -= delta;
+		timerWrong -= delta;
+		if(intro){
+			alpha -= delta;
+			if(alpha <= 0){
+				intro = false;
+				alpha = 0;
+				
+			}
+			
+		}
+		if(outro){
+			alpha += delta;
+			if(alpha >= 1){
+				outro = false;
+				alpha = 1;
+				
+
+				switch(opt){
+				case 0:
+					manager.changeState(0);
+					break;
+				case 3:
+					manager.changeState(5);
+					break;
+				case 4:
+					manager.changeState(5);
+					break;
+				case 5:
+					manager.changeState(5);
+					break;
+				}
+			}
+			outro_vel += delta*20;
+			eng_angle[3] += outro_vel;
+			
+		}
 		
-		if(alpha <= 0) alpha = 0;
+		checkMove();
+		
+		if(timerWrong > 0){
+			if(timerWrong < 0.25f){
+				eng_angle[3] += (ENG_ANGLE - eng_angle[3])/3.0f;
+			}
+			else{
+				eng_angle[3] += (ENG_ANGLE + 10 - eng_angle[3])/3.0f;
+			}
+		}
+		
+		if(!outro && timerWrong <= 0)
+		eng_angle[3] = Back.easeOut(Math.min(globalTimer - timeStamp, 0.5f), LAST_ANGLE, SUM_ANGLE, 0.5f);
+		
+		eng_angle[5] = -eng_angle[4] * (eng_size[4]/eng_size[5]);		
+		eng_angle[4] = -eng_angle[3] * (eng_size[3]/eng_size[4]);		
+		
+		eng_angle[2] = -eng_angle[3] * (eng_size[3]/eng_size[2]);
+		eng_angle[1] = -eng_angle[2] * (eng_size[2]/eng_size[1]);		
+		eng_angle[0] = -eng_angle[1] * (eng_size[1]/eng_size[0]);		
+
+		
 		
 		shaderIntensity += (intensityTarget - shaderIntensity) / 10.0f;
 		
@@ -273,6 +491,84 @@ public class MenuState extends State{
 			}
 		}
 	}
+	
+	boolean left;
+	boolean right;
+	
+	float SUM_ANGLE = 0;
+	float LAST_ANGLE = 0;	
+	float ENG_ANGLE = 0;	
+	
+	float x_value;
+	
+	public void checkMove(){
+		if(x_value < -0.2){
+			if(globalTimer - timeStamp > 0.5f){
+				opt++;
+				if(opt == 6) opt = 0;
+				LAST_ANGLE = ENG_ANGLE;
+				ENG_ANGLE += 180;
+				SUM_ANGLE = 180;
+				timeStamp = globalTimer;
+			}
+			
+		}
+		else if(x_value > 0.2){
+			if(globalTimer - timeStamp > 0.5f){
+				opt--;
+				if(opt == -1) opt = 5;
+				LAST_ANGLE = ENG_ANGLE;
+				ENG_ANGLE -= 180;
+				SUM_ANGLE = -180;
+				timeStamp = globalTimer;
+			}
+			
+		}
+	}
+	
+	@Override
+	public boolean keyDown(int keycode){
+		
+		if(keycode == Keys.LEFT){
+			if(!left){
+				left = true;
+				if(globalTimer - timeStamp > 0.5f){
+					opt++;
+					if(opt == 6) opt = 0;
+					LAST_ANGLE = ENG_ANGLE;
+					ENG_ANGLE += 180;
+					SUM_ANGLE = 180;
+					timeStamp = globalTimer;
+				}
+			}
+		}
+		if(keycode == Keys.RIGHT){
+			if(!right){
+				right = true;
+				if(globalTimer - timeStamp > 0.5f){
+					opt--;
+					if(opt == -1) opt = 5;
+					LAST_ANGLE = ENG_ANGLE;
+					ENG_ANGLE -= 180;
+					SUM_ANGLE = -180;
+					timeStamp = globalTimer;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean keyUp(int keycode){
+		if(keycode == Keys.LEFT){
+			left = false;
+		}
+		if(keycode == Keys.RIGHT){
+			right = false;
+		}
+		return false;
+	}
 
 	public void connected(Controller controller) {
 		
@@ -283,6 +579,43 @@ public class MenuState extends State{
 	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
+		int A = 0;
+		
+		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			A = XBox.BUTTON_A;
+		}
+		else if(controller.getName().equals(Gamecube.getID())){
+			A = Gamecube.A;
+		}
+		else{
+			A = GenericController.X;
+		}
+		
+		if(buttonCode == A){
+			switch(opt){
+			case 0:
+				outro = true;
+				break;
+			case 1:
+				timerWrong = 0.5f;
+				break;
+			case 2:
+				timerWrong = 0.5f;
+				break;
+			case 3:
+				outro = true;
+				break;
+			case 4:
+				outro = true;
+				break;
+			case 5:
+				outro = true;
+				break;
+			}
+			
+		}
+		
+		
 		return false;
 	}
 
@@ -292,6 +625,21 @@ public class MenuState extends State{
 	
 
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
+		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			if(axisCode == XBox.AXIS_LEFT_X){
+				x_value = value;
+			}
+		}
+		else if(controller.getName().equals(Gamecube.getID())){
+			if(axisCode == Gamecube.MAIN_X){
+				x_value = value;
+			}
+		}
+		else{
+			if(axisCode == GenericController.LEFT_X){
+				x_value = value;
+			}
+		}
 		
 		return false;
 	}
