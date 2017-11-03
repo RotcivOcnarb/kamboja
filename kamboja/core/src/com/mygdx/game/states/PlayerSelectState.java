@@ -68,6 +68,7 @@ public class PlayerSelectState extends State{
 	boolean playerReady[] = new boolean[4];
 	
 	private Texture[] texWep; //texture for each weapon
+	Texture inGameWep[];
 	Texture select_gear[] = new Texture[4];
 	float gear_angle[] = new float[4];
 	
@@ -122,6 +123,9 @@ public class PlayerSelectState extends State{
 	BitmapFont outlanderBig[] = new BitmapFont[4];
 	BitmapFont olivers_barney[];
 	GlyphLayout layout;
+	private float back_angle;
+	
+	boolean goingBack;
 
 	
 	public PlayerSelectState(Manager manager) {
@@ -139,7 +143,12 @@ public class PlayerSelectState extends State{
 		globalTimer = 0;
 		sr = new ShapeRenderer();
 		
+		goingBack = false;
+		back_angle = 0;
+		
 		selection_tex = new Texture("menu/player_select/selection.png");
+		
+		KambojaMain.initializeControllers();
 		
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
@@ -157,6 +166,18 @@ public class PlayerSelectState extends State{
 				texWep[5] = new Texture("Weapons/Icon/Flamethrower.png");
 				texWep[6] = new Texture("Weapons/Icon/Bazook.png");
 				texWep[7] = new Texture("Weapons/Icon/Laser.png");
+				
+				if(inGameWep == null) {
+					inGameWep = new Texture[KambojaMain.getWeaponSize()];
+					inGameWep[0] = new Texture("Weapons/In-game/Taurus.png");
+					inGameWep[1] = new Texture("Weapons/In-game/Taurus Akimbo.png");
+					inGameWep[2] = new Texture("Weapons/In-game/Minigun.png");
+					inGameWep[3] = new Texture("Weapons/In-game/sss.png");
+					inGameWep[4] = new Texture("Weapons/In-game/MP5.png");
+					inGameWep[5] = new Texture("Weapons/In-game/flahme.png");
+					inGameWep[6] = new Texture("Weapons/In-game/Bazooka.png");
+					inGameWep[7] = new Texture("Weapons/In-game/Laser.png");
+				}
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -490,6 +511,17 @@ public class PlayerSelectState extends State{
 			break;
 		}
 	}
+	
+	public int getSkinPositionByWeapon(int weapon) {
+		switch (weapon) {
+		case 0:
+			return 2;
+		case 1:
+			return 0;
+		default:
+			return 1;
+		}
+	}
 
 	@Override
 	public void render(SpriteBatch sb) {	
@@ -499,6 +531,7 @@ public class PlayerSelectState extends State{
 		for(int i = 0; i < 4; i ++) {
 			
 			if(KambojaMain.getControllers().size()-1 >= i){
+				if(KambojaMain.getControllers().get(i) != null) {
 				skinOffset[i] += (positionPlayerOffset[i] - skinOffset[i])/10.0f;
 				weaponOffset[i] += (positionWeaponOffset[i] - weaponOffset[i])/10f;
 				
@@ -508,7 +541,9 @@ public class PlayerSelectState extends State{
 				int shift = positionPlayerOffset[i] / KambojaMain.getPlayerSkinsSize();
 				for(int k = shift - 1; k <= shift + 1; k ++) {
 					for(int j = 0; j < KambojaMain.getPlayerSkinsSize(); j ++) {
-						TextureRegion tex = Player.getTexture(j, 0);
+						TextureRegion tex = Player.getTexture(j, getSkinPositionByWeapon(
+								KambojaMain.getControllers().get(i).getWeapon()
+								));
 							
 						sb.begin();
 						sb.setProjectionMatrix(bufferProjectionPlayer);
@@ -523,6 +558,25 @@ public class PlayerSelectState extends State{
 								1,
 								1,
 								globalTimer*50);
+						
+						Texture wep = inGameWep[KambojaMain.getControllers().get(i).getWeapon()];
+						
+						sb.draw(wep,
+								(181 - wep.getWidth()*5) / 2f + j*181 - skinOffset[i]*181 + 
+								k * (181*KambojaMain.getPlayerSkinsSize()),
+								(280 - wep.getHeight()*5) / 2f,
+								wep.getWidth()*5 / 2f,
+								wep.getHeight()*5 / 2f,
+								wep.getWidth()*5,
+								wep.getHeight()*5,
+								1,
+								1,
+								globalTimer*50,
+								0,
+								0,
+								wep.getWidth(),
+								wep.getHeight(),
+								false, false);
 							
 						sb.end();
 					}
@@ -585,6 +639,7 @@ public class PlayerSelectState extends State{
 					}
 				
 				keyboardBuffer[i].end();
+			}
 			}
 		}
 		
@@ -866,8 +921,19 @@ public class PlayerSelectState extends State{
 			sb.draw(back_tex,
 					(Gdx.graphics.getWidth() - back_tex.getWidth()*factor)/2f,
 					Gdx.graphics.getHeight() - back_tex.getHeight()*(1/3f) * factor,
+					back_tex.getWidth()*factor/2f,
+					back_tex.getHeight() * factor/2f,
 					back_tex.getWidth()*factor,
-					back_tex.getHeight() * factor);
+					back_tex.getHeight() * factor,
+					1,
+					1,
+					back_angle,
+					0,
+					0,
+					back_tex.getWidth(),
+					back_tex.getHeight(),
+					false,
+					false);
 
 		
 			//b2dr.render(world, camera.combined);
@@ -914,6 +980,12 @@ public class PlayerSelectState extends State{
 		globalTimer += delta;
 		
 		timer -= delta;
+
+		if(outro && goingBack) {
+			back_angle += delta*100;
+		}
+		
+		
 		
 		fogo.update(delta/2f);
 		bolinha.update(delta);
@@ -932,6 +1004,10 @@ public class PlayerSelectState extends State{
 			if(alpha >= 1){
 				outro = false;
 				alpha = 1;
+				if(goingBack) {
+					goingBack = false;
+					manager.changeState(5);
+				}
 				
 			}
 		}
@@ -940,15 +1016,19 @@ public class PlayerSelectState extends State{
 		for(int i = 0; i < 4; i ++) {
 			if(KambojaMain.getControllers().size()-1 >= i){
 				if(KambojaMain.getControllers().get(i) != null) {
+					
+					
 					if(playerReady[i]) {
 						okAlpha[i] += (1 - okAlpha[i])/10.0f;
 						okScale[i] += (1 - okScale[i])/10.0f;
 						okAngle[i] += (0 - okAngle[i])/10.0f;
+						gear_angle[i] += (180 - gear_angle[i])/10.0f;
 					}
 					else {
 						okAlpha[i] += (0 - okAlpha[i])/10.0f;
 						okScale[i] += (2 - okScale[i])/10.0f;
 						okAngle[i] += (30 - okAngle[i])/10.0f;
+						gear_angle[i] += (0 - gear_angle[i])/10.0f;
 					}
 					
 					selection_bound_tween[i].setRect(
@@ -1082,6 +1162,10 @@ public class PlayerSelectState extends State{
 						case 0:
 							playerReady[id] = true;
 							break;
+						case 4:
+							outro = true;
+							goingBack = true;
+							break;
 					}
 				}
 				else {
@@ -1116,15 +1200,15 @@ public class PlayerSelectState extends State{
 		if(buttonCode == start){
 			if(id == -1){
 				
-				PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "MONARK");
 				int put_id = Util.getFirstAvailableID();
-				System.out.println("Available: " + put_id);
 				if(put_id != -1) {
+					PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "Player " + (put_id+1));
 					KambojaMain.getControllers().remove(put_id);
 					KambojaMain.getControllers().add(put_id, pc);
 				}
 				else {
 					if(KambojaMain.getControllers().size() < 4) {
+						PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "Player " + (KambojaMain.getControllers().size()+1));
 						KambojaMain.getControllers().add(pc);
 						
 						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
