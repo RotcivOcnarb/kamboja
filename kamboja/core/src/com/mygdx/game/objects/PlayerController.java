@@ -45,6 +45,17 @@ public class PlayerController {
 	public String getName() {
 		return name;
 	}
+
+	public void addLetterToName(String letter) {
+		if(name.length() < 8)
+		name += letter;
+	}
+	
+	public void removeLetterFromName() {
+		if(name.length() > 0) {
+			name = name.substring(0, name.length()-1);
+		}
+	}
 	
 
 }

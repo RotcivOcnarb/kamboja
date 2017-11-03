@@ -20,7 +20,18 @@ public class Util {
 	
 	public static int getControllerID(Controller controller){
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
-			if(controller.equals(KambojaMain.getControllers().get(i).controller)){
+			if(KambojaMain.getControllers().get(i) != null) {
+				if(controller.equals(KambojaMain.getControllers().get(i).controller)){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	public static int getFirstAvailableID() {
+		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
+			if(KambojaMain.getControllers().get(i) == null) {
 				return i;
 			}
 		}

@@ -1,18 +1,23 @@
 package com.mygdx.game.states;
 
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -54,12 +59,35 @@ public class PlayerSelectState extends State{
 	Texture back_tex;
 	Texture chain;
 	Texture selection_tex;
+	Texture ok;
+	
+	float okAlpha[] = new float[4];
+	float okScale[] = new float[4];
+	float[] okAngle = new float[4];
+	
+	boolean playerReady[] = new boolean[4];
+	
 	private Texture[] texWep; //texture for each weapon
+	Texture select_gear[] = new Texture[4];
+	float gear_angle[] = new float[4];
 	
 	int[] selection = new int[4];
+	boolean[] typing = new boolean[4];
+	
+	int positionPlayerOffset[] = new int[4];
+	int positionWeaponOffset[] = new int[4];
 	
 	FrameBuffer playerBuffer[] = new FrameBuffer[4];
 	FrameBuffer weaponBuffer[] = new FrameBuffer[4];
+	FrameBuffer keyboardBuffer[] = new FrameBuffer[4];
+	
+	int key_x[] = new int[4];
+	int key_y[] = new int[4];
+	float tween_key_x[] = new float[4];
+	float tween_key_y[] = new float[4];
+	
+	String keys[][] = new String[10][4];
+	
 	float skinOffset[] = new float[4];
 	float weaponOffset[] = new float[4];
 		
@@ -83,9 +111,18 @@ public class PlayerSelectState extends State{
 	World world;
 	Box2DDebugRenderer b2dr;
 	
+	ParticleEffect fogo;
+	ParticleEffect bolinha;
+	
 	OrthographicCamera camera;
 	
 	ArrayList<Body> chainBody;
+	
+	BitmapFont outlander[] = new BitmapFont[4];
+	BitmapFont outlanderBig[] = new BitmapFont[4];
+	BitmapFont olivers_barney[];
+	GlyphLayout layout;
+
 	
 	public PlayerSelectState(Manager manager) {
 		super(manager);
@@ -107,6 +144,8 @@ public class PlayerSelectState extends State{
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
 		
+		setKeys();
+		
 		//texturas das armas
 				if(texWep == null)
 				texWep = new Texture[KambojaMain.getWeaponSize()];
@@ -118,12 +157,14 @@ public class PlayerSelectState extends State{
 				texWep[5] = new Texture("Weapons/Icon/Flamethrower.png");
 				texWep[6] = new Texture("Weapons/Icon/Bazook.png");
 				texWep[7] = new Texture("Weapons/Icon/Laser.png");
-		
+
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.zoom = 1/100f;
 		camera.position.set(Gdx.graphics.getWidth()/2f / 100f, Gdx.graphics.getHeight() / 2f / 100f, 0);
 
+		ok = new Texture("menu/player_select/ok.png");
+		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/color_shift.fs"));
 		ShaderProgram.pedantic = false;
@@ -137,12 +178,46 @@ public class PlayerSelectState extends State{
 		factor = Gdx.graphics.getHeight() / 1080f;
 		
 		for(int i = 0; i < 4; i ++) {
+			//Creates the font
+			FreeTypeFontGenerator ftfg;
+			FreeTypeFontParameter param;
+			ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
+			param = new FreeTypeFontParameter();
+			param.size = (int) (50f * factor);
+			param.color = new Color(0.5f, 0.5f, 0.5f, 1).mul(getPlayerColor(i));
+			param.borderColor = new Color(0.7f, 0.7f,0.7f, 1).add(getPlayerColor(i).mul(0.3f));
+			param.borderWidth = 2*factor;
+			outlander[i] = ftfg.generateFont(param);
+			param.size = (int) (200f * factor);
+			outlanderBig[i] = ftfg.generateFont(param);
+			ftfg.dispose();
+			
+			okAlpha[i] = 0;
+			okScale[i] = 2;
+			okAngle[i] = 30;
+		}
+		
+		layout = new GlyphLayout();
+		
+		fogo = new ParticleEffect();
+		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
+		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
+		fogo.scaleEffect(10*factor);
+		
+		bolinha = new ParticleEffect();
+		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
+		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
+		bolinha.scaleEffect(factor);
+		
+		for(int i = 0; i < 4; i ++) {
 			player_frames[i] = new Texture("menu/player_select/frame"+(i+1)+".png");
 			player_glass[i] = new Texture("menu/player_select/glass"+(i+1)+".png");
 			player_subframes[i] = new Texture("menu/player_select/caixa p"+(i+1)+".png");
 			player_subglass[i] = new Texture("menu/player_select/subglass"+(i+1)+".png");
+			select_gear[i] = new Texture("menu/player_select/gear"+(i+1)+".png");
 			playerBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 280, false);
 			weaponBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
+			keyboardBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
 			selection[i] = 3;
 		}
 		
@@ -163,6 +238,9 @@ public class PlayerSelectState extends State{
 	
 		
 		for(int i = 0; i < 4; i ++) {
+			
+			playerReady[i] = false;
+			typing[i] = false;
 			
 			targetwidth = (452*3 + player_frames[0].getWidth()) * factor;
 			targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
@@ -232,18 +310,65 @@ public class PlayerSelectState extends State{
 					);
 			
 			selection_bounds[i][0] = new Rectangle2D.Double(
-					Gdx.graphics.getWidth()/4f * i,
-					Gdx.graphics.getHeight()/5f * 0,
-					Gdx.graphics.getWidth()/4f,
+					Gdx.graphics.getWidth()/4f * i + 130*factor,
+					- 120*factor,
+					Gdx.graphics.getWidth()/4f - 200*factor,
 					Gdx.graphics.getHeight()/5f
 					);
 			
-			selection_bound_tween[i] = new Rectangle2D.Double(0, 0, 0, 0);
+			selection_bound_tween[i] = (Rectangle2D) selection_bounds[i][3].clone();
 		}
 		
 		
 	}
 	
+	private void setKeys() {
+		
+		keys[0][0] = "1";
+		keys[1][0] = "2";
+		keys[2][0] = "3";
+		keys[3][0] = "4";
+		keys[4][0] = "5";
+		keys[5][0] = "6";
+		keys[6][0] = "7";
+		keys[7][0] = "8";
+		keys[8][0] = "9";
+		keys[9][0] = "0";
+		
+		keys[0][1] = "Q";
+		keys[1][1] = "W";
+		keys[2][1] = "E";
+		keys[3][1] = "R";
+		keys[4][1] = "T";
+		keys[5][1] = "Y";
+		keys[6][1] = "U";
+		keys[7][1] = "I";
+		keys[8][1] = "O";
+		keys[9][1] = "P";
+		
+		keys[0][2] = "A";
+		keys[1][2] = "S";
+		keys[2][2] = "D";
+		keys[3][2] = "F";
+		keys[4][2] = "G";
+		keys[5][2] = "H";
+		keys[6][2] = "J";
+		keys[7][2] = "K";
+		keys[8][2] = "L";
+		keys[9][2] = "";
+		
+		keys[0][3] = "Z";
+		keys[1][3] = "X";
+		keys[2][3] = "C";
+		keys[3][3] = "V";
+		keys[4][3] = "B";
+		keys[5][3] = "N";
+		keys[6][3] = "M";
+		keys[7][3] = "";
+		keys[8][3] = "";
+		keys[9][3] = "";
+	}
+
 	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density) {
 		BodyDef def = new BodyDef();
 		def.type = type;
@@ -318,6 +443,20 @@ public class PlayerSelectState extends State{
 		sr.dispose();
 	}
 	
+	public Color getPlayerColor(int id) {
+		switch(id) {
+		case 0:
+			return new Color(0, 0, 1, 1);
+		case 1:
+			return new Color(1, 0, 0, 1);
+		case 2:
+			return new Color(0, 1, 0, 1);
+		case 3:
+			return new Color(1, 1, 0, 1);
+		}
+		return new Color(1, 1, 1, 1);
+	}
+	
 	public void setSpriteBatchColor(SpriteBatch sb, int id) {
 		switch(id) {
 		case 0:
@@ -334,6 +473,23 @@ public class PlayerSelectState extends State{
 			break;
 		}
 	}
+	
+	public void setFontColor(BitmapFont font, int id) {
+		switch(id) {
+		case 0:
+			font.setColor(0, 0, 1, 1);
+			break;
+		case 1:
+			font.setColor(1, 0, 0, 1);
+			break;
+		case 2:
+			font.setColor(0, 1, 0, 1);
+			break;
+		case 3:
+			font.setColor(1, 1, 0, 1);
+			break;
+		}
+	}
 
 	@Override
 	public void render(SpriteBatch sb) {	
@@ -343,19 +499,22 @@ public class PlayerSelectState extends State{
 		for(int i = 0; i < 4; i ++) {
 			
 			if(KambojaMain.getControllers().size()-1 >= i){
-				skinOffset[i] += (KambojaMain.getControllers().get(i).getPlayer() - skinOffset[i])/10.0f;
-				weaponOffset[i] += (KambojaMain.getControllers().get(i).getWeapon() - weaponOffset[i])/10f;
+				skinOffset[i] += (positionPlayerOffset[i] - skinOffset[i])/10.0f;
+				weaponOffset[i] += (positionWeaponOffset[i] - weaponOffset[i])/10f;
 				
 				playerBuffer[i].begin();
 				Gdx.gl.glClearColor(0, 0, 0, 0f);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+				int shift = positionPlayerOffset[i] / KambojaMain.getPlayerSkinsSize();
+				for(int k = shift - 1; k <= shift + 1; k ++) {
 					for(int j = 0; j < KambojaMain.getPlayerSkinsSize(); j ++) {
 						TextureRegion tex = Player.getTexture(j, 0);
 							
 						sb.begin();
 						sb.setProjectionMatrix(bufferProjectionPlayer);
 						sb.draw(tex,
-								(181 - tex.getRegionWidth()*5) / 2f + j*181 - skinOffset[i]*181,
+								(181 - tex.getRegionWidth()*5) / 2f + j*181 - skinOffset[i]*181 + 
+								k * (181*KambojaMain.getPlayerSkinsSize()),
 								(280 - tex.getRegionHeight()*5) / 2f,
 								tex.getRegionWidth()*5 / 2f,
 								tex.getRegionHeight()*5 / 2f,
@@ -367,11 +526,14 @@ public class PlayerSelectState extends State{
 							
 						sb.end();
 					}
+				}
 				playerBuffer[i].end();
 				
 				weaponBuffer[i].begin();
 				Gdx.gl.glClearColor(0, 0, 0, 0f);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+				shift = positionWeaponOffset[i] / KambojaMain.getWeaponSize();
+				for(int k = shift - 1; k <= shift + 1; k ++) {
 					for(int j = 0; j < KambojaMain.getWeaponSize(); j ++) {
 						Texture tex = texWep[j];
 							
@@ -381,7 +543,8 @@ public class PlayerSelectState extends State{
 						float ratio = 181 / (tex.getWidth()*5f);
 						
 						sb.draw(tex,
-								(181 - tex.getWidth()*5) / 2f + j*181 - weaponOffset[i]*181,
+								(181 - tex.getWidth()*5) / 2f + j*181 - weaponOffset[i]*181 +
+								k * (181*KambojaMain.getWeaponSize()),
 								(151 - tex.getHeight()*5) / 2f,
 								tex.getWidth()*5 / 2f,
 								tex.getHeight()*5 / 2f,
@@ -399,7 +562,29 @@ public class PlayerSelectState extends State{
 							
 						sb.end();
 					}
-					weaponBuffer[i].end();
+				}
+				weaponBuffer[i].end();
+				
+				keyboardBuffer[i].begin();
+				Gdx.gl.glClearColor(0, 0, 0, 0f);
+				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+				
+					for(int x = 0; x < 10; x ++) {
+						for(int y = 0; y < 4; y ++) {
+							BitmapFont f = (x == key_x[i] && y == 3-key_y[i]) ? outlanderBig[i] : outlander[i];
+							
+							layout.setText(f, keys[x][y]);
+							sb.begin();
+							f.draw(
+									sb,
+									keys[x][y],
+									x * 70 + (181 - layout.width)/2f - tween_key_x[i] * 70,
+									(3-y) * 70 + (151 - layout.height)/2f + layout.height - tween_key_y[i] * 70);
+							sb.end();
+						}
+					}
+				
+				keyboardBuffer[i].end();
 			}
 		}
 		
@@ -409,8 +594,12 @@ public class PlayerSelectState extends State{
 		//DESENHA MENU
 		
 			sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+			
+			bolinha.draw(sb);
+			fogo.draw(sb);
+		
 			for(int i = 0; i < 4; i ++) {
+				
 				sb.draw(
 						player_frames[i],
 						body_frames[i].getWorldCenter().x*100f - player_frames[0].getWidth()*factor/2f,
@@ -419,13 +608,24 @@ public class PlayerSelectState extends State{
 						player_frames[i].getHeight() * factor);
 				
 				if(KambojaMain.getControllers().size()-1 >= i){
+					if(KambojaMain.getControllers().get(i) != null) {
 					//desenha a arma e o player selecionado
 					Texture pt = playerBuffer[i].getColorBufferTexture();
 					sb.draw(pt,
 							body_frames[i].getWorldCenter().x*100f - pt.getWidth()*factor/2f,
 							body_frames[i].getWorldCenter().y*100f - pt.getHeight()*factor/2f + 30*factor,
 							pt.getWidth()*factor, pt.getHeight()*factor);
+					
+					layout.setText(outlander[i], KambojaMain.getControllers().get(i).getName());
+					
+					outlander[i].draw(sb, KambojaMain.getControllers().get(i).getName(),
+							body_frames[i].getWorldCenter().x*100f - layout.width/2f,
+							body_frames[i].getWorldCenter().y*100f - 160*factor
+							);
+					sb.setColor(1, 1, 1, 1);
+					}
 				}
+				
 
 				sb.draw(
 						player_glass[i],
@@ -453,9 +653,17 @@ public class PlayerSelectState extends State{
 						false);
 				
 				if(KambojaMain.getControllers().size()-1 >= i){
-					//desenha a arma e o player selecionado
-					Texture pt = weaponBuffer[i].getColorBufferTexture();
+					if(KambojaMain.getControllers().get(i) != null) {
 					
+					//desenha a arma e o player selecionado
+					
+					Texture pt;
+					if(!typing[i]) {
+						pt = weaponBuffer[i].getColorBufferTexture();
+					}
+					else {
+						pt = keyboardBuffer[i].getColorBufferTexture();
+					}
 					
 					sb.draw(
 							pt,
@@ -473,9 +681,10 @@ public class PlayerSelectState extends State{
 							pt.getWidth(),
 							pt.getHeight(),
 							false,
-							false);
+							typing[i]);
 					
-
+					
+					}
 				}
 				
 				sb.draw(
@@ -496,10 +705,30 @@ public class PlayerSelectState extends State{
 						false,
 						false);
 				
+				sb.draw(
+						select_gear[i],
+						body_frames[i].getWorldCenter().x*100f - select_gear[i].getWidth()*factor/2f,
+						-select_gear[i].getHeight()*factor*(2f/3f),
+						select_gear[i].getWidth()*factor/2f,
+						select_gear[i].getHeight()*factor/2f,
+						select_gear[i].getWidth() * factor,
+						select_gear[i].getHeight() * factor,
+						1,
+						1,
+						gear_angle[i],
+						0,
+						0,
+						select_gear[i].getWidth(),
+						select_gear[i].getHeight(),
+						false,
+						false);
+
+				
+				if(!playerReady[i]) {
 				setSpriteBatchColor(sb, i);
 				
-				
 				if(KambojaMain.getControllers().size()-1 >= i){
+					if(KambojaMain.getControllers().get(i) != null) {
 				Rectangle2D boundingBox = selection_bound_tween[i];
 				
 				//UPPER LEFT
@@ -578,13 +807,36 @@ public class PlayerSelectState extends State{
 						false,
 						true);
 				}
+				}
 				
 				sb.setColor(1, 1, 1, 1);
+				}
+			
+				
 			}
 			
-			
-			
-			
+			for(int i = 0; i < 4; i ++) {
+				
+				sb.setColor(1, 1, 1, okAlpha[i]);
+					sb.draw(ok,
+							body_frames[i].getWorldCenter().x*100f - ok.getWidth()*factor/2f,
+							body_frames[i].getWorldCenter().y*100f - ok.getHeight()*factor/2f,
+							ok.getWidth() * factor/2f,
+							ok.getHeight() * factor/2f,
+							ok.getWidth() * factor,
+							ok.getHeight() * factor,
+							okScale[i],
+							okScale[i],
+							okAngle[i],
+							0,
+							0,
+							ok.getWidth(),
+							ok.getHeight(),
+							false,
+							false);
+					
+					sb.setColor(1, 1, 1, 1);
+			}
 			
 			for(int i = chainBody.size() - 1; i >= 0; i --) {
 				Body bd = chainBody.get(i);
@@ -662,6 +914,9 @@ public class PlayerSelectState extends State{
 		globalTimer += delta;
 		
 		timer -= delta;
+		
+		fogo.update(delta/2f);
+		bolinha.update(delta);
 
 		if(intro){
 			alpha -= delta;
@@ -683,15 +938,30 @@ public class PlayerSelectState extends State{
 		
 		
 		for(int i = 0; i < 4; i ++) {
-			if(KambojaMain.getControllers().size()-1 >= 0){
-				
-				selection_bound_tween[i].setRect(
-						selection_bound_tween[i].getX() + (selection_bounds[i][selection[i]].getX() - selection_bound_tween[i].getX())/10f,
-						selection_bound_tween[i].getY() + (selection_bounds[i][selection[i]].getY() - selection_bound_tween[i].getY())/10f,
-						selection_bound_tween[i].getWidth() + (selection_bounds[i][selection[i]].getWidth() - selection_bound_tween[i].getWidth())/10f,
-						selection_bound_tween[i].getHeight() + (selection_bounds[i][selection[i]].getHeight() - selection_bound_tween[i].getHeight())/10f
-						);
-				
+			if(KambojaMain.getControllers().size()-1 >= i){
+				if(KambojaMain.getControllers().get(i) != null) {
+					if(playerReady[i]) {
+						okAlpha[i] += (1 - okAlpha[i])/10.0f;
+						okScale[i] += (1 - okScale[i])/10.0f;
+						okAngle[i] += (0 - okAngle[i])/10.0f;
+					}
+					else {
+						okAlpha[i] += (0 - okAlpha[i])/10.0f;
+						okScale[i] += (2 - okScale[i])/10.0f;
+						okAngle[i] += (30 - okAngle[i])/10.0f;
+					}
+					
+					selection_bound_tween[i].setRect(
+							selection_bound_tween[i].getX() + (selection_bounds[i][selection[i]].getX() - selection_bound_tween[i].getX())/10f,
+							selection_bound_tween[i].getY() + (selection_bounds[i][selection[i]].getY() - selection_bound_tween[i].getY())/10f,
+							selection_bound_tween[i].getWidth() + (selection_bounds[i][selection[i]].getWidth() - selection_bound_tween[i].getWidth())/10f,
+							selection_bound_tween[i].getHeight() + (selection_bounds[i][selection[i]].getHeight() - selection_bound_tween[i].getHeight())/10f
+							);
+					
+					tween_key_x[i] += (key_x[i] - tween_key_x[i])/10.0f;
+					tween_key_y[i] += (key_y[i] - tween_key_y[i])/10.0f;
+
+				}
 			}
 			
 			selection_bounds[i][1].setRect(
@@ -708,6 +978,7 @@ public class PlayerSelectState extends State{
 			timer = (float)Math.random() * 0.5f;
 			intensityTarget = (float)(Math.random() * 0.3f) - 0.15f;
 		}
+		
 	}
 	
 	
@@ -722,8 +993,10 @@ public class PlayerSelectState extends State{
 	
 	public boolean isAvailable(int player){
 		for(PlayerController pc : KambojaMain.getControllers()){
-			if(pc.getPlayer() == player){
-				return false;
+			if(pc != null) {
+				if(pc.getPlayer() == player){
+					return false;
+				}
 			}
 		}
 		return true;
@@ -768,36 +1041,105 @@ public class PlayerSelectState extends State{
 		
 		int id = Util.getControllerID(controller);
 		
-		if(id != -1) {
-		body_subframes[id].applyLinearImpulse(
-				new Vector2((float)(Math.random() * 0.6 - 0.3), (float)(Math.random() * 0.6 - 0.3)),
-				body_subframes[id].getWorldCenter(), true);
-		}
-		
 		int select = 0;
 		int start = 0;
+		int back = 0;
+		int disc = 0;
+		
 		if(controller.getName().equals(Gamecube.getID())){
 			select = Gamecube.A;
 			start = Gamecube.START;
+			back = Gamecube.B;
+			disc = Gamecube.Y;
 
 		}
 		else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
 			select = XBox.BUTTON_A;
 			start = XBox.BUTTON_START;
+			back = XBox.BUTTON_B;
+			disc = XBox.BUTTON_Y;
 		}
 		else{
 			select = GenericController.X;
 			start = GenericController.START;
+			back = GenericController.CIRCLE;
+			disc = GenericController.TRIANGLE;
+		}
+		
+		if(id != -1) {
+		body_subframes[id].applyLinearImpulse(
+				new Vector2((float)(Math.random() * 0.6 - 0.3), (float)(Math.random() * 0.6 - 0.3)),
+				body_subframes[id].getWorldCenter(), true);
+
+		if(buttonCode == select) {
+			if(id != -1){
+				if(!typing[id]) {
+					switch(selection[id]) {
+						case 2:
+							typing[id] = true;
+							selection[id] = 1;
+							break;
+						case 0:
+							playerReady[id] = true;
+							break;
+					}
+				}
+				else {
+					KambojaMain.getControllers().get(id).addLetterToName(keys[key_x[id]][3-key_y[id]]);
+				}
+
+			}
+		}
+		
+		
+		if(buttonCode == back) {
+			if(!typing[id]) {
+				if(!playerReady[id]) {
+					selection[id] = 4;
+				}
+				else {
+					playerReady[id] = false;
+				}
+			}
+			else {
+				KambojaMain.getControllers().get(id).removeLetterFromName();
+			}
+		}
+		
+		if(buttonCode == disc) {
+			if(!typing[id] && !playerReady[id])
+			KambojaMain.getControllers().set(id, null);
+		}
+		
 		}
 		
 		if(buttonCode == start){
-			if(Util.getControllerID(controller) == -1){
-				if(KambojaMain.getControllers().size() < 4){
-					PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "");
-					KambojaMain.getControllers().add(pc);
+			if(id == -1){
+				
+				PlayerController pc = new PlayerController(0, controller, firstPlayerAvailable(), "MONARK");
+				int put_id = Util.getFirstAvailableID();
+				System.out.println("Available: " + put_id);
+				if(put_id != -1) {
+					KambojaMain.getControllers().remove(put_id);
+					KambojaMain.getControllers().add(put_id, pc);
+				}
+				else {
+					if(KambojaMain.getControllers().size() < 4) {
+						KambojaMain.getControllers().add(pc);
+						
+						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
+						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+					}
+				}
+			}
+			else {
+				if(typing[id]) {
+					typing[id] = false;
+					selection[id] = 2;
 				}
 			}
 		}
+		
 		
 		return false;
 	}
@@ -815,37 +1157,95 @@ public class PlayerSelectState extends State{
 	public void changePlayer(float value, int id) {
 		if(value > 0) {
 			int player = KambojaMain.getControllers().get(id).getPlayer();
+			
+			int dif = nextPlayer(player) - player;
+			if(dif > 0) {
+				positionPlayerOffset[id] += dif;
+			}
+			else {
+				positionPlayerOffset[id] += KambojaMain.getPlayerSkinsSize() + dif;
+			}
+			
 			player = nextPlayer(player);
 			KambojaMain.getControllers().get(id).setPlayer(player);
 		}
 		else {
 			int player = KambojaMain.getControllers().get(id).getPlayer();
+			
+			int dif = player - previousPlayer(player);
+			if(dif > 0) {
+				positionPlayerOffset[id] -= dif;
+			}
+			else {
+				positionPlayerOffset[id] -= KambojaMain.getPlayerSkinsSize() + dif;
+			}
+			
 			player = previousPlayer(player);
 			KambojaMain.getControllers().get(id).setPlayer(player);
+			
 		}
 	}
 	
 	public void changeSelection(float value, int id) {
-		System.out.println("Changed selection");
-		if(value < 0) {
-			
-			if(selection[id] < 4)
-			selection[id] ++;
-			
+		if(!typing[id] && !playerReady[id]) {
+			if(value < 0) {
+				
+				if(selection[id] < 4)
+				selection[id] ++;
+				
+			}
+			else {
+				if(selection[id] > 0)
+				selection[id] --;
+				
+			}
+		}
+	}
+	
+	public void changeLetterX(float value, int id) {
+		if(value > 0) {
+			if(key_x[id] + 1 < keys.length) {
+				if(!keys[key_x[id]+1][3-key_y[id]].equals("")) {
+					key_x[id]++;
+				}
+			}
 		}
 		else {
-			if(selection[id] > 0)
-			selection[id] --;
-			
+			if(key_x[id] - 1 >= 0) {
+				if(!keys[key_x[id]-1][3-key_y[id]].equals("")) {
+					key_x[id]--;
+				}
+			}
+		}
+	}	
+	
+	public void changeLetterY(float value, int id) {
+		if(value < 0) {
+			if(key_y[id] + 1 < keys[0].length) {
+				if(!keys[key_x[id]][3-(key_y[id]+1)].equals("")) {
+					key_y[id]++;
+				}
+			}
+		}
+		else {
+			if(key_y[id] - 1 >= 0) {
+				if(!keys[key_x[id]][3-(key_y[id]-1)].equals("")) {
+					key_y[id]--;
+				}
+			}
 		}
 	}
 	
 	public void changeWeapon(float value, int id) {
 		
-		if(value > 0)
+		if(value > 0) {
 			KambojaMain.getControllers().get(id).nextWeapon();
-		else
+			positionWeaponOffset[id] ++;
+		}
+		else {
 			KambojaMain.getControllers().get(id).previousWeapon();	
+			positionWeaponOffset[id] --;
+		}
 	}
 	
 	@Override
@@ -860,11 +1260,16 @@ public class PlayerSelectState extends State{
 						if(!xMoved) {
 							xMoved = true;
 							
-							if(selection[id] == 3)
-							changePlayer(value, id);
-							
-							if(selection[id] == 1)
-							changeWeapon(value, id);
+							if(!typing[id]) {
+								if(selection[id] == 3)
+								changePlayer(value, id);
+								
+								if(selection[id] == 1)
+								changeWeapon(value, id);
+							}
+							else {
+								changeLetterX(value, id);
+							}
 						}
 					}
 					else {
@@ -875,8 +1280,12 @@ public class PlayerSelectState extends State{
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
-
-							changeSelection(value, id);
+							if(!typing[id]) {
+								changeSelection(value, id);
+							}
+							else {
+								changeLetterY(value, id);
+							}
 						}
 					}
 					else {
@@ -890,11 +1299,16 @@ public class PlayerSelectState extends State{
 						if(!xMoved) {
 							xMoved = true;
 							
-							if(selection[id] == 3)
-							changePlayer(value, id);
-							
-							if(selection[id] == 1)
-							changeWeapon(value, id);
+							if(!typing[id]) {
+								if(selection[id] == 3)
+								changePlayer(value, id);
+								
+								if(selection[id] == 1)
+								changeWeapon(value, id);
+							}
+							else {
+								changeLetterX(value, id);
+							}
 						}
 					}
 					else {
@@ -906,7 +1320,12 @@ public class PlayerSelectState extends State{
 						if(!yMoved) {
 							yMoved = true;
 
-							changeSelection(value, id);
+							if(!typing[id]) {
+								changeSelection(value, id);
+							}
+							else {
+								changeLetterY(value, id);
+							}
 						}
 					}
 					else {
@@ -920,11 +1339,16 @@ public class PlayerSelectState extends State{
 						if(!xMoved) {
 							xMoved = true;
 							
-							if(selection[id] == 3)
-							changePlayer(value, id);
-							
-							if(selection[id] == 1)
-							changeWeapon(value, id);
+							if(!typing[id]) {
+								if(selection[id] == 3)
+								changePlayer(value, id);
+								
+								if(selection[id] == 1)
+								changeWeapon(value, id);
+							}
+							else {
+								changeLetterX(value, id);
+							}
 							
 						}
 					}
@@ -937,7 +1361,12 @@ public class PlayerSelectState extends State{
 						if(!yMoved) {
 							yMoved = true;
 
-							changeSelection(value, id);
+							if(!typing[id]) {
+								changeSelection(value, id);
+							}
+							else {
+								changeLetterY(value, id);
+							}
 						}
 					}
 					else {
