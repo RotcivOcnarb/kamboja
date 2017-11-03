@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.MainMenu;
 import com.mygdx.game.states.MapSelect;
+import com.mygdx.game.states.MapSelectState;
 import com.mygdx.game.states.MenuState;
 import com.mygdx.game.states.Options;
 import com.mygdx.game.states.PlayerSelectState;
@@ -21,7 +22,7 @@ import com.mygdx.game.states.PostGame;
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
-	private int currentState = 5;
+	private int currentState = 7;
 	private boolean disposed = false; //so it doesnt dispose the same state twice
 	
 	public Manager(){
@@ -33,6 +34,7 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new Options(this));
 		states.add(new MenuState(this));
 		states.add(new PlayerSelectState(this));
+		states.add(new MapSelectState(this));
 		
 		Controllers.addListener(this);
 		Gdx.input.setInputProcessor(this);
