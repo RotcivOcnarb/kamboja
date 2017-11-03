@@ -15,6 +15,7 @@ import com.mygdx.game.states.MainMenu;
 import com.mygdx.game.states.MapSelect;
 import com.mygdx.game.states.MenuState;
 import com.mygdx.game.states.Options;
+import com.mygdx.game.states.PlayerSelectState;
 import com.mygdx.game.states.PostGame;
 
 public class Manager implements ControllerListener, InputProcessor{
@@ -31,6 +32,7 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new PostGame(this));
 		states.add(new Options(this));
 		states.add(new MenuState(this));
+		states.add(new PlayerSelectState(this));
 		
 		Controllers.addListener(this);
 		Gdx.input.setInputProcessor(this);

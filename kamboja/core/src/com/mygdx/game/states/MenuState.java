@@ -391,7 +391,7 @@ public class MenuState extends State{
 
 				switch(opt){
 				case 0:
-					manager.changeState(0);
+					manager.changeState(6);
 					break;
 				case 3:
 					manager.changeState(5);
@@ -556,6 +556,31 @@ public class MenuState extends State{
 			}
 		}
 		
+		if(keycode == Keys.ENTER){
+			switch(opt){
+			case 0:
+				outro = true;
+				intro = false;
+				break;
+			case 1:
+				timerWrong = 0.5f;
+				break;
+			case 2:
+				timerWrong = 0.5f;
+				break;
+			case 3:
+				timerWrong = 0.5f;
+				break;
+			case 4:
+				timerWrong = 0.5f;
+				break;
+			case 5:
+				timerWrong = 0.5f;
+				break;
+			}
+			
+		}
+		
 		return false;
 	}
 	
@@ -595,6 +620,7 @@ public class MenuState extends State{
 			switch(opt){
 			case 0:
 				outro = true;
+				intro = false;
 				break;
 			case 1:
 				timerWrong = 0.5f;
