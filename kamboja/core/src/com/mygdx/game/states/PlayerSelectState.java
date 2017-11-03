@@ -378,7 +378,7 @@ public class PlayerSelectState extends State{
 						sb.begin();
 						sb.setProjectionMatrix(bufferProjectionWeapon);
 						
-						float ratio = 181 / (tex.getWidth()*6f);
+						float ratio = 181 / (tex.getWidth()*5f);
 						
 						sb.draw(tex,
 								(181 - tex.getWidth()*5) / 2f + j*181 - weaponOffset[i]*181,
