@@ -887,8 +887,11 @@ public class MainMenu extends State{
 						controllerSelecion[Util.getControllerID(controller)] = 1;
 					else
 						controllerSelecion[Util.getControllerID(controller)] = 0;
+					
+					
 				}
 				change_sound();
+				return true;
 			}
 			if(value == XBox.BUTTON_DPAD_UP){
 				if(Util.getControllerID(controller) != -1){
@@ -899,6 +902,7 @@ public class MainMenu extends State{
 						controllerSelecion[Util.getControllerID(controller)] = 0;
 				}
 				change_sound();
+				return true;
 			}
 			
 			if(Util.getControllerID(controller) != -1){
@@ -913,6 +917,7 @@ public class MainMenu extends State{
 					}
 					arrowScale[Util.getControllerID(controller) * 2 + 1] = 1.3f;
 					change_sound();
+					return true;
 				}
 				if(value == XBox.BUTTON_DPAD_LEFT){
 					if(controllerSelecion[Util.getControllerID(controller)] == 0){
@@ -926,6 +931,7 @@ public class MainMenu extends State{
 					
 					arrowScale[Util.getControllerID(controller) * 2] = 1.3f;
 					change_sound();
+					return true;
 				}
 			}
 			
