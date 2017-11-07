@@ -159,6 +159,7 @@ public class PlayerSelectState extends State{
 		
 		selection_tex = new Texture("menu/player_select/selection.png");
 		
+		if(KambojaMain.getControllers() == null)
 		KambojaMain.initializeControllers();
 		
 		chainBody = new ArrayList<Body>();

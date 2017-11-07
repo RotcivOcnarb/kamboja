@@ -147,7 +147,7 @@ public class GamePause {
 			}
 			else{
 				if(yes.contains(p)){
-					state.manager.changeState(1);
+					state.manager.changeState(7);
 					return;
 				}
 				else if(no.contains(p)){
