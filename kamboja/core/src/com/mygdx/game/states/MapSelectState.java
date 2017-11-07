@@ -25,7 +25,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.objects.Util;
@@ -43,6 +42,7 @@ public class MapSelectState extends State{
 	Texture options_frame;
 	Texture map_frame;
 	Texture chain;
+	Texture map_name;
 	
 	ParticleEffect fogo;
 	ParticleEffect bolinha;
@@ -63,6 +63,7 @@ public class MapSelectState extends State{
 	OrthographicCamera camera;
 	
 	Body mapBody;
+	Body mapNameBody;
 	
 	ArrayList<Body> chainBody;
 	
@@ -80,6 +81,7 @@ public class MapSelectState extends State{
 		
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
+		map_name = new Texture("menu/map_select/map_name.png");
 
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
@@ -123,17 +125,19 @@ public class MapSelectState extends State{
 		
 		mapBody = createBox(
 				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight() * (3/4f)),
-				new Vector2(444/2f*factor, 413/2f*factor), BodyType.DynamicBody, 1);
+				new Vector2(444/2f*factor, 413/2f*factor), BodyType.DynamicBody, 0.1f);
 		
+		mapNameBody = createBox(
+				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight()/2f),
+				new Vector2(402/2f*factor, 88/2f*factor), BodyType.DynamicBody, 0.1f);
 		
-		buildRopeJoint();
+		buildRopeJoint((int)(10 * factor));
+		buildRopeJoint2((int)(3 * factor));
 	}
 
 	public void dispose() {
 		
 	}
-
-
 	
 	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density) {
 		BodyDef def = new BodyDef();
@@ -151,12 +155,12 @@ public class MapSelectState extends State{
 		return b;
 	}
 	
-	public void buildRopeJoint() {
+	public void buildRopeJoint(int numChains) {
 		
 		for(int k = -1; k <= 1; k += 2) {
 			Array<Body> bodies = new Array<Body>();
 			
-			for(int i = 0; i < 5; i ++) {
+			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
 						new Vector2(Gdx.graphics.getWidth()*(3/4f) + k*100, Gdx.graphics.getHeight()-(30*i) + 50*factor),
 						new Vector2(5f, 20), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f);
@@ -165,7 +169,7 @@ public class MapSelectState extends State{
 				bodies.add(b);
 			}
 			
-			for(int i = 1; i < 5; i ++) {
+			for(int i = 1; i < numChains; i ++) {
 				RevoluteJointDef def = new RevoluteJointDef();
 				def.bodyA = bodies.get(i-1);
 				def.bodyB = bodies.get(i);
@@ -188,10 +192,53 @@ public class MapSelectState extends State{
 			
 		}
 		
-		//controles ativos
-				if(KambojaMain.getControllers() == null){
-					KambojaMain.initializeControllers();
-				}
+	}
+	
+	public void buildRopeJoint2(int numChains) {
+		
+		for(int k = -1; k <= 1; k += 2) {
+			Array<Body> bodies = new Array<Body>();
+			
+			for(int i = 0; i < numChains; i ++) {
+				Body b = createBox(
+						new Vector2(Gdx.graphics.getWidth()*(3/4f) + k*100, Gdx.graphics.getHeight()-(30*i) - 600*factor),
+						new Vector2(5f, 20), BodyType.DynamicBody, 1f);
+				
+				chainBody.add(b);
+				bodies.add(b);
+			}
+			
+			RevoluteJointDef def = new RevoluteJointDef();
+			def.bodyA = mapBody;
+			def.bodyB = bodies.get(0);
+			def.localAnchorA.set((Gdx.graphics.getWidth()*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
+					-(413/2f*factor - 50*factor) / 100f);
+			def.localAnchorB.set(0, 15f/100f);
+			
+			world.createJoint(def);
+			
+			for(int i = 1; i < numChains; i ++) {
+				def = new RevoluteJointDef();
+				def.bodyA = bodies.get(i-1);
+				def.bodyB = bodies.get(i);
+				def.localAnchorA.set(0, -15f/100f);
+				def.localAnchorB.set(0, 15f/100f);
+				
+				world.createJoint(def);
+			}
+			
+			def = new RevoluteJointDef();
+			def.bodyA = bodies.get(bodies.size - 1);
+			def.bodyB = mapNameBody;
+			def.localAnchorA.set(0, -7.5f/100f);
+			def.localAnchorB.set((Gdx.graphics.getWidth()*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
+					(200/2f*factor - 50*factor) / 100f);
+			
+			world.createJoint(def);
+			
+			bodies.get(1).applyLinearImpulse(new Vector2((float)Math.random()*0.1f, 0), bodies.get(1).getWorldCenter(), true);
+			
+		}
 		
 	}
 	
@@ -207,7 +254,7 @@ public class MapSelectState extends State{
 	
 		sb.draw(options_frame,
 				options_x,
-				0,
+				-100*factor,
 				options_frame.getWidth() * factor,
 				options_frame.getHeight() * factor);
 		
@@ -223,6 +270,20 @@ public class MapSelectState extends State{
 				0, 0,
 				map_frame.getWidth(),
 				map_frame.getWidth(),
+				false, false);
+		
+		sb.draw(map_name,
+				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f*factor,
+				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f*factor,
+				map_name.getWidth()/2f*factor,
+				map_name.getHeight()/2f*factor,
+				map_name.getWidth()*factor,
+				map_name.getWidth()*factor,
+				1, 1,
+				(float)Math.toDegrees(mapNameBody.getAngle()),
+				0, 0,
+				map_name.getWidth(),
+				map_name.getWidth(),
 				false, false);
 		
 		for(int i = chainBody.size() - 1; i >= 0; i --) {
@@ -248,7 +309,7 @@ public class MapSelectState extends State{
 		
 		sb.end();
 		
-		//b2dr.render(world, camera.combined);
+		b2dr.render(world, camera.combined);
 		
 		shaderBuffer.end();
 		

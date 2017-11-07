@@ -4,6 +4,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
@@ -29,6 +32,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
@@ -39,6 +43,7 @@ import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
@@ -60,6 +65,7 @@ public class PlayerSelectState extends State{
 	Texture chain;
 	Texture selection_tex;
 	Texture ok;
+	Texture pressStart;
 	
 	float okAlpha[] = new float[4];
 	float okScale[] = new float[4];
@@ -94,6 +100,7 @@ public class PlayerSelectState extends State{
 		
 	Body body_frames[] = new Body[4];
 	Body body_subframes[] = new Body[4];
+	Body pressStartBody;
 	
 	ShapeRenderer sr;
 	FrameBuffer shaderBuffer;
@@ -126,6 +133,8 @@ public class PlayerSelectState extends State{
 	private float back_angle;
 	
 	boolean goingBack;
+	boolean allReady;
+	boolean hasFallen;
 
 	
 	public PlayerSelectState(Manager manager) {
@@ -140,10 +149,12 @@ public class PlayerSelectState extends State{
 		timer = 0;
 		shaderIntensity = 0;
 		intensityTarget = 0;
+		hasFallen = false;
 		globalTimer = 0;
 		sr = new ShapeRenderer();
 		
 		goingBack = false;
+		allReady = false;
 		back_angle = 0;
 		
 		selection_tex = new Texture("menu/player_select/selection.png");
@@ -152,6 +163,8 @@ public class PlayerSelectState extends State{
 		
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
+		
+		pressStart = new Texture("menu/player_select/press start.png");
 		
 		setKeys();
 		
@@ -198,6 +211,8 @@ public class PlayerSelectState extends State{
 		
 		factor = Gdx.graphics.getHeight() / 1080f;
 		
+	
+		
 		for(int i = 0; i < 4; i ++) {
 			//Creates the font
 			FreeTypeFontGenerator ftfg;
@@ -216,6 +231,8 @@ public class PlayerSelectState extends State{
 			okAlpha[i] = 0;
 			okScale[i] = 2;
 			okAngle[i] = 30;
+			key_x[i] = 0;
+			key_y[i] = 2;
 		}
 		
 		layout = new GlyphLayout();
@@ -252,6 +269,13 @@ public class PlayerSelectState extends State{
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
 		
+		pressStartBody = createBox(
+				new Vector2(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()*2),
+				new Vector2(772*factor, 181*factor),
+				BodyType.DynamicBody, 0.01f, true);
+		
+		buildStartRopeJoint((int)(20 * factor));
+		
 		
 		float targetwidth = (452*3 + player_frames[0].getWidth()) * factor;
 		float targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
@@ -277,7 +301,7 @@ public class PlayerSelectState extends State{
 							player_frames[i].getWidth()*0.9f * factor / 2f,
 							player_frames[i].getHeight()*0.9f * factor / 2f
 							),
-					BodyType.StaticBody, 0f
+					BodyType.StaticBody, 0f, true
 					);		
 			
 			targetwidth = (452*3 + player_subframes[0].getWidth()) * factor;
@@ -294,7 +318,7 @@ public class PlayerSelectState extends State{
 							player_subframes[i].getWidth()*0.7f * factor / 2f,
 							player_subframes[i].getHeight()*0.7f * factor / 2f
 							),
-					BodyType.DynamicBody, 0.03f
+					BodyType.DynamicBody, 0.03f, false
 					);	
 			
 			//buildRopeJoint(body_frames[i], body_subframes[i]);
@@ -339,8 +363,7 @@ public class PlayerSelectState extends State{
 			
 			selection_bound_tween[i] = (Rectangle2D) selection_bounds[i][3].clone();
 		}
-		
-		
+
 	}
 	
 	private void setKeys() {
@@ -356,41 +379,41 @@ public class PlayerSelectState extends State{
 		keys[8][0] = "9";
 		keys[9][0] = "0";
 		
-		keys[0][1] = "Q";
-		keys[1][1] = "W";
-		keys[2][1] = "E";
-		keys[3][1] = "R";
-		keys[4][1] = "T";
-		keys[5][1] = "Y";
-		keys[6][1] = "U";
-		keys[7][1] = "I";
-		keys[8][1] = "O";
-		keys[9][1] = "P";
+		keys[0][1] = "A";
+		keys[1][1] = "B";
+		keys[2][1] = "C";
+		keys[3][1] = "D";
+		keys[4][1] = "E";
+		keys[5][1] = "F";
+		keys[6][1] = "G";
+		keys[7][1] = "H";
+		keys[8][1] = "I";
+		keys[9][1] = "";
 		
-		keys[0][2] = "A";
-		keys[1][2] = "S";
-		keys[2][2] = "D";
-		keys[3][2] = "F";
-		keys[4][2] = "G";
-		keys[5][2] = "H";
-		keys[6][2] = "J";
-		keys[7][2] = "K";
-		keys[8][2] = "L";
+		keys[0][2] = "J";
+		keys[1][2] = "K";
+		keys[2][2] = "L";
+		keys[3][2] = "M";
+		keys[4][2] = "N";
+		keys[5][2] = "O";
+		keys[6][2] = "P";
+		keys[7][2] = "Q";
+		keys[8][2] = "R";
 		keys[9][2] = "";
 		
-		keys[0][3] = "Z";
-		keys[1][3] = "X";
-		keys[2][3] = "C";
+		keys[0][3] = "S";
+		keys[1][3] = "T";
+		keys[2][3] = "U";
 		keys[3][3] = "V";
-		keys[4][3] = "B";
-		keys[5][3] = "N";
-		keys[6][3] = "M";
-		keys[7][3] = "";
+		keys[4][3] = "W";
+		keys[5][3] = "X";
+		keys[6][3] = "Y";
+		keys[7][3] = "Z";
 		keys[8][3] = "";
 		keys[9][3] = "";
 	}
 
-	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density) {
+	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density, boolean sensor) {
 		BodyDef def = new BodyDef();
 		def.type = type;
 		def.linearDamping = 0.2f;
@@ -401,7 +424,8 @@ public class PlayerSelectState extends State{
 		PolygonShape s = new PolygonShape();
 		s.setAsBox(size.x / 100f, size.y / 100f);
 		
-		b.createFixture(s, density);
+		Fixture f = b.createFixture(s, density);
+		f.setSensor(sensor);
 		
 		return b;
 	}
@@ -421,7 +445,7 @@ public class PlayerSelectState extends State{
 								Gdx.graphics.getHeight() - factor*(138 + player_frames[p].getHeight()*0.9f)
 								+ (player_frames[p].getHeight()*0.9f * factor)/2f - player_frames[p].getHeight()*0.9f * factor / 2f
 								- (15*i)),
-						new Vector2(2.5f, 10), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f);
+						new Vector2(2.5f, 10), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, false);
 				
 				chainBody.add(b);
 				bodies.add(b);
@@ -451,11 +475,45 @@ public class PlayerSelectState extends State{
 			bodies.get(1).applyLinearImpulse(new Vector2((float)Math.random()*0.1f, 0), bodies.get(1).getWorldCenter(), true);
 			
 		}
+
+	}
+	
+	public void buildStartRopeJoint(int numChains) {
 		
-		//controles ativos
-				if(KambojaMain.getControllers() == null){
-					KambojaMain.initializeControllers();
-				}
+		for(int k = -1; k <= 1; k += 2) {
+			Array<Body> bodies = new Array<Body>();
+			
+			for(int i = 0; i < numChains; i ++) {
+				Body b = createBox(
+						new Vector2(Gdx.graphics.getWidth()/2 + k*(Gdx.graphics.getWidth()/4f), Gdx.graphics.getHeight()-(30*i) + 250*factor),
+						new Vector2(5f, 20), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, true);
+				
+				chainBody.add(b);
+				bodies.add(b);
+			}
+			
+			for(int i = 1; i < numChains; i ++) {
+				RevoluteJointDef def = new RevoluteJointDef();
+				def.bodyA = bodies.get(i-1);
+				def.bodyB = bodies.get(i);
+				def.localAnchorA.set(0, -15f/100f);
+				def.localAnchorB.set(0, 15f/100f);
+				
+				world.createJoint(def);
+			}
+			
+			RevoluteJointDef def = new RevoluteJointDef();
+			def.bodyA = bodies.get(bodies.size - 1);
+			def.bodyB = pressStartBody;
+			def.localAnchorA.set(0, -7.5f/100f);
+			def.localAnchorB.set((k*Gdx.graphics.getWidth()/4f) /100f,
+					(413/2f*factor - 50*factor) / 100f);
+			
+			world.createJoint(def);
+			
+			bodies.get(1).applyLinearImpulse(new Vector2((float)Math.random()*0.1f, 0), bodies.get(1).getWorldCenter(), true);
+			
+		}
 		
 	}
 
@@ -866,9 +924,12 @@ public class PlayerSelectState extends State{
 				
 				sb.setColor(1, 1, 1, 1);
 				}
+				
+				
 			
 				
 			}
+			
 			
 			for(int i = 0; i < 4; i ++) {
 				
@@ -934,6 +995,25 @@ public class PlayerSelectState extends State{
 					back_tex.getHeight(),
 					false,
 					false);
+			
+
+			sb.draw(
+					pressStart,
+					pressStartBody.getWorldCenter().x*100f - pressStart.getWidth()*factor/2f,
+					pressStartBody.getWorldCenter().y*100f - pressStart.getHeight()*factor/2f,
+					pressStart.getWidth()*factor/2f,
+					pressStart.getHeight()*factor/2f,
+					pressStart.getWidth() * factor,
+					pressStart.getHeight() * factor,
+					1,
+					1,
+					(float)Math.toDegrees(pressStartBody.getAngle()),
+					0,
+					0,
+					pressStart.getWidth(),
+					pressStart.getHeight(),
+					false,
+					false);
 
 		
 			//b2dr.render(world, camera.combined);
@@ -985,6 +1065,33 @@ public class PlayerSelectState extends State{
 			back_angle += delta*100;
 		}
 		
+		if(allReady) {
+			if(!hasFallen) {
+				pressStartBody.setTransform(new Vector2(Gdx.graphics.getWidth()/2f / 100f,  Gdx.graphics.getHeight()*2 / 100f), 0);
+				pressStartBody.setLinearVelocity(0, 0);
+				hasFallen = true;
+			}
+		}
+		else {
+			hasFallen = false;
+			pressStartBody.applyForceToCenter(new Vector2(0, 20), true);
+		}
+		
+		allReady = true;
+		for(int i = 0; i < 4; i ++) {
+			if(KambojaMain.getControllers().size()-1 >= i){
+				if(KambojaMain.getControllers().get(i) != null) {
+					if(!playerReady[i]) {
+						allReady = false;
+						break;
+					}
+				}
+			}
+			else {
+				if(i <= 1) allReady = false;
+			}
+		}
+		
 		
 		
 		fogo.update(delta/2f);
@@ -1007,6 +1114,9 @@ public class PlayerSelectState extends State{
 				if(goingBack) {
 					goingBack = false;
 					manager.changeState(5);
+				}
+				else {
+					manager.changeState(7);
 				}
 				
 			}
@@ -1221,6 +1331,12 @@ public class PlayerSelectState extends State{
 					typing[id] = false;
 					selection[id] = 2;
 				}
+				else if(!allReady && !playerReady[id]) {
+					selection[id] = 0;
+				}
+				else if(allReady) {
+					outro = true;
+				}
 			}
 		}
 		
@@ -1235,8 +1351,6 @@ public class PlayerSelectState extends State{
 		return false;
 	}
 
-	boolean xMoved = false;
-	boolean yMoved = false;
 	
 	public void changePlayer(float value, int id) {
 		if(value > 0) {
@@ -1331,7 +1445,9 @@ public class PlayerSelectState extends State{
 			positionWeaponOffset[id] --;
 		}
 	}
-	
+
+	boolean xMoved = false;
+	boolean yMoved = false;
 	@Override
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
 		int id = Util.getControllerID(controller);
@@ -1459,6 +1575,155 @@ public class PlayerSelectState extends State{
 				}
 			}
 		}
+		return false;
+	}
+	
+	public KeyboardController getKeyboardController() {
+		
+		for(PlayerController pc : KambojaMain.getControllers()) {
+			if(pc instanceof KeyboardController) {
+				return (KeyboardController)pc;
+			}
+		}
+		
+		return null;
+	}
+	
+	public boolean keyDown(int keycode) {
+		
+		int id = Util.getControllerID(getKeyboardController());
+		
+		if(keycode == Keys.ENTER) {
+			if(id == -1) {
+				int put_id = Util.getFirstAvailableID();
+				if(put_id != -1) {
+					KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (put_id+1));
+					KambojaMain.getControllers().remove(put_id);
+					KambojaMain.getControllers().add(put_id, pc);
+				}
+				else {
+					if(KambojaMain.getControllers().size() < 4) {
+						KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (KambojaMain.getControllers().size()+1));
+						KambojaMain.getControllers().add(pc);
+						
+						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
+						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+					}
+				}
+			}
+			else {
+				if(!typing[id]) {
+					if(playerReady[id]) {
+						if(allReady) {
+							outro = true;
+						}
+					}
+					else {
+						switch(selection[id]) {
+							case 2:
+								typing[id] = true;
+								selection[id] = 1;
+								break;
+							case 0:
+								playerReady[id] = true;
+								break;
+							case 4:
+								outro = true;
+								goingBack = true;
+								break;
+						}
+					}
+				}
+				else {
+					typing[id] = false;
+					selection[id] = 2;
+				}
+
+			}
+		}
+		if(keycode == Keys.DOWN || keycode == Keys.S) {
+			if(id != -1) {
+				if(!typing[id]) {
+					changeSelection(1, id);
+				}
+				else {
+					changeLetterY(1, id);
+				}
+			}
+		}
+		if(keycode == Keys.UP || keycode == Keys.W) {
+			if(id != -1) {
+				if(!typing[id]) {
+					changeSelection(-1, id);
+				}
+				else {
+					changeLetterY(-1, id);
+				}
+			}
+		}
+		if(keycode == Keys.LEFT || keycode == Keys.A) {
+			if(id != -1) {
+				if(!typing[id]) {
+					if(selection[id] == 3)
+					changePlayer(-1, id);
+					
+					if(selection[id] == 1)
+					changeWeapon(-1, id);
+				}
+				else {
+					changeLetterX(-1, id);
+				}
+			}
+		}
+		if(keycode == Keys.RIGHT || keycode == Keys.D) {
+			if(id != -1) {
+				if(!typing[id]) {
+					if(selection[id] == 3)
+					changePlayer(1, id);
+					
+					if(selection[id] == 1)
+					changeWeapon(1, id);
+				}
+				else {
+					changeLetterX(1, id);
+				}
+			}
+		}
+		if(keycode == Keys.ESCAPE) {
+			if(!typing[id] && !playerReady[id])
+				KambojaMain.getControllers().set(id, null);
+		}
+		
+		if(keycode == Keys.BACKSPACE || keycode == Keys.DEL || keycode == Keys.FORWARD_DEL) {
+			if(!typing[id]) {
+				if(!playerReady[id]) {
+					selection[id] = 4;
+				}
+				else {
+					playerReady[id] = false;
+				}
+			}
+			else {
+				KambojaMain.getControllers().get(id).removeLetterFromName();
+			}
+		}
+		
+		if(id != -1) {
+			if(typing[id]) {
+				if(keycode >= 29 && keycode <= 54) {
+					KambojaMain.getControllers().get(id).addLetterToName(getLetterFromKeycode(keycode));
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public String getLetterFromKeycode(int keycode) {
+		return Input.Keys.toString(keycode);
+	}
+
+	public boolean keyUp(int keycode) {
 		return false;
 	}
 

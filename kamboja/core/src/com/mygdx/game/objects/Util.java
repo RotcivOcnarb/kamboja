@@ -28,6 +28,18 @@ public class Util {
 		}
 		return -1;
 	}
+	
+	public static int getControllerID(PlayerController controller){
+		if(controller == null) return -1;
+		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
+			if(KambojaMain.getControllers().get(i) != null) {
+				if(controller.equals(KambojaMain.getControllers().get(i))){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
 
 	public static int getFirstAvailableID() {
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){

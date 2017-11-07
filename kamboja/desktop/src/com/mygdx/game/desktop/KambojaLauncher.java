@@ -1,23 +1,39 @@
 package com.mygdx.game.desktop;
 
+import java.awt.AWTException;
 import java.awt.DisplayMode;
 import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Robot;
 import java.awt.Toolkit;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
+import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.Util;
 
-public class KambojaLauncher {
+public class KambojaLauncher{
 	public static void main (String[] arg) {
-		
+		new KambojaLauncher();
+	}
+
+	public KambojaLauncher() {
 		JPanel panel = new JPanel();
 		
 		JCheckBox chk_full = new JCheckBox("Fullscreen");
@@ -51,7 +67,7 @@ public class KambojaLauncher {
 		panel.add(chk_full);
 		panel.add(lbl_res);
 		panel.add(combo);
-		
+				
 		if(JOptionPane.showConfirmDialog(null, panel, "Kamboja", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION){
 				
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
@@ -64,7 +80,6 @@ public class KambojaLauncher {
 			config.backgroundFPS = 60;
 			config.resizable = false;
 			
-
 		new LwjglApplication(new KambojaMain(), config);
 		}
 	}
@@ -108,5 +123,5 @@ public class KambojaLauncher {
 		}
 		return false;
 	}
-	
+
 }
