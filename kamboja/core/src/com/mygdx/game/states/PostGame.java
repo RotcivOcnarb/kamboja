@@ -14,6 +14,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector3;
+import com.codedisaster.steamworks.SteamAPICall;
+import com.codedisaster.steamworks.SteamUserStats;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
@@ -25,6 +27,7 @@ import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.steam.MySteamCallback;
 
 public class PostGame extends State{
 	
@@ -88,6 +91,9 @@ public class PostGame extends State{
 				return (int) (((float)arg1.getKills() - (float)arg0.getKills()));
 			}
 		});
+		
+		SteamUserStats userStats = new SteamUserStats(new MySteamCallback());
+		userStats.setAchievement("ACH_PLAY_ONCE");
 		
 	}
 	
@@ -179,7 +185,7 @@ public class PostGame extends State{
 				
 				
 				if(buttonCode == start){
-					manager.changeState(1);
+					manager.changeState(6);
 					if(GameState.SFX)
 					sound_select.play();
 						

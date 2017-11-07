@@ -497,6 +497,7 @@ public class GameState extends State{
 		}
 
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
+			if(KambojaMain.getControllers().get(i) != null)
 				createPlayer(i);
 		}
 		

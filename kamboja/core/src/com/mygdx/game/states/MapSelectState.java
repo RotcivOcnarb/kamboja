@@ -1,9 +1,11 @@
 package com.mygdx.game.states;
 
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.files.FileHandle;
@@ -37,6 +39,12 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
+import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
+import com.mygdx.game.controllers.Playstation3;
+import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.KeyboardController;
+import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
 
 public class MapSelectState extends State{
@@ -56,7 +64,11 @@ public class MapSelectState extends State{
 	Texture gear_start;
 	Texture gear_back;
 	Texture map_containers;
+	Texture selection_tex;
 	TextureRegion[] map_container = new TextureRegion[16];
+	
+	Rectangle2D selection_bounds[] = new Rectangle2D[21];
+	Rectangle2D selection_bound_tween[] = new Rectangle2D[4];
 	
 	ParticleEffect fogo;
 	ParticleEffect bolinha;
@@ -69,7 +81,9 @@ public class MapSelectState extends State{
 
 	ShapeRenderer sr;
 	
-	int selected_map = 3;
+	int selected_map = 0;
+	
+	int selection[] = new int[4];
 	
 	float factor;
 	
@@ -93,6 +107,8 @@ public class MapSelectState extends State{
 	
 	FrameBuffer mapNameBuffer;
 	Matrix4 nameBufferProjection;
+	private boolean goingBack;
+
 	
 	public MapSelectState(Manager manager) {
 		super(manager);
@@ -123,6 +139,8 @@ public class MapSelectState extends State{
 				map_container[i + j*4] = new TextureRegion(map_containers, i*217, j*199, 217, 199);
 			}
 		}
+		
+		selection_tex = new Texture("menu/player_select/selection.png");
 		
 
 		world = new World(new Vector2(0, -9.81f), false);
@@ -216,6 +234,58 @@ public class MapSelectState extends State{
 		mapNames.add("");
 		thumbs.add(new Texture(new FileHandle(new File("maps/thumb_random.png"))));
 		mapTitles.add("Random");
+		
+		for(int i = 0; i < 16; i ++) {
+			int x = i % 4;
+			int y = i / 4;
+			selection_bounds[i] = new Rectangle2D.Double(
+					x*250*factor - 217*factor/2f + 190*factor,
+					Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 360*factor,
+					237*factor,
+					219*factor
+					);
+
+		}
+		
+		selection_bounds[16] = new Rectangle2D.Double(
+				Gdx.graphics.getWidth()* (1/4f) - gear_back.getWidth()/2f*factor,
+				-30*factor - gear_back.getHeight()/2f*factor,
+				gear_back.getWidth()*factor,
+				gear_back.getHeight()*factor
+				);
+		
+		selection_bounds[17] = new Rectangle2D.Double(
+				Gdx.graphics.getWidth()/2f - gear_start.getWidth()/2f*factor,
+				-30*factor - gear_start.getHeight()/2f*factor,
+				gear_start.getWidth()*factor,
+				gear_start.getHeight()*factor
+				);
+		
+		
+		String tm = "" + (KambojaMain.getGameTime() == -1 ? "Inf." :
+			KambojaMain.getGameTime()/60 + ":" + ((KambojaMain.getGameTime() % 60 >= 10) ? KambojaMain.getGameTime() % 60 : "0" + KambojaMain.getGameTime() % 60));
+	
+		layout.setText(oliver_barney, tm);
+		selection_bounds[18] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
+				190* factor, 550*factor, 120*factor);
+
+		tm = "" + (KambojaMain.getDeathsNumber() == -1  ? "Inf." : KambojaMain.getDeathsNumber());
+
+		layout.setText(oliver_barney, tm);
+		selection_bounds[19] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
+				120* factor, 550*factor, 120*factor);
+
+		tm = "" + (KambojaMain.hasItems()  ? "on" : "off");
+		
+		layout.setText(oliver_barney, tm);
+		selection_bounds[20] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
+				50* factor, 550*factor, 120*factor);
+
+		
+		for(int i = 0; i < 4; i ++) {
+			selection[i] = i;
+			selection_bound_tween[i] = (Rectangle2D) selection_bounds[i].clone();
+		}
 	}
 
 	public void dispose() {
@@ -323,6 +393,28 @@ public class MapSelectState extends State{
 			
 		}
 		
+	}
+	
+	public Color getPlayerColor(int id) {
+		switch(id) {
+		case 0:
+			return new Color(0, 0, 1, 1);
+		case 1:
+			return new Color(1, 0, 0, 1);
+		case 2:
+			return new Color(0, 1, 0, 1);
+		case 3:
+			return new Color(1, 1, 0, 1);
+		}
+		return new Color(1, 1, 1, 1);
+	}
+	
+	public void setSpriteBatchColor(SpriteBatch sb, int id) {
+		sb.setColor(getPlayerColor(id));
+	}
+	
+	public void setFontColor(BitmapFont font, int id) {
+		font.setColor(getPlayerColor(id));
 	}
 	
 	public void render(SpriteBatch sb) {
@@ -519,6 +611,94 @@ public class MapSelectState extends State{
 					false);
 		}
 		
+		for(int i = 0; i < 4; i ++) {
+			setSpriteBatchColor(sb, i);
+			
+			if(KambojaMain.getControllers().size()-1 >= i){
+				if(KambojaMain.getControllers().get(i) != null) {
+				Rectangle2D boundingBox = selection_bound_tween[i];
+				
+				//UPPER LEFT
+				sb.draw(
+						selection_tex,
+						(float)boundingBox.getX(),
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						(float)boundingBox.getWidth()/2f,
+						-(float)boundingBox.getHeight()/2f,
+						selection_tex.getWidth()*factor,
+						selection_tex.getHeight()*factor,
+						1,
+						1,
+						0,
+						0,
+						0,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
+						true,
+						false);
+				
+				//UPPER RIGHT
+				sb.draw(
+						selection_tex,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						-(float)boundingBox.getWidth()/2f,
+						-(float)boundingBox.getHeight()/2f,
+						selection_tex.getWidth()*factor,
+						selection_tex.getHeight()*factor,
+						1,
+						1,
+						0,
+						0,
+						0,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
+						false,
+						false);
+				
+				//BOTTOM LEFT
+				sb.draw(
+						selection_tex,
+						(float)boundingBox.getX(),
+						(float)boundingBox.getY(),
+						(float)boundingBox.getWidth()/2f,
+						(float)boundingBox.getHeight()/2f,
+						selection_tex.getWidth()*factor,
+						selection_tex.getHeight()*factor,
+						1,
+						1,
+						0,
+						0,
+						0,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
+						true,
+						true);
+				
+				//BOTTOM RIGHT
+				sb.draw(
+						selection_tex,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
+						(float)boundingBox.getY(),
+						-(float)boundingBox.getWidth()/2f,
+						(float)boundingBox.getHeight()/2f,
+						selection_tex.getWidth()*factor,
+						selection_tex.getHeight()*factor,
+						1,
+						1,
+						0,
+						0,
+						0,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
+						false,
+						true);
+				}
+			}
+		}
+		
+		sb.setColor(1, 1, 1, 1);
+		
 		sb.end();
 		
 		//b2dr.render(world, camera.combined);
@@ -580,6 +760,12 @@ public class MapSelectState extends State{
 			if(alpha >= 1){
 				outro = false;
 				alpha = 1;
+				if(goingBack) {
+					manager.changeState(6);
+				}
+				else {
+					manager.changeState(2);
+				}
 			}
 		}
 		
@@ -587,6 +773,20 @@ public class MapSelectState extends State{
 			timer = (float)Math.random() * 0.5f;
 			intensityTarget = (float)(Math.random() * 0.3f) - 0.15f;
 		}
+		
+		for(int i = 0; i < 4; i ++) {
+			if(KambojaMain.getControllers().size()-1 >= i){
+				if(KambojaMain.getControllers().get(i) != null) {
+					selection_bound_tween[i].setRect(
+							selection_bound_tween[i].getX() + (selection_bounds[selection[i]].getX() - selection_bound_tween[i].getX())/10f,
+							selection_bound_tween[i].getY() + (selection_bounds[selection[i]].getY() - selection_bound_tween[i].getY())/10f,
+							selection_bound_tween[i].getWidth() + (selection_bounds[selection[i]].getWidth() - selection_bound_tween[i].getWidth())/10f,
+							selection_bound_tween[i].getHeight() + (selection_bounds[selection[i]].getHeight() - selection_bound_tween[i].getHeight())/10f
+							);
+				}
+			}
+		}
+			
 		
 		shaderIntensity += (intensityTarget - shaderIntensity) / 10.0f;
 
@@ -604,14 +804,211 @@ public class MapSelectState extends State{
 	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
+		int id = Util.getControllerID(controller);
+		if(id != -1){
+			int select = 0;
+			int backbtn = 0;
+			int startbtn = 0;
+			
+			if(controller.getName().equals(Gamecube.getID())){
+				select = Gamecube.A;
+				backbtn = Gamecube.B;
+				startbtn = Gamecube.START;
+			}
+			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+				select = XBox.BUTTON_A;
+				backbtn = XBox.BUTTON_B;
+				startbtn = XBox.BUTTON_START;
+			}
+			else{
+				select = GenericController.X;
+				backbtn = GenericController.TRIANGLE;
+				startbtn = GenericController.START;
+			}
+			
+			if(buttonCode == select) {
+				doSelection(id);
+			}
+			if(buttonCode == backbtn) {
+				selection[id] = 16;
+			}
+			if(buttonCode == startbtn) {
+				selection[id] = 17;
+			}
+		}
+		
 		return false;
 	}
 
 	public boolean buttonUp(Controller controller, int buttonCode) {
 		return false;
 	}
-
+	
+	boolean xMoved = false;
+	boolean yMoved = false;
+	
+	public void changeSelectionX(int id, float value) {
+		if(id != -1) {
+			if(value > 0) {
+				if(selection[id] < 15) {
+					if((selection[id]+1) % 4 != 0) {
+						if(selection[id] + 1 < mapNames.size()) {
+							selection[id] ++;
+						}
+						else {
+							selection[id] = 18;
+						}
+					}
+					else {
+						selection[id] = 18;
+					}
+				}
+				else {
+					if(selection[id] == 15) {
+						selection[id] = 18;
+					}
+					else {
+						if(selection[id] == 16) selection[id] = 17;
+						else if(selection[id] == 17) selection[id] = 20;
+					}
+				}
+			}
+			else {
+				if(selection[id] < 16) {
+					if(selection[id] % 4 != 0) {
+						selection[id] --;
+					}
+				}
+				else {
+					if(selection[id] == 17) selection[id] = 16;
+					else if(selection[id] > 17) selection[id] = 17;
+				}
+			}
+		}
+	}
+	
+	public void changeSelectionY(int id, float value) {
+		if(value < 0) {
+			if(selection[id] > 3) {
+				if(selection[id] < 16) {
+					selection[id] -= 4;
+				}
+				else {
+					if(selection[id] <= 17) {
+						selection[id] = 15;
+						while(selection[id] >= mapNames.size()) {
+							selection[id] --;
+						}
+					}
+					else if(selection[id] > 18) selection[id] --;
+					
+					
+				}
+			}
+		}
+		else {
+			if(selection[id] < 12) {
+				if(selection[id] + 4 < mapNames.size()) {
+					selection[id] += 4;
+				}
+				else {
+					selection[id] = 16;
+				}
+			}
+			else {
+				if(selection[id] < 16) {
+					selection[id] = 16;
+				}
+				else {
+					if(selection[id] >= 18 && selection[id] != 20) {
+						selection[id]++;
+					}
+				}
+			}
+		}
+	}
+	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
+	int id = Util.getControllerID(controller);
+		
+		
+		if(id != -1){
+			if(controller.getName().equals(Gamecube.getID())){
+				if(axisCode == Gamecube.MAIN_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							
+							changeSelectionX(id, value);
+							
+						}
+					}
+					else {
+						xMoved = false;
+					}
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(id, value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+				if(axisCode == XBox.AXIS_LEFT_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							changeSelectionX(id, value);
+						}
+					}
+					else {
+						xMoved = false;
+					}
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(id, value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+			else {
+				if(axisCode == GenericController.LEFT_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							changeSelectionX(id, value);
+							
+						}
+					}
+					else {
+						xMoved = false;
+					}
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(id, value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
@@ -628,6 +1025,95 @@ public class MapSelectState extends State{
 	}
 
 	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+		return false;
+	}
+	
+	public KeyboardController getKeyboardController() {
+			
+			for(PlayerController pc : KambojaMain.getControllers()) {
+				if(pc instanceof KeyboardController) {
+					return (KeyboardController)pc;
+				}
+			}
+			
+			return null;
+		}
+	
+	public void doSelection(int id) {
+
+		switch(selection[id]) {
+		case 16:
+			outro = true;
+			goingBack = true;
+			break;
+		case 17:
+			outro = true;
+			break;
+		case 18:
+			KambojaMain.setGameTime(KambojaMain.getGameTime() + 60);
+			if(KambojaMain.getGameTime() == 11*60){
+				if(KambojaMain.getDeathsNumber() != -1){
+					KambojaMain.setGameTime(-1);
+				}
+				else{
+					KambojaMain.setGameTime(60);
+				}
+			}
+			if(KambojaMain.getGameTime() == 59){
+				KambojaMain.setGameTime(60);
+			}
+			break;
+		case 19:
+			KambojaMain.setDeathsNumber(KambojaMain.getDeathsNumber() + 1);
+			if(KambojaMain.getDeathsNumber() == 16){
+				if(KambojaMain.getGameTime() != -1){
+					KambojaMain.setDeathsNumber(-1);
+				}
+				else{
+					KambojaMain.setDeathsNumber(1);
+				}
+			}
+			if(KambojaMain.getDeathsNumber() == 0){
+				KambojaMain.setDeathsNumber(1);
+			}
+			break;
+		case 20:
+			KambojaMain.setItems(!KambojaMain.hasItems());
+			break;
+		default:
+			
+			if(KambojaMain.mapUnlocked[selection[id]]) {
+				selected_map = selection[id];
+				if(selected_map == mapNames.size() - 1){
+					selected_map = (int) (Math.random() * 4);
+				}
+				KambojaMain.setMapName(mapNames.get(selected_map));
+			}
+			
+			break;
+		}
+	}
+	
+	public boolean keyDown(int keycode) {
+		int id = Util.getControllerID(getKeyboardController());
+		
+		if(id != -1) {
+			if(keycode == Keys.ENTER) {
+				doSelection(id);
+			}
+			if(keycode == Keys.DOWN || keycode == Keys.S) {
+				changeSelectionY(id, 1);
+			}
+			if(keycode == Keys.UP || keycode == Keys.W) {
+				changeSelectionY(id, -1);
+			}
+			if(keycode == Keys.LEFT || keycode == Keys.A) {
+				changeSelectionX(id, -1);
+			}
+			if(keycode == Keys.RIGHT || keycode == Keys.D) {
+				changeSelectionX(id, 1);
+			}
+		}
 		return false;
 	}
 

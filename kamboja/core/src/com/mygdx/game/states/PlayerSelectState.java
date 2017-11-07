@@ -4,7 +4,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
@@ -37,6 +36,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
+import com.codedisaster.steamworks.SteamAPI;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
@@ -520,6 +520,7 @@ public class PlayerSelectState extends State{
 	@Override
 	public void dispose() {
 		sr.dispose();
+		
 	}
 	
 	public Color getPlayerColor(int id) {
@@ -537,37 +538,11 @@ public class PlayerSelectState extends State{
 	}
 	
 	public void setSpriteBatchColor(SpriteBatch sb, int id) {
-		switch(id) {
-		case 0:
-			sb.setColor(0, 0, 1, 1);
-			break;
-		case 1:
-			sb.setColor(1, 0, 0, 1);
-			break;
-		case 2:
-			sb.setColor(0, 1, 0, 1);
-			break;
-		case 3:
-			sb.setColor(1, 1, 0, 1);
-			break;
-		}
+		sb.setColor(getPlayerColor(id));
 	}
 	
 	public void setFontColor(BitmapFont font, int id) {
-		switch(id) {
-		case 0:
-			font.setColor(0, 0, 1, 1);
-			break;
-		case 1:
-			font.setColor(1, 0, 0, 1);
-			break;
-		case 2:
-			font.setColor(0, 1, 0, 1);
-			break;
-		case 3:
-			font.setColor(1, 1, 0, 1);
-			break;
-		}
+		font.setColor(getPlayerColor(id));
 	}
 	
 	public int getSkinPositionByWeapon(int weapon) {
@@ -1116,7 +1091,7 @@ public class PlayerSelectState extends State{
 					manager.changeState(5);
 				}
 				else {
-					manager.changeState(1);
+					manager.changeState(7);
 				}
 				
 			}
@@ -1690,8 +1665,10 @@ public class PlayerSelectState extends State{
 			}
 		}
 		if(keycode == Keys.ESCAPE) {
-			if(!typing[id] && !playerReady[id])
-				KambojaMain.getControllers().set(id, null);
+			if(id != -1) {
+				if(!typing[id] && !playerReady[id])
+					KambojaMain.getControllers().set(id, null);
+			}
 		}
 		
 		if(keycode == Keys.BACKSPACE || keycode == Keys.DEL || keycode == Keys.FORWARD_DEL) {

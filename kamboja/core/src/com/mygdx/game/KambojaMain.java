@@ -14,6 +14,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
+import com.codedisaster.steamworks.SteamFriends;
+import com.codedisaster.steamworks.SteamFriendsCallback;
+import com.codedisaster.steamworks.SteamID;
+import com.codedisaster.steamworks.SteamResult;
+import com.codedisaster.steamworks.SteamUserStats;
+import com.codedisaster.steamworks.SteamFriends.PersonaChange;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.shift.Barrier;
@@ -27,6 +33,7 @@ import com.mygdx.game.objects.weapon.Mp5;
 import com.mygdx.game.objects.weapon.Pistol;
 import com.mygdx.game.objects.weapon.Shotgun;
 import com.mygdx.game.states.GameState;
+import com.mygdx.game.steam.MySteamCallback;
 
 public class KambojaMain extends ApplicationAdapter {
 	
@@ -156,7 +163,19 @@ public class KambojaMain extends ApplicationAdapter {
 		sb = new SpriteBatch();
 		manager = new Manager();
 		manager.create();
-	
+		
+		try {
+			//SteamAPI.restartAppIfNecessary(747110);
+		    if (!SteamAPI.init()) {
+		       System.exit(1);
+		    }
+		} catch (SteamException e) {
+		    e.printStackTrace();
+		}
+		
+		
+		
+
 		//Loads the config.ini file and sets all the parameters
 		try {
 			File conf = new File("config.ini");
@@ -239,7 +258,9 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	float gcTimer = 0;
 	public void render () {
-		//SteamAPI.runCallbacks();
+		if (SteamAPI.isSteamRunning()) {
+			SteamAPI.runCallbacks();
+		}
 		//summons the garbage collector every 30 seconds
 		//not really sure if it makes any difference but nah, whatever
 		gcTimer += Gdx.graphics.getDeltaTime();
@@ -261,5 +282,6 @@ public class KambojaMain extends ApplicationAdapter {
 	@Override
 	public void dispose(){
 		super.dispose();
+		SteamAPI.shutdown();
 	}
 }
