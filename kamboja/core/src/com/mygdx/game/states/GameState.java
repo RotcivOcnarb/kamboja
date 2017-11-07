@@ -67,6 +67,7 @@ import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.map.WaterBlock;
 
 import box2dLight.RayHandler;
+import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
 public class GameState extends State{
 	
@@ -88,6 +89,8 @@ public class GameState extends State{
 	private BitmapFont timeFont;
 	
 	private boolean inputBlocked;
+	
+	Box2DMapObjectParser parser;
 	
 	private int tilesize = 32;
 	
@@ -229,6 +232,8 @@ public class GameState extends State{
 			music = Gdx.audio.newMusic(Gdx.files.internal("music/the_league_of_mice.ogg"));
 			music.setLooping(true);
 		}
+		
+		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
 		beforeBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		afterBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -561,6 +566,14 @@ public class GameState extends State{
 		if(exitMap){
 			System.out.println("Fix the [MUST] errors and run again");
 			System.exit(1);
+		}
+		
+		MapLayer layer2d = tiledMap.getLayers().get("BOX2D");
+		if(layer2d != null) {
+			parser.load(world, layer2d);
+			System.out.println("Loaded " + parser.getBodies().size + " BOX2D objects!");
+			System.out.println(parser.getBodies().get("fonte").getWorldCenter());
+			
 		}
 
 	}
@@ -1013,7 +1026,7 @@ public class GameState extends State{
 	public void update(float delta) {
 		Gdx.gl.glClearColor(0, 162/255f, 132/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+				
 		if(islandBackground != null){
 			islandBackground.update(delta);
 		}

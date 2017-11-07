@@ -1,20 +1,29 @@
 package com.mygdx.game.states;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -25,6 +34,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.objects.Util;
@@ -43,15 +53,29 @@ public class MapSelectState extends State{
 	Texture map_frame;
 	Texture chain;
 	Texture map_name;
+	Texture gear_start;
+	Texture gear_back;
+	Texture map_containers;
+	TextureRegion[] map_container = new TextureRegion[16];
 	
 	ParticleEffect fogo;
 	ParticleEffect bolinha;
+	
+	BitmapFont outlander;
+	BitmapFont oliver_barney;
+	GlyphLayout layout;
 	
 	float options_x;
 
 	ShapeRenderer sr;
 	
+	int selected_map = 3;
+	
 	float factor;
+	
+	private ArrayList<Texture> thumbs;
+	private ArrayList<String> mapNames;
+	private ArrayList<String> mapTitles;
 	
 	FrameBuffer shaderBuffer;
 	ShaderProgram shader;
@@ -66,6 +90,9 @@ public class MapSelectState extends State{
 	Body mapNameBody;
 	
 	ArrayList<Body> chainBody;
+	
+	FrameBuffer mapNameBuffer;
+	Matrix4 nameBufferProjection;
 	
 	public MapSelectState(Manager manager) {
 		super(manager);
@@ -82,6 +109,21 @@ public class MapSelectState extends State{
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
 		map_name = new Texture("menu/map_select/map_name.png");
+		
+		mapNameBuffer = new FrameBuffer(Format.RGBA8888, map_name.getWidth(), map_name.getHeight(), false);
+		nameBufferProjection = new Matrix4();
+		nameBufferProjection.setToOrtho2D(0, 0, map_name.getWidth(), map_name.getHeight());
+		
+		gear_start = new Texture("menu/map_select/gear_start.png");
+		gear_back = new Texture("menu/map_select/gear_back.png");
+		map_containers = new Texture("menu/map_select/map_containers.png");
+		
+		for(int i = 0; i < 4; i ++) {
+			for(int j = 0; j < 4; j ++) {
+				map_container[i + j*4] = new TextureRegion(map_containers, i*217, j*199, 217, 199);
+			}
+		}
+		
 
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
@@ -103,6 +145,23 @@ public class MapSelectState extends State{
 		options_frame = new Texture("menu/map_select/frame_options.png");
 		
 		factor = Gdx.graphics.getHeight() / 1080f;
+		
+
+		FreeTypeFontGenerator ftfg;
+		FreeTypeFontParameter param;
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
+		param = new FreeTypeFontParameter();
+		param.size = (int) (100f * factor);
+		param.color = new Color(199/255f, 224/255f, 243/255f, 1f).mul(0.9f);
+		outlander = ftfg.generateFont(param);
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/olivers barney.ttf"));
+		param = new FreeTypeFontParameter();
+		param.size = (int) (60 * factor);
+		param.color = new Color(255/255f, 48/255f, 77/255f, 1f);
+		oliver_barney = ftfg.generateFont(param);
+		ftfg.dispose();
+		
+		layout = new GlyphLayout();
 		
 		fogo = new ParticleEffect();
 		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
@@ -133,6 +192,30 @@ public class MapSelectState extends State{
 		
 		buildRopeJoint((int)(10 * factor));
 		buildRopeJoint2((int)(3 * factor));
+		
+		thumbs = new ArrayList<Texture>();
+		mapTitles = new ArrayList<String>();
+		mapNames = new ArrayList<String>();
+		File folder = new File("maps");
+		
+		for(File f : folder.listFiles()){
+			if(f.getName().endsWith(".tmx")){
+				
+				System.out.println("path " + f.getPath());
+				mapNames.add(f.getPath());
+				
+				String thumbnailPath = "maps/thumb_" + f.getName().split("\\.")[0] + ".png";
+				System.out.println(thumbnailPath);
+				thumbs.add(new Texture(new FileHandle(new File(thumbnailPath))));
+				
+				String mapTitle = f.getName().replaceFirst(f.getName().substring(0, 1), f.getName().substring(0, 1).toUpperCase());
+				System.out.println(mapTitle.split("\\.")[0]);
+				mapTitles.add(mapTitle.split("\\.")[0]);
+			}
+		}
+		mapNames.add("");
+		thumbs.add(new Texture(new FileHandle(new File("maps/thumb_random.png"))));
+		mapTitles.add("Random");
 	}
 
 	public void dispose() {
@@ -244,8 +327,24 @@ public class MapSelectState extends State{
 	
 	public void render(SpriteBatch sb) {
 		
+		mapNameBuffer.begin();
+		Gdx.gl.glClearColor(1, 1, 1, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			sb.setProjectionMatrix(nameBufferProjection);
+			sb.begin();
+			
+			layout.setText(outlander, mapTitles.get(selected_map));
+			outlander.draw(sb, mapTitles.get(selected_map),
+					(mapNameBuffer.getWidth() - layout.width)/2f,
+					(mapNameBuffer.getHeight() - layout.height)/2f + layout.height);
+			
+			sb.end();
+		
+		mapNameBuffer.end();
+		
 		shaderBuffer.begin();
 		sb.begin();
+		sb.setProjectionMatrix(Util.getNormalProjection());
 		
 		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	
@@ -264,12 +363,26 @@ public class MapSelectState extends State{
 				map_frame.getWidth()/2f*factor,
 				map_frame.getHeight()/2f*factor,
 				map_frame.getWidth()*factor,
-				map_frame.getWidth()*factor,
+				map_frame.getHeight()*factor,
 				1, 1,
 				(float)Math.toDegrees(mapBody.getAngle()),
 				0, 0,
 				map_frame.getWidth(),
-				map_frame.getWidth(),
+				map_frame.getHeight(),
+				false, false);
+		
+		sb.draw(thumbs.get(selected_map),
+				mapBody.getWorldCenter().x * 100f - map_frame.getWidth()/2f*factor * 0.6f,
+				mapBody.getWorldCenter().y * 100f - map_frame.getHeight()/2f*factor * 0.6f - 20*factor,
+				map_frame.getWidth()/2f*factor * 0.6f,
+				map_frame.getHeight()/2f*factor * 0.6f,
+				map_frame.getWidth()*factor * 0.6f,
+				map_frame.getHeight()*factor * 0.6f,
+				1, 1,
+				(float)Math.toDegrees(mapBody.getAngle()),
+				0, 0,
+				thumbs.get(selected_map).getWidth(),
+				thumbs.get(selected_map).getHeight(),
 				false, false);
 		
 		sb.draw(map_name,
@@ -278,13 +391,112 @@ public class MapSelectState extends State{
 				map_name.getWidth()/2f*factor,
 				map_name.getHeight()/2f*factor,
 				map_name.getWidth()*factor,
-				map_name.getWidth()*factor,
+				map_name.getHeight()*factor,
 				1, 1,
 				(float)Math.toDegrees(mapNameBody.getAngle()),
 				0, 0,
 				map_name.getWidth(),
-				map_name.getWidth(),
+				map_name.getHeight(),
 				false, false);
+		
+		sb.draw(mapNameBuffer.getColorBufferTexture(),
+				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f*factor,
+				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f*factor,
+				map_name.getWidth()/2f*factor,
+				map_name.getHeight()/2f*factor,
+				map_name.getWidth()*factor,
+				map_name.getHeight()*factor,
+				1, 1,
+				(float)Math.toDegrees(mapNameBody.getAngle()),
+				0, 0,
+				map_name.getWidth(),
+				map_name.getHeight(),
+				false, true);
+		
+		sb.draw(gear_start,
+				Gdx.graphics.getWidth()/2f - gear_start.getWidth()/2f*factor,
+				-30*factor - gear_start.getHeight()/2f*factor,
+				gear_start.getWidth()/2f*factor,
+				gear_start.getHeight()/2f*factor,
+				gear_start.getWidth()*factor,
+				gear_start.getHeight()*factor,
+				1, 1,
+				0,
+				0, 0,
+				gear_start.getWidth(),
+				gear_start.getHeight(),
+				false, false);
+		
+		sb.draw(gear_back,
+				Gdx.graphics.getWidth()* (1/4f) - gear_back.getWidth()/2f*factor,
+				-30*factor - gear_back.getHeight()/2f*factor,
+				gear_back.getWidth()/2f*factor,
+				gear_back.getHeight()/2f*factor,
+				gear_back.getWidth()*factor,
+				gear_back.getHeight()*factor,
+				1, 1,
+				0,
+				0, 0,
+				gear_back.getWidth(),
+				gear_back.getHeight(),
+				false, false);
+		
+		String tm = "" + (KambojaMain.getGameTime() == -1 ? "Inf." :
+			KambojaMain.getGameTime()/60 + ":" + ((KambojaMain.getGameTime() % 60 >= 10) ? KambojaMain.getGameTime() % 60 : "0" + KambojaMain.getGameTime() % 60));
+	
+		layout.setText(oliver_barney, tm);
+		oliver_barney.draw(sb, tm,
+				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
+				275* factor);
+		
+		tm = "" + (KambojaMain.getDeathsNumber() == -1  ? "Inf." : KambojaMain.getDeathsNumber());
+
+		layout.setText(oliver_barney, tm);
+		oliver_barney.draw(sb, tm,
+				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
+				210* factor);
+		
+		tm = "" + (KambojaMain.hasItems()  ? "on" : "off");
+		
+		layout.setText(oliver_barney, tm);
+		oliver_barney.draw(sb, tm,
+				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
+				140* factor);
+				
+		for(int i = 0; i < mapNames.size(); i ++){
+			int x = i % 4;
+			int y = i / 4;
+			if(i < thumbs.size()) {
+				
+				sb.draw(map_container[i],
+						x*250*factor - 217*factor/2f + 200*factor,
+						Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 350*factor,
+						217*factor,
+						199*factor
+						);
+				
+				sb.draw(thumbs.get(i),
+						x*250*factor - 192*factor/2f + 200*factor,
+						Gdx.graphics.getHeight() - (y*250*factor - 174*factor/2f) - 325*factor,
+						192*factor,
+						174*factor
+						);
+				
+				if(KambojaMain.mapUnlocked[i])
+				sb.setColor(1, 1, 1, 0.3f);
+				else
+				sb.setColor(0.3f, 0.3f, 0.3f, 1f);
+				
+				sb.draw(map_container[i],
+						x*250*factor - 217*factor/2f + 200*factor,
+						Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 350*factor,
+						217*factor,
+						199*factor
+						);
+				
+				sb.setColor(1, 1, 1, 1);
+			}
+		}
 		
 		for(int i = chainBody.size() - 1; i >= 0; i --) {
 			Body bd = chainBody.get(i);
@@ -309,7 +521,7 @@ public class MapSelectState extends State{
 		
 		sb.end();
 		
-		b2dr.render(world, camera.combined);
+		//b2dr.render(world, camera.combined);
 		
 		shaderBuffer.end();
 		

@@ -43,6 +43,7 @@ public class KambojaMain extends ApplicationAdapter {
 	private static int playersize = 5;
 	private static boolean items = true; 
 	public static final double SENSITIVITY = 1.5f;
+	public static boolean[] mapUnlocked = new boolean[]{true, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true};
 	
 	/**Lists all the controllers connected currently (of people that pressed "start", keyboard and bots
 	 * included)
