@@ -1116,7 +1116,7 @@ public class PlayerSelectState extends State{
 					manager.changeState(5);
 				}
 				else {
-					manager.changeState(7);
+					manager.changeState(1);
 				}
 				
 			}
