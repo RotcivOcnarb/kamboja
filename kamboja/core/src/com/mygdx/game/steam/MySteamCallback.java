@@ -4,7 +4,6 @@ import com.codedisaster.steamworks.SteamID;
 import com.codedisaster.steamworks.SteamLeaderboardEntriesHandle;
 import com.codedisaster.steamworks.SteamLeaderboardHandle;
 import com.codedisaster.steamworks.SteamResult;
-import com.codedisaster.steamworks.SteamUserStats;
 import com.codedisaster.steamworks.SteamUserStatsCallback;
 
 public class MySteamCallback implements SteamUserStatsCallback{

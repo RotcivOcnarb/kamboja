@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector3;
-import com.codedisaster.steamworks.SteamAPICall;
 import com.codedisaster.steamworks.SteamUserStats;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
@@ -32,7 +31,6 @@ import com.mygdx.game.steam.MySteamCallback;
 public class PostGame extends State{
 	
 	private Background background;
-	private float timer;
 	private BitmapFont first;
 	private BitmapFont other;
 	private GlyphLayout layout;
@@ -55,7 +53,6 @@ public class PostGame extends State{
 
 	public void create() {
 		botTimer = 0;
-		timer = -1;
 
 		sound_select = Gdx.audio.newSound(Gdx.files.internal("audio/select.ogg"));
 		
@@ -142,7 +139,6 @@ public class PostGame extends State{
 	}
 
 	public void update(float delta) {
-		timer += delta;
 		botTimer += delta;
 		pos += (targetPos - pos)/10.0f;
 		

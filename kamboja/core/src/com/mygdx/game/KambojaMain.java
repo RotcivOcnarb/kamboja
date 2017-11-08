@@ -14,12 +14,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
-import com.codedisaster.steamworks.SteamFriends;
-import com.codedisaster.steamworks.SteamFriendsCallback;
-import com.codedisaster.steamworks.SteamID;
-import com.codedisaster.steamworks.SteamResult;
-import com.codedisaster.steamworks.SteamUserStats;
-import com.codedisaster.steamworks.SteamFriends.PersonaChange;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.shift.Barrier;
@@ -33,7 +27,6 @@ import com.mygdx.game.objects.weapon.Mp5;
 import com.mygdx.game.objects.weapon.Pistol;
 import com.mygdx.game.objects.weapon.Shotgun;
 import com.mygdx.game.states.GameState;
-import com.mygdx.game.steam.MySteamCallback;
 
 public class KambojaMain extends ApplicationAdapter {
 	
