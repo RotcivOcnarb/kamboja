@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.mygdx.game.objects.Player.PlayerFall;
+import com.mygdx.game.objects.map.Asteroid;
 import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.map.BreakableBlock;
 import com.mygdx.game.objects.map.HoleBlock;
@@ -18,7 +19,7 @@ import com.mygdx.game.states.GameState;
 public class MyContactListener implements ContactListener{
 
 	public void beginContact(Contact contact) {
-		
+
 		//player com buraco
 		if(contact.getFixtureA().getUserData() instanceof PlayerFall && contact.getFixtureB().getUserData() instanceof HoleBlock){
 			PlayerFall p = (PlayerFall) contact.getFixtureA().getUserData();
@@ -248,6 +249,29 @@ public class MyContactListener implements ContactListener{
 			block.bulletCollided(contact, bullet);
 			
 		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Asteroid) {
+			if(contact.getFixtureA().getUserData() instanceof Bullet) {
+				Asteroid a = (Asteroid)contact.getFixtureB().getBody().getUserData();
+				Bullet bullet = (Bullet) contact.getFixtureA().getUserData();
+				
+				a.destroy();
+				
+				bullet.remove();
+				GameState.removeBody(bullet.getBody());
+			}
+		}
+		
+		if(contact.getFixtureA().getBody().getUserData() instanceof Asteroid) {
+			if(contact.getFixtureB().getUserData() instanceof Bullet) {
+				Asteroid a = (Asteroid)contact.getFixtureA().getBody().getUserData();
+				Bullet bullet = (Bullet) contact.getFixtureB().getUserData();
+				
+				a.destroy();
+				
+				bullet.remove();
+				GameState.removeBody(bullet.getBody());
+			}
+		}
 	}
 
 	public void endContact(Contact contact) {
@@ -265,6 +289,18 @@ public class MyContactListener implements ContactListener{
 	}
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
+		if(contact.getFixtureA().getBody().getUserData() instanceof Asteroid) {
+			if(!(contact.getFixtureB().getBody().getUserData() instanceof Player)) {
+				contact.setEnabled(false);
+			}
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Asteroid) {
+			if(!(contact.getFixtureA().getBody().getUserData() instanceof Player)) {
+				contact.setEnabled(false);
+			}
+
+		}
+		
 		//flamethrower atinge algo
 		if(contact.getFixtureA().getUserData() instanceof Flamethrower.FlameParticle){
 			contact.setEnabled(false);
