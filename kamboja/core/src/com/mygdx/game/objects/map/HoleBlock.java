@@ -10,7 +10,7 @@ import com.mygdx.game.states.GameState;
 public class HoleBlock extends Block{
 
 	public HoleBlock(TextureRegion texture, float x, float y, float width, float height, World world, GameState state) {
-		super(texture, x, y, width, height, world, state);
+		super(texture, x, y, width, height, world, state, null);
 		body.getFixtureList().get(0).setSensor(true);
 	}
 

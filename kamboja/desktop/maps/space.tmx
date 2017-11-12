@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="23" height="20" tilewidth="32" tileheight="32" nextobjectid="6">
+ <properties>
+  <property name="mapClass" value="SpaceMap"/>
+ </properties>
+ <tileset firstgid="1" source="space.tsx"/>
+ <layer name="unbreakable" width="23" height="20">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,1,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,3,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,21,21,21,0,0,0,0,0,0,0,0,0,0,0,0,0,21,21,21,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,6,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,8,0,
+0,11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="Player">
+  <object id="1" type="player0" x="96" y="96" width="32" height="32">
+   <properties>
+    <property name="angle" type="float" value="0"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="3" type="player1" x="608" y="96" width="32" height="32">
+   <properties>
+    <property name="angle" type="float" value="0"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="4" type="player3" x="96" y="512" width="32" height="32">
+   <properties>
+    <property name="angle" type="float" value="0"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="5" type="player2" x="608" y="512" width="32" height="32">
+   <properties>
+    <property name="angle" type="float" value="0"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>

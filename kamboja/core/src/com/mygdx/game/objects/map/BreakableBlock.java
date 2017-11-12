@@ -3,6 +3,7 @@ package com.mygdx.game.objects.map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.objects.Bullet;
@@ -13,8 +14,8 @@ public class BreakableBlock extends Block{
 	float life = 1;
 	float hitTimer = 0;
 	
-	public BreakableBlock(TextureRegion texture, float x, float y, float width, float height, World world, GameState state) {
-		super(texture, x, y, width, height, world, state);
+	public BreakableBlock(TextureRegion texture, float x, float y, float width, float height, World world, GameState state, Cell cell) {
+		super(texture, x, y, width, height, world, state, cell);
 		
 	}
 
@@ -27,7 +28,14 @@ public class BreakableBlock extends Block{
 		hitTimer -= Gdx.graphics.getDeltaTime();
 		if(hitTimer < 0) hitTimer = 0;
 
-        sb.draw(texture, x, y, width, height);
+		sb.draw(texture,
+				x, y,
+				width/2f, height/2f,
+				width, height,
+				cell.getFlipHorizontally() ? -1 : 1,
+				cell.getFlipVertically() ? -1 : 1,
+				cell.getRotation()*90);
+
 
 		if(life <= 0){
 			//if(GameState.SFX)

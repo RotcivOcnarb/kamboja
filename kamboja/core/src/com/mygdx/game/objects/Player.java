@@ -82,10 +82,13 @@ public class Player implements Steerable<Vector2>{
 	private float flameTimer = 0;
 	private float flameAtk = 1;
 	private float gruntTimer = 0;
+	private boolean inSpace = false;
 
 	private Texture aim;
 	private Texture atkTex, defTex, spdTex;
 	private Texture stamina_on, stamina_off;
+	private Texture space_skin;
+	private TextureRegion space;
 	private static Texture[] players;
 	private TextureRegion player;
 	private Animation<TextureRegion> legsAnimation;
@@ -137,6 +140,10 @@ public class Player implements Steerable<Vector2>{
 		
 	}
 	
+	public void setInSpace(boolean inSpace) {
+		this.inSpace = inSpace;
+	}
+	
 	public float getAngle(){
 		return angle.angle() - (float)Math.sin(angle_walking)*5;
 	}
@@ -152,6 +159,10 @@ public class Player implements Steerable<Vector2>{
 	public void setAngle(Vector2 angle){
 		this.angle = angle;
 		this.legAngle  = angle.angle();
+	}
+	
+	public TextureRegion getSpaceTexture(int posid) {
+		return new TextureRegion(space_skin, (posid % 5)*32, (posid/5)*32, 32, 32);
 	}
 	
 	public static TextureRegion getTexture(int playerid, int posid){
@@ -196,6 +207,8 @@ public class Player implements Steerable<Vector2>{
 		body.setFixedRotation(true);
 		
 		stamina = 0;
+		
+		space_skin = new Texture("player/space_skin.png");
 		
 		stamina_off = new Texture("player/stamina_off.png");
 		stamina_on = new Texture("player/stamina_on.png");
@@ -271,41 +284,49 @@ public class Player implements Steerable<Vector2>{
 		case 0:
 			setWeapon(new Pistol(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 2);
+			space = getSpaceTexture(2);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Pistol.WEIGHT) * 10);
 			break;
 		case 1:
 			setWeapon(new DoublePistol(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 0);
+			space = getSpaceTexture(0);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -DoublePistol.WEIGHT) * 10);
 			break;
 		case 2:
 			setWeapon(new Minigun(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Minigun.WEIGHT) * 10);
 			break;
 		case 3:
 			setWeapon(new Shotgun(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Shotgun.WEIGHT) * 10);
 			break;
 		case 4:
 			setWeapon(new Mp5(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Mp5.WEIGHT) * 10);
 			break;
 		case 5:
 			setWeapon(new Flamethrower(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Flamethrower.WEIGHT) * 10);
 			break;
 		case 6:
 			setWeapon(new Bazooka(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Bazooka.WEIGHT) * 10);
 			break;
 		case 7:
 			setWeapon(new Laser(body.getWorld(), this));
 			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Laser.WEIGHT) * 10);
 			break;
 		}
@@ -427,6 +448,8 @@ public class Player implements Steerable<Vector2>{
 		shader.setUniformf("intensity", body.getLinearVelocity().len() * 0.001f * (buff == Item.SPEED && buffTimer > 0 ? 1f : 0f));
 		shader.setUniformf("transparency", opacity);
 		
+		
+		
 		sb.draw(player,
 				body.getWorldCenter().x - player.getRegionWidth()/2 / GameState.UNIT_SCALE,
 				body.getWorldCenter().y - player.getRegionHeight()/2 / GameState.UNIT_SCALE,
@@ -437,6 +460,19 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - getAngle());
+		
+		if(inSpace) {
+			sb.draw(space,
+					body.getWorldCenter().x - space.getRegionWidth()/2 / GameState.UNIT_SCALE,
+					body.getWorldCenter().y - space.getRegionHeight()/2 / GameState.UNIT_SCALE,
+					space.getRegionWidth()/2 /GameState.UNIT_SCALE,
+					space.getRegionHeight()/2 /GameState.UNIT_SCALE,
+					space.getRegionWidth() /GameState.UNIT_SCALE,
+					space.getRegionHeight() /GameState.UNIT_SCALE,
+					isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
+					isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
+					270 - getAngle());
+		}
 		sb.end();
 	
 		shader.end();
@@ -689,7 +725,13 @@ public class Player implements Steerable<Vector2>{
 	
 	public void update(float delta){
 		if(!isDead())
-		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd), true);
+		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd * (inSpace ? 0.1f : 1f)), true);
+		
+		if(inSpace) {
+			if(body.getLinearVelocity().len() > 3) {
+				body.setLinearVelocity(body.getLinearVelocity().cpy().nor().scl(3));
+			}
+		}
 		
 		if(isFalling()){
 			setFallingTimer(getFallingTimer() - delta);
@@ -699,7 +741,7 @@ public class Player implements Steerable<Vector2>{
 				takeDamage(1000, null, false);
 			}
 		}
-		
+
 		for(int i = ghosts.size() - 1; i >= 0; i --){
 			Ghost g = ghosts.get(i);
 			g.update(delta);

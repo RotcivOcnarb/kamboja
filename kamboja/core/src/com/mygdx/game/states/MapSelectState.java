@@ -118,7 +118,7 @@ public class MapSelectState extends State{
 		intro = true;
 		outro = false;
 		alpha = 1;
-		
+		goingBack = false;
 		timer = 0;
 		
 		chainBody = new ArrayList<Body>();

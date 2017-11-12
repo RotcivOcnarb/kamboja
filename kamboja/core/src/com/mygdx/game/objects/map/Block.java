@@ -3,6 +3,7 @@ package com.mygdx.game.objects.map;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -21,18 +22,20 @@ public abstract class Block {
 	float y;
 	float width;
 	float height;
+	Cell cell;
 	Body body;
 
 	GameState state;
 	
-	public Block(TextureRegion texture, float x, float y, float width, float height, World world, GameState state){
+	public Block(TextureRegion texture, float x, float y, float width, float height, World world, GameState state, Cell cell){
 		this.texture = texture;
 		this.state = state;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		
+		this.cell = cell;
+				
 		BodyDef def = new BodyDef();
 		def.position.set(x, y);
 		

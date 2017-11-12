@@ -63,6 +63,7 @@ import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.map.BreakableBlock;
 import com.mygdx.game.objects.map.HoleBlock;
 import com.mygdx.game.objects.map.IslandBackground;
+import com.mygdx.game.objects.map.KambojaMap;
 import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.map.WaterBlock;
 
@@ -153,6 +154,8 @@ public class GameState extends State{
 	ShaderProgram overlay;
 	FrameBuffer beforeBlood;
 	FrameBuffer afterBlood;
+	
+	KambojaMap kambojaMap;
 	
 	Music music;
 	
@@ -315,6 +318,27 @@ public class GameState extends State{
 			islandBackground = null;
 		}
 		
+		if(tiledMap.getProperties().get("mapClass") != null) {
+			String mapClass = tiledMap.getProperties().get("mapClass").toString();
+			
+			if(mapClass != null) {
+				try {
+					kambojaMap = (KambojaMap)Class.forName("com.mygdx.game.objects.map." + mapClass).newInstance();
+					kambojaMap.setGameState(this);
+					kambojaMap.create();
+				} catch (InstantiationException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
+		System.out.println(kambojaMap);
+		
+		
 		endTimer = 0;
 
 		world = new World(new Vector2(0, 0), false);
@@ -421,7 +445,7 @@ public class GameState extends State{
 						TextureRegion tr = c.getTile().getTextureRegion();
 						Block block = new BreakableBlock(tr, i*tr.getRegionWidth() / UNIT_SCALE, j*tr.getRegionHeight() / UNIT_SCALE,
 								tr.getRegionWidth() / UNIT_SCALE,
-								tr.getRegionHeight() / UNIT_SCALE, world, this);
+								tr.getRegionHeight() / UNIT_SCALE, world, this, c);
 								
 						getBlocks().add(block);
 					}
@@ -442,7 +466,7 @@ public class GameState extends State{
 						TextureRegion tr = c.getTile().getTextureRegion();
 						Block block = new UnbreakableBlock(tr, i*tr.getRegionWidth() / UNIT_SCALE, j*tr.getRegionHeight() / UNIT_SCALE,
 								tr.getRegionWidth() / UNIT_SCALE,
-								tr.getRegionHeight() / UNIT_SCALE, world, this);
+								tr.getRegionHeight() / UNIT_SCALE, world, this, c);
 								
 						getBlocks().add(block);
 					}
@@ -484,7 +508,7 @@ public class GameState extends State{
 						TextureRegion tr = c.getTile().getTextureRegion();
 						Block block = new WaterBlock(tr, i*tr.getRegionWidth() / UNIT_SCALE, j*tr.getRegionHeight() / UNIT_SCALE,
 								tr.getRegionWidth() / UNIT_SCALE,
-								tr.getRegionHeight() / UNIT_SCALE, world, this);
+								tr.getRegionHeight() / UNIT_SCALE, world, this, c);
 								
 						getBlocks().add(block);
 					}
@@ -573,10 +597,25 @@ public class GameState extends State{
 		if(layer2d != null) {
 			parser.load(world, layer2d);
 			System.out.println("Loaded " + parser.getBodies().size + " BOX2D objects!");
-			System.out.println(parser.getBodies().get("fonte").getWorldCenter());
-			
 		}
 
+	}
+	
+	public void setInSpace() {
+		bloodEffect.setMinLinDamp(0);
+		bloodEffect.setMaxLinDamp(0);
+		
+		bloodSpill.setMinLinDamp(0);
+		bloodSpill.setMaxLinDamp(0);
+		
+		shellEffect.setMinLinDamp(0);
+		shellEffect.setMaxLinDamp(0);
+		
+		rockEffect.setMinLinDamp(0);
+		rockEffect.setMaxLinDamp(0);
+		
+		skullEffect.setMinLinDamp(0);
+		skullEffect.setMaxLinDamp(0);
 	}
 
 	public void addItem(Vector2 pos, int id){
@@ -717,6 +756,8 @@ public class GameState extends State{
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
+		if(kambojaMap != null)
+			kambojaMap.behindRender(sb, camera);
 		drawBackgroundTiles(sb);
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -736,12 +777,17 @@ public class GameState extends State{
 //			shader.setUniformf("time", timer);
 //			shader.setUniformf("x_t", 0.1f);
 //			shader.setUniformf("y_t", 0);
-
+		
+		
+		
 		drawPersistentParticles(sb);
+		
 		drawBlocks(sb);
 		drawItems(sb);
 		drawParticles(sb);
 		drawPlayersAndLight(sb);
+		if(kambojaMap != null)
+		kambojaMap.render(sb, camera);
 		drawCeilingTiles(sb);
 		drawUI(sb);
 		drawDebug(sb);
@@ -774,21 +820,23 @@ public class GameState extends State{
 		int mapWidth = getTiledMap().getProperties().get("width", Integer.class);
 		int mapHeight = getTiledMap().getProperties().get("height", Integer.class);
 		TiledMapTileLayer bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("floor"));
-		for(int i = 0; i < mapWidth; i ++){
-			for(int j = 0; j < mapHeight; j ++){
-				
-				//tiles background
-				Cell c = bg.getCell(i, j);
-				if(c != null){ 
-					TextureRegion tr = c.getTile().getTextureRegion();
-					sb.draw(
-						tr,
-						i*tr.getRegionWidth() / UNIT_SCALE,
-						j*tr.getRegionHeight() / UNIT_SCALE,
-						tr.getRegionWidth() / UNIT_SCALE,
-						tr.getRegionHeight() / UNIT_SCALE);
+		if(bg != null){
+			for(int i = 0; i < mapWidth; i ++){
+				for(int j = 0; j < mapHeight; j ++){
+					
+					//tiles background
+					Cell c = bg.getCell(i, j);
+					if(c != null){ 
+						TextureRegion tr = c.getTile().getTextureRegion();
+						sb.draw(
+							tr,
+							i*tr.getRegionWidth() / UNIT_SCALE,
+							j*tr.getRegionHeight() / UNIT_SCALE,
+							tr.getRegionWidth() / UNIT_SCALE,
+							tr.getRegionHeight() / UNIT_SCALE);
+					}
+					
 				}
-				
 			}
 		}
 		bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("floor2"));
@@ -1031,6 +1079,9 @@ public class GameState extends State{
 		if(islandBackground != null){
 			islandBackground.update(delta);
 		}
+		
+		if(kambojaMap != null)
+		kambojaMap.update(delta);
 		
 		if(Gdx.input.getX() < 0) Gdx.input.setCursorPosition(0, Gdx.input.getY());
 		if(Gdx.input.getX() > Gdx.graphics.getWidth() - 45) Gdx.input.setCursorPosition(Gdx.graphics.getWidth() - 45, Gdx.input.getY());
@@ -1520,6 +1571,10 @@ public class GameState extends State{
 
 	public float getTimer() {
 		return timer;
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	
