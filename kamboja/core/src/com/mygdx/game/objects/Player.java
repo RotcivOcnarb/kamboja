@@ -83,7 +83,8 @@ public class Player implements Steerable<Vector2>{
 	private float flameAtk = 1;
 	private float gruntTimer = 0;
 	private boolean inSpace = false;
-
+	private boolean wearSpaceSuit = false;
+	
 	private Texture aim;
 	private Texture atkTex, defTex, spdTex;
 	private Texture stamina_on, stamina_off;
@@ -140,8 +141,9 @@ public class Player implements Steerable<Vector2>{
 		
 	}
 	
-	public void setInSpace(boolean inSpace) {
+	public void setInSpace(boolean inSpace, boolean wearSpaceSuit) {
 		this.inSpace = inSpace;
+		this.wearSpaceSuit = wearSpaceSuit;
 	}
 	
 	public float getAngle(){
@@ -461,7 +463,7 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - getAngle());
 		
-		if(inSpace) {
+		if(wearSpaceSuit) {
 			sb.draw(space,
 					body.getWorldCenter().x - space.getRegionWidth()/2 / GameState.UNIT_SCALE,
 					body.getWorldCenter().y - space.getRegionHeight()/2 / GameState.UNIT_SCALE,

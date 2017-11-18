@@ -60,7 +60,7 @@ public class SpaceMap extends KambojaMap{
 	public void update(float delta) {
 		for(Player p : gameState.getPlayers()) {
 			p.getBody().setLinearDamping(0);
-			p.setInSpace(true);
+			p.setInSpace(true, true);
 		}
 		gameState.setInSpace();
 		
@@ -122,10 +122,12 @@ public class SpaceMap extends KambojaMap{
 
 
 	public void remove(Asteroid asteroid) {
-		asteroids.remove(asteroid);
-		if(asteroid.size > 1) {
-			for(int i = 0; i < 4; i ++) {
-				addAsteroid(asteroid.body.getWorldCenter(), asteroid.size - 1, false);
+		if(asteroids.contains(asteroid)) {
+			asteroids.remove(asteroid);
+			if(asteroid.size > 1) {
+				for(int i = 0; i < 4; i ++) {
+					addAsteroid(asteroid.body.getWorldCenter(), asteroid.size - 1, false);
+				}
 			}
 		}
 	}

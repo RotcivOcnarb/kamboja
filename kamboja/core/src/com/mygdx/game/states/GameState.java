@@ -318,23 +318,6 @@ public class GameState extends State{
 			islandBackground = null;
 		}
 		
-		if(tiledMap.getProperties().get("mapClass") != null) {
-			String mapClass = tiledMap.getProperties().get("mapClass").toString();
-			
-			if(mapClass != null) {
-				try {
-					kambojaMap = (KambojaMap)Class.forName("com.mygdx.game.objects.map." + mapClass).newInstance();
-					kambojaMap.setGameState(this);
-					kambojaMap.create();
-				} catch (InstantiationException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
 		
 		System.out.println(kambojaMap);
 		
@@ -358,6 +341,9 @@ public class GameState extends State{
 		
 		if(layout == null)
 		layout = new GlyphLayout();
+		
+
+		
 		
 		timer = 0;
 
@@ -525,7 +511,23 @@ public class GameState extends State{
 				createPlayer(i);
 		}
 		
-		
+		if(tiledMap.getProperties().get("mapClass") != null) {
+			String mapClass = tiledMap.getProperties().get("mapClass").toString();
+			
+			if(mapClass != null) {
+				try {
+					kambojaMap = (KambojaMap)Class.forName("com.mygdx.game.objects.map." + mapClass).newInstance();
+					kambojaMap.setGameState(this);
+					kambojaMap.create();
+				} catch (InstantiationException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 
 		BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
