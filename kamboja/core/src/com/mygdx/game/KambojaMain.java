@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.shift.Barrier;
@@ -153,6 +154,8 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 
 	public void create () {
+		GameMusic.initialize();
+		
 		sb = new SpriteBatch();
 		manager = new Manager();
 		manager.create();
@@ -234,6 +237,8 @@ public class KambojaMain extends ApplicationAdapter {
 			GameState.DEBUG = configs.get("DebugMode").toLowerCase().equals("true");
 			GameState.DIFFICULTY = Integer.parseInt(configs.get("BotDifficulty"));
 			GameState.VOLUME = Float.parseFloat(configs.get("SFXVolume"));
+			GameMusic.MUSIC_VOLUME = Float.parseFloat(configs.get("MusicVolume"));
+			
 			
 			
 		} catch (FileNotFoundException e) {

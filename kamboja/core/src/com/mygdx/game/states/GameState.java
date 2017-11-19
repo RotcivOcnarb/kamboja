@@ -53,6 +53,7 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.BotPlayer;
 import com.mygdx.game.objects.Bullet;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.GamePause;
 import com.mygdx.game.objects.Item;
 import com.mygdx.game.objects.MyContactListener;
@@ -107,6 +108,7 @@ public class GameState extends State{
 	private float opacity = 1;
 	private float endTimer;
 	private boolean end;
+	private String musicName;
 	
 	private float menuPos = 0;
 	private float targetMenuPos = 0;
@@ -157,7 +159,7 @@ public class GameState extends State{
 	
 	KambojaMap kambojaMap;
 	
-	Music music;
+
 	
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
@@ -231,10 +233,7 @@ public class GameState extends State{
 		
 		//shader stuff
 		
-		if(music == null){
-			music = Gdx.audio.newMusic(Gdx.files.internal("music/the_league_of_mice.ogg"));
-			music.setLooping(true);
-		}
+		
 		
 		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
@@ -600,7 +599,12 @@ public class GameState extends State{
 			parser.load(world, layer2d);
 			System.out.println("Loaded " + parser.getBodies().size + " BOX2D objects!");
 		}
-
+		if(tiledMap.getProperties().get("music") != null)
+		musicName = tiledMap.getProperties().get("music").toString();
+		else
+			musicName = "the_league_of_mice";
+		
+		GameMusic.loadMusic(musicName);
 	}
 	
 	public void setInSpace() {
@@ -1075,8 +1079,8 @@ public class GameState extends State{
 	//Update
 	
 	public void update(float delta) {
-		Gdx.gl.glClearColor(0, 162/255f, 132/255f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		GameMusic.fadeOut(GameMusic.MAIN_MENU);
 				
 		if(islandBackground != null){
 			islandBackground.update(delta);
@@ -1131,7 +1135,7 @@ public class GameState extends State{
 			if(opacity > 1){
 				opacity = 1;
 				manager.changeState(3);
-				music.stop();
+				GameMusic.fadeOut(musicName);
 				return;
 			}
 		}
@@ -1181,9 +1185,7 @@ public class GameState extends State{
 			else
 			inputBlocked = true;
 			
-			if(!music.isPlaying()){
-				music.play();
-			}
+			GameMusic.loop(musicName, 1);
 		}
 		
 		for(int i = 0; i < getPlayers().size(); i ++){

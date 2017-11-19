@@ -42,6 +42,7 @@ import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
@@ -155,6 +156,9 @@ public class PlayerSelectState extends State{
 		goingBack = false;
 		allReady = false;
 		back_angle = 0;
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 		
 		selection_tex = new Texture("menu/player_select/selection.png");
 		

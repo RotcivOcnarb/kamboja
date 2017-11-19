@@ -58,7 +58,7 @@ public class VolcanMap extends KambojaMap{
 			if(rockLaunch <= 0) {
 				rockLaunch = 0.5f;
 				numRocks ++;
-				rocks.add(new LavaRock(lava_rocks[(int)(Math.random() * 3)], new Vector2(13.5f, 13.6f), rocks));
+				rocks.add(new LavaRock(lava_rocks[(int)(Math.random() * 3)], new Vector2(17.5f, 13.6f), rocks));
 				if(numRocks == 3) {
 					timer = (float)(Math.random() * 10) + 10;
 					rockLaunch = 0.5f;

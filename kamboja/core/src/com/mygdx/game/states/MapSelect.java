@@ -31,6 +31,7 @@ import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.MenuCursors;
 import com.mygdx.game.objects.PlayerController;
@@ -90,6 +91,7 @@ public class MapSelect extends State{
 
 		timer = -1;
 		exiting = false;
+		
 		
 		sr = new ShapeRenderer();
 		tempC = new Color();

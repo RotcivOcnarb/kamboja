@@ -24,6 +24,7 @@ import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
 import com.mygdx.game.steam.MySteamCallback;
@@ -55,6 +56,8 @@ public class PostGame extends State{
 		botTimer = 0;
 
 		sound_select = Gdx.audio.newSound(Gdx.files.internal("audio/select.ogg"));
+		
+		GameMusic.stopAll();
 		
 		background = new Background();
 		

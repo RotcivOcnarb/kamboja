@@ -42,6 +42,7 @@ import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
@@ -120,6 +121,9 @@ public class MapSelectState extends State{
 		alpha = 1;
 		goingBack = false;
 		timer = 0;
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 		
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");

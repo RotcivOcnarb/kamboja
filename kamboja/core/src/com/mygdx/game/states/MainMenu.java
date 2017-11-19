@@ -3,6 +3,7 @@ package com.mygdx.game.states;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -33,6 +34,7 @@ import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.Background;
 import com.mygdx.game.objects.BotController;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.KeyboardTyper;
 import com.mygdx.game.objects.MenuCursors;
@@ -224,10 +226,15 @@ public class MainMenu extends State{
 		for(int i = 0; i < 4; i ++){
 			typer[i] = new KeyboardTyper(new Vector2(Gdx.graphics.getWidth()/4 * i + (Gdx.graphics.getWidth()/4 * 0.1f), 230), i);
 		}
-				
+		
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 	}
 	public void render(SpriteBatch sb) {
 		background.render(sb);
+		
+		GameMusic.fadeIn(GameMusic.MAIN_MENU);
 		
 	//Desenha o logo
 		Gdx.gl.glEnable(GL20.GL_BLEND);

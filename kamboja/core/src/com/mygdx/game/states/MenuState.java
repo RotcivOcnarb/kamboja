@@ -23,6 +23,7 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.easing.Back;
+import com.mygdx.game.objects.GameMusic;
 
 public class MenuState extends State{
 	
@@ -87,6 +88,9 @@ public class MenuState extends State{
 		alpha = 1;
 		shaderIntensity = 0;
 		intensityTarget = 0;
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 		
 		background = new Texture("menu/background.png");
 		bolinha = new Texture("menu/bolinha.png");
@@ -155,7 +159,7 @@ public class MenuState extends State{
 	}
 
 	public void render(SpriteBatch sb) {
-					
+		GameMusic.fadeIn(GameMusic.MAIN_MENU);
 		
 		//desenha menu no frameBuffer
 		shaderBuffer.begin();
