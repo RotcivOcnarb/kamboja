@@ -196,7 +196,8 @@ public class MapSelectState extends State{
 				
 				String mapTitle = f.getName().replaceFirst(f.getName().substring(0, 1), f.getName().substring(0, 1).toUpperCase());
 				System.out.println(mapTitle.split("\\.")[0]);
-				mapTitles.add(mapTitle.split("\\.")[0]);
+				String tf = mapTitle.split("\\.")[0];
+				mapTitles.add(tf.substring(1, tf.length()));
 			}
 		}
 		mapNames.add("");
@@ -589,7 +590,7 @@ public class MapSelectState extends State{
 						174*factor
 						);
 				
-				if(KambojaMain.mapUnlocked[i])
+				if(KambojaMain.mapUnlocked[i]  || i == KambojaMain.mapUnlocked.length-1)
 				sb.setColor(1, 1, 1, 0.3f);
 				else
 				sb.setColor(0.3f, 0.3f, 0.3f, 1f);
@@ -1071,7 +1072,6 @@ public class MapSelectState extends State{
 			goingBack = true;
 			break;
 		case 17:
-			KambojaMain.setMapName(mapNames.get(selected_map));
 			outro = true;
 			break;
 		case 18:
@@ -1106,12 +1106,22 @@ public class MapSelectState extends State{
 			KambojaMain.setItems(!KambojaMain.hasItems());
 			break;
 		default:			
-			if(KambojaMain.mapUnlocked[selection[id]]) {
+			if(KambojaMain.mapUnlocked[selection[id]] || selection[id] == KambojaMain.mapUnlocked.length-1) {
 				selected_map = selection[id];
-				if(selected_map == mapNames.size() - 1){
-					selected_map = (int) (Math.random() * 4);
-				}
 				KambojaMain.setMapName(mapNames.get(selected_map));
+				if(selected_map == mapNames.size() - 1){
+					
+					int randomMap = (int)(Math.random() * (KambojaMain.mapUnlocked.length - 1));
+					
+					while(!KambojaMain.mapUnlocked[randomMap]) {
+						randomMap = (int)(Math.random() * (KambojaMain.mapUnlocked.length - 1));
+					}
+					
+					KambojaMain.setMapName(mapNames.get(randomMap));
+					
+					System.out.println("map generated: (" + KambojaMain.getMapName() + ")");
+				}
+				
 			}
 			break;
 		}

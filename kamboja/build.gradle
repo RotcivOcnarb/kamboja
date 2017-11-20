@@ -45,7 +45,7 @@ project(":desktop") {
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.2"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
         compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
-        
+		compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
     }
 }
 
@@ -69,6 +69,7 @@ project(":core") {
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.2"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
         compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
+        compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
     }
 }
 

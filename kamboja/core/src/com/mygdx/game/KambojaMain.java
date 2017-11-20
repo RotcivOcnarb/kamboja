@@ -4,9 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -14,11 +21,17 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Json;
 import com.codedisaster.steamworks.SteamAPI;
+import com.codedisaster.steamworks.SteamAuth.AuthSessionResponse;
 import com.codedisaster.steamworks.SteamException;
+import com.codedisaster.steamworks.SteamID;
+import com.codedisaster.steamworks.SteamUser;
+import com.codedisaster.steamworks.SteamUserCallback;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
+import com.mygdx.game.objects.SaveObject;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Turret;
 import com.mygdx.game.objects.weapon.Bazooka;
@@ -51,7 +64,11 @@ public class KambojaMain extends ApplicationAdapter {
 	private static int playersize = 5;
 	private static boolean items = true; 
 	public static final double SENSITIVITY = 1.5f;
-	public static boolean[] mapUnlocked = new boolean[]{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
+	public static boolean[] mapUnlocked = new boolean[]{true, true, true, true, true, true, true, true};
+	public static boolean[] weaponUnlocked = new boolean[] {true, true, false, false, false, false, false, false};
+	public static int level = 30;
+	public static int experience = 0;
+	static SteamUser steamUser;
 	
 	AssetManager assets;
 	
@@ -170,18 +187,112 @@ public class KambojaMain extends ApplicationAdapter {
 		KambojaMain.items = items;
 	}
 
+	public static String encrypt(String key, String initVector, String value) {
+        try {
+            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
+
+            byte[] encrypted = cipher.doFinal(value.getBytes());
+
+            return Base64.encodeBase64String(encrypted);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static String decrypt(String key, String initVector, String encrypted) {
+        try {
+            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+
+            byte[] original = cipher.doFinal(Base64.decodeBase64(encrypted));
+
+            return new String(original);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+    
+    public static void loadGame() {
+    	String encrypted;
+    	
+    	try {
+			BufferedReader fw = new BufferedReader(new FileReader(new File("save.sav")));
+			encrypted = fw.readLine();
+			fw.close();
+			
+	    	String save = decrypt("" + steamUser.getSteamID().getAccountID() + steamUser.getSteamID().getAccountID(), "RandomInitVector", encrypted);
+
+	    	System.out.println(save);
+	    	
+	    	Json json = new Json();
+	    	SaveObject so = json.fromJson(SaveObject.class, save);
+	    	
+	    	mapUnlocked = so.getMaps();
+	    	weaponUnlocked = so.getWeapons();
+	    	level = so.getLevel();
+	    	experience = so.getExperience();
+	    	
+		}
+    	catch(FileNotFoundException e) {
+    		File file = new File("save.sav");
+    		if(!file.exists()) {
+    			try {
+					file.createNewFile();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+    		}
+    	}
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    }
+    
+    public static void saveGame() {
+    	SaveObject so = new SaveObject();
+		so.setMaps(mapUnlocked);
+		so.setWeapons(weaponUnlocked);
+		so.setLevel(level);
+		so.setExperience(experience);
+		
+		Json json = new Json();
+
+		String encrypted = encrypt("" + steamUser.getSteamID().getAccountID() + steamUser.getSteamID().getAccountID(), "RandomInitVector", json.toJson(so));
+		//System.out.println(encrypted);
+		
+		try {
+			FileWriter fw = new FileWriter(new File("save.sav"));
+			fw.write(encrypted);
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+	
 	public void create () {
 		GameMusic.initialize();
 		instance = this;
 		Assets.LOADSHIT(assets);
 		
+		
+		
 		loading = new Texture("imgs/loading.png");
-		
-		
+
 		sb = new SpriteBatch();
-		
-		
-		
+
 		try {
 			//SteamAPI.restartAppIfNecessary(747110);
 		    if (!SteamAPI.init()) {
@@ -192,9 +303,15 @@ public class KambojaMain extends ApplicationAdapter {
 		    e.printStackTrace();
 		}
 		
+		steamUser = new SteamUser(new SteamUserCallback() {
+			public void onValidateAuthTicket(SteamID steamID, AuthSessionResponse authSessionResponse,
+					SteamID ownerSteamID) {				
+			}
+			public void onMicroTxnAuthorization(int appID, long orderID, boolean authorized) {				
+			}
+		});
 		
-		
-
+		loadGame();
 		//Loads the config.ini file and sets all the parameters
 		try {
 			File conf = new File("config.ini");
@@ -326,6 +443,7 @@ public class KambojaMain extends ApplicationAdapter {
 	@Override
 	public void dispose(){
 		super.dispose();
+		saveGame();
 		SteamAPI.shutdown();
 	}
 }

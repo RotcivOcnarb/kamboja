@@ -84,6 +84,8 @@ public class Assets {
 		assets.load("menu/player_select/selection.png", Texture.class);
 		assets.load("menu/player_select/chain.png", Texture.class);
 		
+		assets.load("Weapons/Icon/lock.png", Texture.class);
+		
 		assets.load("menu/player_select/press start.png", Texture.class);
 		
 		assets.load("Weapons/Icon/Pistol.png", Texture.class);

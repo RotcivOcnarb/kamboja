@@ -232,9 +232,7 @@ public class GameState extends State{
 	public void create() {
 		
 		//shader stuff
-		
-		
-		
+
 		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
 		beforeBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -307,7 +305,7 @@ public class GameState extends State{
 		if(bounds == null)
 		bounds = new Rectangle2D.Double();
 		
-		System.out.println("Loading map " + KambojaMain.getMapName());
+		System.out.println("Loading map (" + KambojaMain.getMapName() + ")");
 		setTiledMap(new TmxMapLoader().load(KambojaMain.getMapName()));
 		
 		if(KambojaMain.getMapName().endsWith("island.tmx")){

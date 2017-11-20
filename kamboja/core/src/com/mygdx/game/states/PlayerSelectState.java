@@ -136,6 +136,7 @@ public class PlayerSelectState extends State{
 	boolean allReady;
 	boolean hasFallen;
 
+	Texture lock;
 	
 	//TODO: particulas de fumaça
 	//correntes
@@ -152,6 +153,8 @@ public class PlayerSelectState extends State{
 		chain = KambojaMain.getTexture("menu/player_select/chain.png");
 		
 		pressStart = KambojaMain.getTexture("menu/player_select/press start.png");
+		
+		lock = KambojaMain.getTexture("Weapons/Icon/lock.png");
 		
 		if(KambojaMain.getControllers() == null)
 			KambojaMain.initializeControllers();
@@ -611,6 +614,7 @@ public class PlayerSelectState extends State{
 						
 						Texture wep = inGameWep[KambojaMain.getControllers().get(i).getWeapon()];
 						
+						if(KambojaMain.weaponUnlocked[KambojaMain.getControllers().get(i).getWeapon()]) 
 						sb.draw(wep,
 								(181 - wep.getWidth()*5) / 2f + j*181 - skinOffset[i]*181 + 
 								k * (181*KambojaMain.getPlayerSkinsSize()),
@@ -627,7 +631,7 @@ public class PlayerSelectState extends State{
 								wep.getWidth(),
 								wep.getHeight(),
 								false, false);
-							
+						
 						sb.end();
 					}
 				}
@@ -646,6 +650,9 @@ public class PlayerSelectState extends State{
 						
 						float ratio = 181 / (tex.getWidth()*5f);
 						
+						if(!KambojaMain.weaponUnlocked[j]) 
+							tex = lock;
+						
 						sb.draw(tex,
 								(181 - tex.getWidth()*5) / 2f + j*181 - weaponOffset[i]*181 +
 								k * (181*KambojaMain.getWeaponSize()),
@@ -663,7 +670,7 @@ public class PlayerSelectState extends State{
 								tex.getHeight(),
 								false,
 								true);
-							
+						
 						sb.end();
 					}
 				}
@@ -1070,6 +1077,7 @@ public class PlayerSelectState extends State{
 		}
 		
 		allReady = true;
+		int cont = 0;
 		for(int i = 0; i < 4; i ++) {
 			if(KambojaMain.getControllers().size()-1 >= i){
 				if(KambojaMain.getControllers().get(i) != null) {
@@ -1077,10 +1085,13 @@ public class PlayerSelectState extends State{
 						allReady = false;
 						break;
 					}
+					else {
+						cont ++;
+					}
 				}
 			}
 			else {
-				if(i <= 1) allReady = false;
+				if(cont <= 1) allReady = false;
 			}
 		}
 		
@@ -1262,6 +1273,7 @@ public class PlayerSelectState extends State{
 							selection[id] = 1;
 							break;
 						case 0:
+							if(KambojaMain.weaponUnlocked[KambojaMain.getControllers().get(id).getWeapon()])
 							playerReady[id] = true;
 							break;
 						case 4:
@@ -1617,6 +1629,7 @@ public class PlayerSelectState extends State{
 								selection[id] = 1;
 								break;
 							case 0:
+								if(KambojaMain.weaponUnlocked[KambojaMain.getControllers().get(id).getWeapon()])
 								playerReady[id] = true;
 								break;
 							case 4:
@@ -1688,17 +1701,19 @@ public class PlayerSelectState extends State{
 			}
 		}
 		
-		if(keycode == Keys.BACKSPACE || keycode == Keys.DEL || keycode == Keys.FORWARD_DEL) {
-			if(!typing[id]) {
-				if(!playerReady[id]) {
-					selection[id] = 4;
+		if(id != -1) {
+			if(keycode == Keys.BACKSPACE || keycode == Keys.DEL || keycode == Keys.FORWARD_DEL) {
+				if(!typing[id]) {
+					if(!playerReady[id]) {
+						selection[id] = 4;
+					}
+					else {
+						playerReady[id] = false;
+					}
 				}
 				else {
-					playerReady[id] = false;
+					KambojaMain.getControllers().get(id).removeLetterFromName();
 				}
-			}
-			else {
-				KambojaMain.getControllers().get(id).removeLetterFromName();
 			}
 		}
 		

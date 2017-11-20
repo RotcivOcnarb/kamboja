@@ -67,6 +67,8 @@ public class Manager implements ControllerListener, InputProcessor{
 	public void update(float delta){
 		if(!disposed)
 		states.get(currentState).update(delta);
+		
+		
 	}
 
 	public void connected(Controller controller) {
@@ -109,6 +111,7 @@ public class Manager implements ControllerListener, InputProcessor{
 	}
 	
 	public void changeState(int state){
+		KambojaMain.saveGame();
 		dispose();
 		currentState = state;
 		create();

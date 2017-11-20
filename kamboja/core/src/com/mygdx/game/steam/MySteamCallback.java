@@ -10,8 +10,7 @@ public class MySteamCallback implements SteamUserStatsCallback{
 
 	@Override
 	public void onUserStatsReceived(long gameId, SteamID steamIDUser, SteamResult result) {
-		
-		
+
 	}
 
 	@Override
