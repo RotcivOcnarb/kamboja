@@ -69,6 +69,8 @@ public class OptionsState extends GenericInterface{
 	
 	float val_x;
 	
+	//TODO: dar update no volume da music a cada update;
+	
 	public OptionsState(Manager manager) {
 		super(manager);
 	}

@@ -34,6 +34,8 @@ public class HelpState extends GenericInterface{
 		super(manager);
 	}
 	
+	//TODO: particula de fumaça
+	
 	public void create() {
 		super.create();
 		background = new Texture("menu/help/fundo.jpg");

@@ -137,6 +137,10 @@ public class PlayerSelectState extends State{
 	boolean hasFallen;
 
 	
+	//TODO: particulas de fumaça
+	//correntes
+	//mayber logo imagem no titulo
+	
 	public PlayerSelectState(Manager manager) {
 		super(manager);
 	}
