@@ -111,7 +111,7 @@ public class PostGame extends State{
 			}
 			
 			if(botcont >= 4 && botTimer >= 1){
-				manager.changeState(1);
+				manager.changeState(6);
 				if(GameState.SFX)
 				sound_select.play();
 				
@@ -148,7 +148,7 @@ public class PostGame extends State{
 		background.update(delta, false);
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ENTER)){
-			manager.changeState(1);
+			manager.changeState(6);
 			if(GameState.SFX)
 			sound_select.play(GameState.VOLUME);
 			
