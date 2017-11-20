@@ -81,7 +81,7 @@ public class MenuState extends State{
 		
 		background = KambojaMain.getTexture("menu/background.png");
 		bolinha = KambojaMain.getTexture("menu/bolinha.png");
-		explosao = KambojaMain.getTexture("menu/explosão.png");
+		explosao = KambojaMain.getTexture("menu/explosao.png");
 		armas = KambojaMain.getTexture("menu/armas.png");
 		fumaca = KambojaMain.getTexture("menu/fumaca.png");
 		placa_letras = KambojaMain.getTexture("menu/placa_letras.png");
