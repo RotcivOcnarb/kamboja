@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.GL20;
@@ -17,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
@@ -64,47 +64,30 @@ public class MenuState extends State{
 	float shaderIntensity;
 	float intensityTarget;
 	
+	float SUM_ANGLE = 0;
+	float LAST_ANGLE = 0;	
+	float ENG_ANGLE = 0;	
+	
+	float x_value;
+	
 	ArrayList<ParticleEffect> explosions;
 	ArrayList<ParticleEffect> bolinhas;
 	
 	ShaderProgram shader;
 	FrameBuffer shaderBuffer;
-	
-	Music music;
-	
+		
 	public MenuState(Manager manager) {
 		super(manager);
-	}
-
-	public void create() {
 		
-		outro = false;
-		intro = true;
-		outro_vel = 0;
-		timerWrong = 0;
-		opt = 0;
-		timeStamp = 0;
-		timer = 0;
-		alpha = 1;
-		shaderIntensity = 0;
-		intensityTarget = 0;
-		
-		GameMusic.loadMusic(GameMusic.MAIN_MENU);
-		GameMusic.loop(GameMusic.MAIN_MENU, 0);
-		
-		background = new Texture("menu/background.png");
-		bolinha = new Texture("menu/bolinha.png");
-		explosao = new Texture("menu/explosão.png");
-		armas = new Texture("menu/armas.png");
-		fumaca = new Texture("menu/fumaca.png");
-		placa_letras = new Texture("menu/placa_letras.png");
-		sombra_letras = new Texture("menu/sombra_letras.png");
-		fumaca_tras = new Texture("menu/fumaca_back.png");
-		fumaca_frente = new Texture("menu/fumaca_front.png");
-		
-		for(int i = 0; i < 6; i ++){
-			engrenagens[i] = new Texture("menu/E" + (i+1) + ".png");
-		}
+		background = KambojaMain.getTexture("menu/background.png");
+		bolinha = KambojaMain.getTexture("menu/bolinha.png");
+		explosao = KambojaMain.getTexture("menu/explosão.png");
+		armas = KambojaMain.getTexture("menu/armas.png");
+		fumaca = KambojaMain.getTexture("menu/fumaca.png");
+		placa_letras = KambojaMain.getTexture("menu/placa_letras.png");
+		sombra_letras = KambojaMain.getTexture("menu/sombra_letras.png");
+		fumaca_tras = KambojaMain.getTexture("menu/fumaca_back.png");
+		fumaca_frente = KambojaMain.getTexture("menu/fumaca_front.png");
 		
 		eng_pos[0] = new Vector2(-981, 1009);
 		eng_pos[1] = new Vector2(-677, 969);
@@ -120,26 +103,26 @@ public class MenuState extends State{
 		eng_size[4] = 171.5f;
 		eng_size[5] = 217.5f;
 		
-		options[0] = new Texture("menu/VERSUS.png");
-		options[1] = new Texture("menu/COOP_off.png");
-		options[2] = new Texture("menu/ONLINE_off.png");
-		options[3] = new Texture("menu/HELP.png");
-		options[4] = new Texture("menu/OPTIONS.png");
-		options[5] = new Texture("menu/CREDITS.png");
+		options[0] = KambojaMain.getTexture("menu/VERSUS.png");
+		options[1] = KambojaMain.getTexture("menu/COOP_off.png");
+		options[2] = KambojaMain.getTexture("menu/ONLINE_off.png");
+		options[3] = KambojaMain.getTexture("menu/HELP.png");
+		options[4] = KambojaMain.getTexture("menu/OPTIONS.png");
+		options[5] = KambojaMain.getTexture("menu/CREDITS.png");
 		
-		music = Gdx.audio.newMusic(Gdx.files.internal("music/sylvan_spring.ogg"));
-		music.setLooping(true);
-		//music.play();
+		for(int i = 0; i < 6; i ++){
+			engrenagens[i] = KambojaMain.getTexture("menu/E" + (i+1) + ".png");
+		}
 		
 		explosions = new ArrayList<MenuState.ParticleEffect>();
 		
 		for(int i = 0; i < 5; i ++){
-			exps[i] = new Texture("menu/exp" + (i+1) + ".png");
+			exps[i] = KambojaMain.getTexture("menu/exp" + (i+1) + ".png");
 		}
 		
-		bolinhas = new ArrayList<MenuState.ParticleEffect>();
-		
 		sr = new ShapeRenderer();
+		
+		bolinhas = new ArrayList<MenuState.ParticleEffect>();
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/color_shift.fs"));
@@ -150,6 +133,38 @@ public class MenuState extends State{
 			System.out.println(shader.getLog());
 		}
 		
+	}
+
+	public void create() {
+		
+		globalTimer = 0;
+		outro = false;
+		intro = true;
+		outro_vel = 0;
+		timerWrong = 0;
+		opt = 0;
+		timeStamp = 0;
+		timer = 0;
+		alpha = 1;
+		shaderIntensity = 0;
+		intensityTarget = 0;
+		
+		SUM_ANGLE = 0;
+		LAST_ANGLE = 0;	
+		ENG_ANGLE = 0;	
+		
+		x_value = 0;
+		
+		eng_angle[0] = 0;
+		eng_angle[1] = 0;
+		eng_angle[2] = 0;
+		eng_angle[3] = 0;
+		eng_angle[4] = 0;
+		eng_angle[5] = 0;
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
+
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		
 	}
@@ -374,6 +389,9 @@ public class MenuState extends State{
 	}
 
 	public void update(float delta) {
+		System.out.println(opt);
+		
+		
 		globalTimer += delta;
 		timer -= delta;
 		timerWrong -= delta;
@@ -408,7 +426,7 @@ public class MenuState extends State{
 					break;
 				case 5:
 					//Credits
-					manager.changeState(5);
+					manager.changeState(10);
 					break;
 				}
 			}
@@ -502,12 +520,6 @@ public class MenuState extends State{
 	
 	boolean left;
 	boolean right;
-	
-	float SUM_ANGLE = 0;
-	float LAST_ANGLE = 0;	
-	float ENG_ANGLE = 0;	
-	
-	float x_value;
 	
 	public void checkMove(){
 		if(x_value > 0.2){
@@ -603,7 +615,8 @@ public class MenuState extends State{
 			intro = false;
 			break;
 		case 5:
-			timerWrong = 0.5f;
+			outro = true;
+			intro = false;
 			break;
 		}
 	}

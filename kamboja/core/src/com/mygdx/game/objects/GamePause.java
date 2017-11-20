@@ -42,7 +42,7 @@ public class GamePause {
 	public GamePause(GameState state){
 		this.state = state;
 				
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
 		param.size = (int) (50 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);

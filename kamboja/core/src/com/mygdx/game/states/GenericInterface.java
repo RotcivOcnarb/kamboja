@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -33,6 +35,8 @@ public abstract class GenericInterface extends State{
 	Texture chain;
 	ParticleEffect fogo;
 	ParticleEffect bolinha;
+	ParticleEffect fumaca_cano;
+	ParticleEffectPool cano_pool;
 	boolean intro;
 	boolean outro;
 	
@@ -52,6 +56,34 @@ public abstract class GenericInterface extends State{
 	
 	public GenericInterface(Manager manager) {
 		super(manager);
+		factor = Gdx.graphics.getHeight() / 1080f;
+		chainBody = new ArrayList<Body>();
+		chain = new Texture("menu/player_select/chain.png");
+		
+		sr = new ShapeRenderer();
+		
+		fogo = new ParticleEffect();
+		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
+		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
+		fogo.scaleEffect(10*factor);
+		
+		bolinha = new ParticleEffect();
+		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
+		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
+		bolinha.scaleEffect(factor);
+		
+		fumaca_cano = new ParticleEffect();
+		fumaca_cano.load(Gdx.files.internal("particles/cano.par"), Gdx.files.internal("particles"));
+		fumaca_cano.scaleEffect(factor*2);
+		
+		cano_pool = new ParticleEffectPool(fumaca_cano, 1, 5);
+
+		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
+				Gdx.files.internal("shaders/color_shift.fs"));
+		ShaderProgram.pedantic = false;
+		if(shader.getLog().length() > 0){
+			System.out.println(shader.getLog());
+		}
 	}
 	
 	public void renderImageInBody(SpriteBatch sb, Texture tex, Body body) {
@@ -72,10 +104,8 @@ public abstract class GenericInterface extends State{
 	
 	@Override
 	public void create() {
-		factor = Gdx.graphics.getHeight() / 1080f;
 		
-		chainBody = new ArrayList<Body>();
-		chain = new Texture("menu/player_select/chain.png");
+		chainBody.clear();
 		
 		shaderIntensity = 0;
 		intensityTarget = 0;
@@ -93,24 +123,7 @@ public abstract class GenericInterface extends State{
 		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
 		camera.zoom = 1/100f;
 		
-		sr = new ShapeRenderer();
 		
-		fogo = new ParticleEffect();
-		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-		fogo.scaleEffect(10*factor);
-		
-		bolinha = new ParticleEffect();
-		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-		bolinha.scaleEffect(factor);
-		
-		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/color_shift.fs"));
-		ShaderProgram.pedantic = false;
-		if(shader.getLog().length() > 0){
-			System.out.println(shader.getLog());
-		}
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		
 		
@@ -260,6 +273,7 @@ public abstract class GenericInterface extends State{
 		
 		bolinha.update(delta);
 		fogo.update(delta);
+		fumaca_cano.update(delta);
 		
 		camera.update();
 		world.step(1/60f, 6, 2);

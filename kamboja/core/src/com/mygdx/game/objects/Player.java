@@ -121,8 +121,6 @@ public class Player implements Steerable<Vector2>{
 	
 	ArrayList<Ghost> ghosts;
 	
-	ShaderProgram shader;
-
 	static{
 		for(int i = 0; i < 5; i ++){
 			grunt[i] = Gdx.audio.newSound(Gdx.files.internal("audio/grunt"+(i+1)+".ogg"));
@@ -217,12 +215,7 @@ public class Player implements Steerable<Vector2>{
 		
 		ghosts = new ArrayList<Ghost>();
 		
-		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"), Gdx.files.internal("shaders/motion_blur.fs"));
-		ShaderProgram.pedantic = false;
-		
-		if(shader.getLog().length() > 0){
-			System.out.println(shader.getLog());
-		}
+
 				
 		fire = new ParticleEffect();
 		fire.load(Gdx.files.internal("particles/firebuff.par"), Gdx.files.internal("particles"));
@@ -341,12 +334,10 @@ public class Player implements Steerable<Vector2>{
 				
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 		param = new FreeTypeFontParameter();
 		param.size = (int) (50 * Gdx.graphics.getDensity());
-		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
-		param.borderWidth = 2;
-		param.borderColor = new Color(1, 0.9f, 0.9f, 1);
+		param.color = new Color(1, 0.9f, 0.9f, 1);
 		param.shadowColor = new Color(0, 0, 0, 0.7f);
 		param.shadowOffsetX = 3;
 		param.shadowOffsetY = 3;
@@ -438,20 +429,12 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - legAngle);
 		
-		shader.begin();
-		sb.setShader(shader);
+
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		
-		shader.setUniformf("angle", (float)Math.toRadians(
-				body.getLinearVelocity().cpy().scl(1, -1).angle() - angle.cpy().scl(1, -1).angle() + 90
-				));
-		shader.setUniformf("intensity", body.getLinearVelocity().len() * 0.001f * (buff == Item.SPEED && buffTimer > 0 ? 1f : 0f));
-		shader.setUniformf("transparency", opacity);
-		
-		
-		
+
+
 		sb.draw(player,
 				body.getWorldCenter().x - player.getRegionWidth()/2 / GameState.UNIT_SCALE,
 				body.getWorldCenter().y - player.getRegionHeight()/2 / GameState.UNIT_SCALE,
@@ -476,8 +459,7 @@ public class Player implements Steerable<Vector2>{
 					270 - getAngle());
 		}
 		sb.end();
-	
-		shader.end();
+
 		sb.setShader(null);
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -647,16 +629,16 @@ public class Player implements Steerable<Vector2>{
 
 		switch(getId()){
 		case 0:
-			font.setColor(0, 0, 1, 1f);
+			font.setColor(90/255f, 56/255f, 207/255f, 1f);
 			break;
 		case 1:
-			font.setColor(1, 0, 0, 1f);
+			font.setColor(203/255f, 30/255f, 48/255f, 1f);
 			break;
 		case 2:
-			font.setColor(0, 1, 0, 1f);
+			font.setColor(43/255f, 179/255f, 169/255f, 1f);
 			break;
 		case 3:
-			font.setColor(1, 1, 0, 1f);
+			font.setColor(247/255f, 215/255f, 71/255f, 1f);
 		}
 		
 		if(!isDead()){

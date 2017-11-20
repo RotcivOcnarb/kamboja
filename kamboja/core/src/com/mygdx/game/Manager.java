@@ -25,7 +25,7 @@ import com.mygdx.game.states.PostGame;
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
-	private int currentState = 10;
+	private int currentState = 5;
 	private boolean disposed = false; //so it doesnt dispose the same state twice
 	
 	public Manager(){

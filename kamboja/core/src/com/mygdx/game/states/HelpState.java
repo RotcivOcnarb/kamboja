@@ -5,11 +5,13 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
@@ -29,26 +31,38 @@ public class HelpState extends GenericInterface{
 	
 	float cog_angle;
 	float cog_speed;
+	
+	PooledEffect fumaca[] = new PooledEffect[2];
 
 	public HelpState(Manager manager) {
 		super(manager);
+		
+		background = KambojaMain.getTexture("menu/help/fundo.jpg");
+		base = KambojaMain.getTexture("menu/help/base.png");
+		
+		shoot = KambojaMain.getTexture("menu/help/placa shoot.png");
+		sprint = KambojaMain.getTexture("menu/help/placa sprint.png");
+		
+		back_cog = KambojaMain.getTexture("menu/help/engrenagem.png");
+		
+		move = KambojaMain.getTexture("menu/help/placa move.png");
+		aim = KambojaMain.getTexture("menu/help/placa aim.png");
+		
+		for(int i = 0; i < 2; i ++) {
+			fumaca[i] = cano_pool.obtain();
+		}
+		
+		fumaca[1].getEmitters().get(0).getAngle().setHighMin(-50);
+		fumaca[1].getEmitters().get(0).getAngle().setHighMax(-40);
+		
+		fumaca[1].getEmitters().get(0).getAngle().setLowMin(0);
+		fumaca[1].getEmitters().get(0).getAngle().setLowMax(0);
 	}
 	
 	//TODO: particula de fumaça
 	
 	public void create() {
 		super.create();
-		background = new Texture("menu/help/fundo.jpg");
-		base = new Texture("menu/help/base.png");
-		
-		shoot = new Texture("menu/help/placa shoot.png");
-		sprint = new Texture("menu/help/placa sprint.png");
-		
-		back_cog = new Texture("menu/help/engrenagem.png");
-		
-		move = new Texture("menu/help/placa move.png");
-		aim = new Texture("menu/help/placa aim.png");
-		
 		shootBody = createBox(
 				new Vector2(Gdx.graphics.getWidth()/2 -700*factor, Gdx.graphics.getHeight()),
 				new Vector2(shoot.getWidth()*factor/2f, shoot.getHeight()*factor/2f),
@@ -102,6 +116,12 @@ public class HelpState extends GenericInterface{
 			renderImageInBody(sb, sprint, sprintBody);
 			renderImageInBody(sb, move, moveBody);
 			renderImageInBody(sb, aim, aimBody);
+			
+			 fumaca[0].setPosition(680*factor, 160*factor);
+			 fumaca[0].draw(sb, Gdx.graphics.getDeltaTime());
+			
+			 fumaca[1].setPosition(1330*factor, 90*factor);
+			 fumaca[1].draw(sb, Gdx.graphics.getDeltaTime());
 			
 			sb.flush();
 			//b2dr.render(world, camera.combined);

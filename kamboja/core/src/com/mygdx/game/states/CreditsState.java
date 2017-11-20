@@ -5,17 +5,23 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
+import com.mygdx.game.controllers.Gamecube;
+import com.mygdx.game.controllers.GenericController;
+import com.mygdx.game.controllers.XBox;
 
 public class CreditsState extends GenericInterface{
 
@@ -28,29 +34,25 @@ public class CreditsState extends GenericInterface{
 	Texture sign;
 	Texture cano_d, cano_e_b, cano_e_c, chain_big, chain_small;
 	
+	PooledEffect fumaca[] = new PooledEffect[3];
+	
 	float credit_y = 0;
 	Document doc;
 	public CreditsState(Manager manager) {
 		super(manager);
-	}
-	
-	@Override
-	public void create() {
-		super.create();
-		background = new Texture("menu/credits/fundo.jpg");
-		credits_string = Gdx.files.internal("credits.txt").readString();
 		
-		sign = new Texture("menu/credits/placa.png");
+		background = KambojaMain.getTexture("menu/credits/fundo.jpg");
+		credits_string = Gdx.files.internal("credits.txt").readString();
+
+		sign = KambojaMain.getTexture("menu/credits/placa.png");
 		
 		doc = Jsoup.parse(credits_string);
 		
-		credit_y = -3620*factor;
-		
-		cano_d = new Texture("menu/credits/cano_d.png");
-		cano_e_b = new Texture("menu/credits/cano_e_b.png");
-		cano_e_c = new Texture("menu/credits/cano_e_c.png");
-		chain_big = new Texture("menu/credits/chain_big.png");
-		chain_small = new Texture("menu/credits/chain_small.png");
+		cano_d = KambojaMain.getTexture("menu/credits/cano_d.png");
+		cano_e_b = KambojaMain.getTexture("menu/credits/cano_e_b.png");
+		cano_e_c = KambojaMain.getTexture("menu/credits/cano_e_c.png");
+		chain_big = KambojaMain.getTexture("menu/credits/chain_big.png");
+		chain_small = KambojaMain.getTexture("menu/credits/chain_small.png");
 		
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
@@ -63,6 +65,22 @@ public class CreditsState extends GenericInterface{
 		param.color = new Color(127/255f, 176/255f, 210/255f, 1);
 		olivers_barney_big = ftfg.generateFont(param);
 		ftfg.dispose();
+		
+		for(int i = 0; i < 3; i ++) {
+			fumaca[i] = cano_pool.obtain();
+		}
+		
+		fumaca[1].getEmitters().get(0).getAngle().setHighMin(20);
+		fumaca[1].getEmitters().get(0).getAngle().setHighMax(30);
+		
+		fumaca[2].getEmitters().get(0).getAngle().setHighMin(130);
+		fumaca[2].getEmitters().get(0).getAngle().setHighMax(140);
+	}
+	
+	@Override
+	public void create() {
+		super.create();
+		credit_y = -3620*factor;
 	}
 
 	public void insideRender(SpriteBatch sb) {
@@ -98,20 +116,30 @@ public class CreditsState extends GenericInterface{
 			sb.draw(cano_d, Gdx.graphics.getWidth() - cano_d.getWidth()*factor, Gdx.graphics.getHeight() - cano_d.getHeight()*factor,
 					cano_d.getWidth()*factor, cano_d.getHeight()*factor);
 			
+			sb.flush();
+			
+			 fumaca[0].setPosition(240*factor, 360*factor);
+			 fumaca[0].draw(sb, Gdx.graphics.getDeltaTime());
+			
+			 fumaca[1].setPosition(340*factor, 230*factor);
+			 fumaca[1].draw(sb, Gdx.graphics.getDeltaTime());
+		
+			 fumaca[2].setPosition(1770*factor, 390*factor);
+			 fumaca[2].draw(sb, Gdx.graphics.getDeltaTime());
+			
 		sb.end();
 		
 	}
 	
 	public void update(float delta) {
 		super.update(delta);
-		System.out.println(credit_y);
 		credit_y += delta*100;
 		
 		
 	}
 
 	public void changeScreen() {
-		
+		manager.changeState(5);
 	}
 
 	public void dispose() {
@@ -127,6 +155,31 @@ public class CreditsState extends GenericInterface{
 	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
+		int A = 0;
+		
+		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			A = XBox.BUTTON_START;
+		}
+		else if(controller.getName().equals(Gamecube.getID())){
+			A = Gamecube.START;
+		}
+		else{
+			A = GenericController.START;
+		}
+		
+		if(buttonCode == A){
+			intro = false;
+			outro = true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean keyDown(int keyCode) {
+		if(keyCode == Keys.ENTER) {
+			intro = false;
+			outro = true;
+		}
 		return false;
 	}
 

@@ -28,6 +28,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
@@ -77,20 +78,20 @@ public class OptionsState extends GenericInterface{
 
 	public void create() {
 		super.create();
-		background = new Texture("menu/options/fundo.jpg");
-		main_sign = new Texture("menu/options/main_sign.png");
-		above_bar = new Texture("menu/options/above_bar.png");
-		options_sign = new Texture("menu/options/options_sign.png");
+		background = KambojaMain.getTexture("menu/options/fundo.jpg");
+		main_sign = KambojaMain.getTexture("menu/options/main_sign.png");
+		above_bar = KambojaMain.getTexture("menu/options/above_bar.png");
+		options_sign = KambojaMain.getTexture("menu/options/options_sign.png");
 		
-		left_arrow = new Texture("menu/options/seta esquerda.png");
-		right_arrow = new Texture("menu/options/seta direita.png");
-		on = new Texture("menu/options/on.png");
-		off = new Texture("menu/options/off.png");
+		left_arrow = KambojaMain.getTexture("menu/options/seta esquerda.png");
+		right_arrow = KambojaMain.getTexture("menu/options/seta direita.png");
+		on = KambojaMain.getTexture("menu/options/on.png");
+		off = KambojaMain.getTexture("menu/options/off.png");
 		
-		bar = new Texture("menu/options/barra.png");
-		small_cog = new Texture("menu/options/small_cog.png");
+		bar = KambojaMain.getTexture("menu/options/barra.png");
+		small_cog = KambojaMain.getTexture("menu/options/small_cog.png");
 		
-		selection_tex = new Texture("menu/player_select/selection.png");
+		selection_tex = KambojaMain.getTexture("menu/player_select/selection.png");
 		
 		left_light_scale = 1;
 		right_light_scale = 1;
@@ -104,10 +105,10 @@ public class OptionsState extends GenericInterface{
 		
 		currentBound = new Rectangle2D.Double(0, 0, 0, 0);
 		
-		light_sign = new Texture("menu/options/light.png");
-		debug_sign = new Texture("menu/options/debug_mode.png");
+		light_sign = KambojaMain.getTexture("menu/options/light.png");
+		debug_sign = KambojaMain.getTexture("menu/options/debug_mode.png");
 		
-		back_cog = new Texture("menu/options/engrenagem.png");
+		back_cog = KambojaMain.getTexture("menu/options/engrenagem.png");
 		light_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f + 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(

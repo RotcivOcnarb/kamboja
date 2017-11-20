@@ -143,6 +143,104 @@ public class PlayerSelectState extends State{
 	
 	public PlayerSelectState(Manager manager) {
 		super(manager);
+		
+		factor = Gdx.graphics.getHeight() / 1080f;
+		
+		sr = new ShapeRenderer();
+		selection_tex = KambojaMain.getTexture("menu/player_select/selection.png");
+		chainBody = new ArrayList<Body>();
+		chain = KambojaMain.getTexture("menu/player_select/chain.png");
+		
+		pressStart = KambojaMain.getTexture("menu/player_select/press start.png");
+		
+		if(KambojaMain.getControllers() == null)
+			KambojaMain.initializeControllers();
+		
+			texWep = new Texture[KambojaMain.getWeaponSize()];
+			texWep[0] = KambojaMain.getTexture("Weapons/Icon/Pistol.png");
+			texWep[1] = KambojaMain.getTexture("Weapons/Icon/PistolAkimbo.png");
+			texWep[2] = KambojaMain.getTexture("Weapons/Icon/minigun.png");
+			texWep[3] = KambojaMain.getTexture("Weapons/Icon/shotgun.png");
+			texWep[4] = KambojaMain.getTexture("Weapons/Icon/Mp5.png");
+			texWep[5] = KambojaMain.getTexture("Weapons/Icon/Flamethrower.png");
+			texWep[6] = KambojaMain.getTexture("Weapons/Icon/Bazook.png");
+			texWep[7] = KambojaMain.getTexture("Weapons/Icon/Laser.png");
+			
+			inGameWep = new Texture[KambojaMain.getWeaponSize()];
+			inGameWep[0] = KambojaMain.getTexture("Weapons/In-game/Taurus.png");
+			inGameWep[1] = KambojaMain.getTexture("Weapons/In-game/Taurus Akimbo.png");
+			inGameWep[2] = KambojaMain.getTexture("Weapons/In-game/Minigun.png");
+			inGameWep[3] = KambojaMain.getTexture("Weapons/In-game/sss.png");
+			inGameWep[4] = KambojaMain.getTexture("Weapons/In-game/MP5.png");
+			inGameWep[5] = KambojaMain.getTexture("Weapons/In-game/flahme.png");
+			inGameWep[6] = KambojaMain.getTexture("Weapons/In-game/Bazooka.png");
+			inGameWep[7] = KambojaMain.getTexture("Weapons/In-game/Laser.png");
+			
+			ok = KambojaMain.getTexture("menu/player_select/ok.png");
+			
+			camera = new OrthographicCamera();
+			camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			camera.zoom = 1/100f;
+			camera.position.set(Gdx.graphics.getWidth()/2f / 100f, Gdx.graphics.getHeight() / 2f / 100f, 0);
+			
+			setKeys();
+			
+			shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
+					Gdx.files.internal("shaders/color_shift.fs"));
+			ShaderProgram.pedantic = false;
+			if(shader.getLog().length() > 0){
+				System.out.println(shader.getLog());
+			}
+			
+			background = KambojaMain.getTexture("menu/player_select/fundo.jpg");
+			
+			for(int i = 0; i < 4; i ++) {
+				//Creates the font
+				FreeTypeFontGenerator ftfg;
+				FreeTypeFontParameter param;
+				ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
+				param = new FreeTypeFontParameter();
+				param.size = (int) (50f * factor);
+				param.color = new Color(0.5f, 0.5f, 0.5f, 1).mul(getPlayerColor(i));
+				param.borderColor = new Color(0.7f, 0.7f,0.7f, 1).add(getPlayerColor(i).mul(0.3f));
+				param.borderWidth = 2*factor;
+				outlander[i] = ftfg.generateFont(param);
+				param.size = (int) (200f * factor);
+				outlanderBig[i] = ftfg.generateFont(param);
+				ftfg.dispose();	
+			}
+			
+			layout = new GlyphLayout();
+			
+			
+			fogo = new ParticleEffect();
+			fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
+			fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
+			fogo.scaleEffect(10*factor);
+			
+			bolinha = new ParticleEffect();
+			bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
+			bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
+			bolinha.scaleEffect(factor);
+			
+			bufferProjectionPlayer = new Matrix4();
+			bufferProjectionPlayer.setToOrtho2D(0, 0, 181, 280);
+			bufferProjectionWeapon = new Matrix4();
+			bufferProjectionWeapon.setToOrtho2D(0, 0, 181, 151);
+			
+			for(int i = 0; i < 4; i ++) {
+				player_frames[i] = KambojaMain.getTexture("menu/player_select/frame"+(i+1)+".png");
+				player_glass[i] = KambojaMain.getTexture("menu/player_select/glass"+(i+1)+".png");
+				player_subframes[i] = KambojaMain.getTexture("menu/player_select/caixa p"+(i+1)+".png");
+				player_subglass[i] = KambojaMain.getTexture("menu/player_select/subglass"+(i+1)+".png");
+				select_gear[i] = KambojaMain.getTexture("menu/player_select/gear"+(i+1)+".png");
+				playerBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 280, false);
+				weaponBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
+				keyboardBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
+				
+			}
+			
+			back_tex = KambojaMain.getTexture("menu/player_select/back_btn.png");
 	}
 
 	@Override
@@ -155,7 +253,7 @@ public class PlayerSelectState extends State{
 		intensityTarget = 0;
 		hasFallen = false;
 		globalTimer = 0;
-		sr = new ShapeRenderer();
+		
 		
 		goingBack = false;
 		allReady = false;
@@ -163,116 +261,29 @@ public class PlayerSelectState extends State{
 		
 		GameMusic.loadMusic(GameMusic.MAIN_MENU);
 		GameMusic.loop(GameMusic.MAIN_MENU, 0);
-		
-		selection_tex = new Texture("menu/player_select/selection.png");
-		
-		if(KambojaMain.getControllers() == null)
-		KambojaMain.initializeControllers();
-		
-		chainBody = new ArrayList<Body>();
-		chain = new Texture("menu/player_select/chain.png");
-		
-		pressStart = new Texture("menu/player_select/press start.png");
-		
-		setKeys();
-		
-		//texturas das armas
-				if(texWep == null)
-				texWep = new Texture[KambojaMain.getWeaponSize()];
-				texWep[0] = new Texture("Weapons/Icon/Pistol.png");
-				texWep[1] = new Texture("Weapons/Icon/PistolAkimbo.png");
-				texWep[2] = new Texture("Weapons/Icon/minigun.png");
-				texWep[3] = new Texture("Weapons/Icon/shotgun.png");
-				texWep[4] = new Texture("Weapons/Icon/Mp5.png");
-				texWep[5] = new Texture("Weapons/Icon/Flamethrower.png");
-				texWep[6] = new Texture("Weapons/Icon/Bazook.png");
-				texWep[7] = new Texture("Weapons/Icon/Laser.png");
-				
-				if(inGameWep == null) {
-					inGameWep = new Texture[KambojaMain.getWeaponSize()];
-					inGameWep[0] = new Texture("Weapons/In-game/Taurus.png");
-					inGameWep[1] = new Texture("Weapons/In-game/Taurus Akimbo.png");
-					inGameWep[2] = new Texture("Weapons/In-game/Minigun.png");
-					inGameWep[3] = new Texture("Weapons/In-game/sss.png");
-					inGameWep[4] = new Texture("Weapons/In-game/MP5.png");
-					inGameWep[5] = new Texture("Weapons/In-game/flahme.png");
-					inGameWep[6] = new Texture("Weapons/In-game/Bazooka.png");
-					inGameWep[7] = new Texture("Weapons/In-game/Laser.png");
-				}
 
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.zoom = 1/100f;
-		camera.position.set(Gdx.graphics.getWidth()/2f / 100f, Gdx.graphics.getHeight() / 2f / 100f, 0);
+		chainBody.clear();
 
-		ok = new Texture("menu/player_select/ok.png");
+
 		
-		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/color_shift.fs"));
-		ShaderProgram.pedantic = false;
-		if(shader.getLog().length() > 0){
-			System.out.println(shader.getLog());
-		}
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 		
-		background = new Texture("menu/player_select/fundo.jpg");
-		
-		factor = Gdx.graphics.getHeight() / 1080f;
-		
-	
-		
+
 		for(int i = 0; i < 4; i ++) {
-			//Creates the font
-			FreeTypeFontGenerator ftfg;
-			FreeTypeFontParameter param;
-			ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
-			param = new FreeTypeFontParameter();
-			param.size = (int) (50f * factor);
-			param.color = new Color(0.5f, 0.5f, 0.5f, 1).mul(getPlayerColor(i));
-			param.borderColor = new Color(0.7f, 0.7f,0.7f, 1).add(getPlayerColor(i).mul(0.3f));
-			param.borderWidth = 2*factor;
-			outlander[i] = ftfg.generateFont(param);
-			param.size = (int) (200f * factor);
-			outlanderBig[i] = ftfg.generateFont(param);
-			ftfg.dispose();
-			
 			okAlpha[i] = 0;
 			okScale[i] = 2;
 			okAngle[i] = 30;
 			key_x[i] = 0;
 			key_y[i] = 2;
 		}
-		
-		layout = new GlyphLayout();
-		
-		fogo = new ParticleEffect();
-		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-		fogo.scaleEffect(10*factor);
-		
-		bolinha = new ParticleEffect();
-		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-		bolinha.scaleEffect(factor);
-		
+
 		for(int i = 0; i < 4; i ++) {
-			player_frames[i] = new Texture("menu/player_select/frame"+(i+1)+".png");
-			player_glass[i] = new Texture("menu/player_select/glass"+(i+1)+".png");
-			player_subframes[i] = new Texture("menu/player_select/caixa p"+(i+1)+".png");
-			player_subglass[i] = new Texture("menu/player_select/subglass"+(i+1)+".png");
-			select_gear[i] = new Texture("menu/player_select/gear"+(i+1)+".png");
-			playerBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 280, false);
-			weaponBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
-			keyboardBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
 			selection[i] = 3;
 		}
 		
-		bufferProjectionPlayer = new Matrix4();
-		bufferProjectionPlayer.setToOrtho2D(0, 0, 181, 280);
-		bufferProjectionWeapon = new Matrix4();
-		bufferProjectionWeapon.setToOrtho2D(0, 0, 181, 151);
 		
-		back_tex = new Texture("menu/player_select/back_btn.png");
+		
+	
 		
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
@@ -525,9 +536,7 @@ public class PlayerSelectState extends State{
 		
 	}
 
-	@Override
 	public void dispose() {
-		sr.dispose();
 		
 	}
 	

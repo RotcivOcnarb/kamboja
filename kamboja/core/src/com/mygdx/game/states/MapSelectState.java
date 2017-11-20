@@ -108,64 +108,41 @@ public class MapSelectState extends State{
 	FrameBuffer mapNameBuffer;
 	Matrix4 nameBufferProjection;
 	private boolean goingBack;
+	
+	float back_angle;
+	float back_speed;
+	float start_angle;
+	float start_speed;
 
 	
 	public MapSelectState(Manager manager) {
 		super(manager);
-	}
-
-	public void create() {
+		factor = Gdx.graphics.getHeight() / 1080f;
 		
-		intro = true;
-		outro = false;
-		alpha = 1;
-		goingBack = false;
-		timer = 0;
-		
-		GameMusic.loadMusic(GameMusic.MAIN_MENU);
-		GameMusic.loop(GameMusic.MAIN_MENU, 0);
-		
-		chainBody = new ArrayList<Body>();
-		chain = new Texture("menu/player_select/chain.png");
-		map_name = new Texture("menu/map_select/map_name.png");
+		chain = KambojaMain.getTexture("menu/player_select/chain.png");
+		map_name = KambojaMain.getTexture("menu/map_select/map_name.png");
 		
 		mapNameBuffer = new FrameBuffer(Format.RGBA8888, map_name.getWidth(), map_name.getHeight(), false);
 		nameBufferProjection = new Matrix4();
 		nameBufferProjection.setToOrtho2D(0, 0, map_name.getWidth(), map_name.getHeight());
 		
-		gear_start = new Texture("menu/map_select/gear_start.png");
-		gear_back = new Texture("menu/map_select/gear_back.png");
-		map_containers = new Texture("menu/map_select/map_containers.png");
+		
+		gear_start = KambojaMain.getTexture("menu/map_select/gear_start.png");
+		gear_back = KambojaMain.getTexture("menu/map_select/gear_back.png");
+		map_containers = KambojaMain.getTexture("menu/map_select/map_containers.png");
+		
+		selection_tex = KambojaMain.getTexture("menu/player_select/selection.png");
 		
 		for(int i = 0; i < 4; i ++) {
 			for(int j = 0; j < 4; j ++) {
 				map_container[i + j*4] = new TextureRegion(map_containers, i*217, j*199, 217, 199);
 			}
 		}
-		
-		selection_tex = new Texture("menu/player_select/selection.png");
-		
 
-		world = new World(new Vector2(0, -9.81f), false);
-		b2dr = new Box2DDebugRenderer();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
-		camera.zoom = 1/100f;
+		map_frame = KambojaMain.getTexture("menu/map_select/frame_map.png");
 		
-		options_x = Gdx.graphics.getWidth()/2f;
-		
-		map_frame = new Texture("menu/map_select/frame_map.png");
-
-		shaderIntensity = 0;
-		intensityTarget = 0;
-		
-		sr = new ShapeRenderer();
-		
-		background = new Texture("menu/map_select/fundo.jpg");
-		options_frame = new Texture("menu/map_select/frame_options.png");
-		
-		factor = Gdx.graphics.getHeight() / 1080f;
+		background = KambojaMain.getTexture("menu/map_select/fundo.jpg");
+		options_frame = KambojaMain.getTexture("menu/map_select/frame_options.png");
 		
 
 		FreeTypeFontGenerator ftfg;
@@ -201,18 +178,6 @@ public class MapSelectState extends State{
 			System.out.println(shader.getLog());
 		}
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-		
-		
-		mapBody = createBox(
-				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight() * (3/4f)),
-				new Vector2(444/2f*factor, 413/2f*factor), BodyType.DynamicBody, 0.1f);
-		
-		mapNameBody = createBox(
-				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight()/2f),
-				new Vector2(402/2f*factor, 88/2f*factor), BodyType.DynamicBody, 0.1f);
-		
-		buildRopeJoint((int)(10 * factor));
-		buildRopeJoint2((int)(3 * factor));
 		
 		thumbs = new ArrayList<Texture>();
 		mapTitles = new ArrayList<String>();
@@ -283,6 +248,53 @@ public class MapSelectState extends State{
 		layout.setText(oliver_barney, tm);
 		selection_bounds[20] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
 				50* factor, 550*factor, 120*factor);
+
+	}
+
+	public void create() {
+		
+		intro = true;
+		outro = false;
+		alpha = 1;
+		goingBack = false;
+		timer = 0;
+
+		back_angle = 0;
+		back_speed = 0;
+		start_angle = 0;
+		start_speed = 0;
+		
+		GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		GameMusic.loop(GameMusic.MAIN_MENU, 0);
+		
+		chainBody = new ArrayList<Body>();
+
+		world = new World(new Vector2(0, -9.81f), false);
+		b2dr = new Box2DDebugRenderer();
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
+		camera.zoom = 1/100f;
+		
+		options_x = Gdx.graphics.getWidth()/2f;
+
+		shaderIntensity = 0;
+		intensityTarget = 0;
+		
+		sr = new ShapeRenderer();
+		
+		factor = Gdx.graphics.getHeight() / 1080f;
+		
+		mapBody = createBox(
+				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight() * (3/4f)),
+				new Vector2(444/2f*factor, 413/2f*factor), BodyType.DynamicBody, 0.1f);
+		
+		mapNameBody = createBox(
+				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight()/2f),
+				new Vector2(402/2f*factor, 88/2f*factor), BodyType.DynamicBody, 0.1f);
+		
+		buildRopeJoint((int)(10 * factor));
+		buildRopeJoint2((int)(3 * factor));
 
 		
 		for(int i = 0; i < 4; i ++) {
@@ -516,7 +528,7 @@ public class MapSelectState extends State{
 				gear_start.getWidth()*factor,
 				gear_start.getHeight()*factor,
 				1, 1,
-				0,
+				start_angle,
 				0, 0,
 				gear_start.getWidth(),
 				gear_start.getHeight(),
@@ -530,7 +542,7 @@ public class MapSelectState extends State{
 				gear_back.getWidth()*factor,
 				gear_back.getHeight()*factor,
 				1, 1,
-				0,
+				back_angle,
 				0, 0,
 				gear_back.getWidth(),
 				gear_back.getHeight(),
@@ -747,6 +759,9 @@ public class MapSelectState extends State{
 		
 		options_x += (0 - options_x)/10.0f;
 		
+		back_angle += back_speed;
+		start_angle += start_speed;
+		
 		camera.update();
 		world.step(1/60f, 6, 2);
 		
@@ -760,6 +775,12 @@ public class MapSelectState extends State{
 		}
 		if(outro){
 			alpha += delta;
+			if(goingBack) {
+				back_speed += delta*10;
+			}
+			else {
+				start_speed += delta*10;
+			}
 			if(alpha >= 1){
 				outro = false;
 				alpha = 1;
@@ -1050,6 +1071,7 @@ public class MapSelectState extends State{
 			goingBack = true;
 			break;
 		case 17:
+			KambojaMain.setMapName(mapNames.get(selected_map));
 			outro = true;
 			break;
 		case 18:
@@ -1083,8 +1105,7 @@ public class MapSelectState extends State{
 		case 20:
 			KambojaMain.setItems(!KambojaMain.hasItems());
 			break;
-		default:
-			
+		default:			
 			if(KambojaMain.mapUnlocked[selection[id]]) {
 				selected_map = selection[id];
 				if(selected_map == mapNames.size() - 1){
@@ -1092,7 +1113,6 @@ public class MapSelectState extends State{
 				}
 				KambojaMain.setMapName(mapNames.get(selected_map));
 			}
-			
 			break;
 		}
 	}

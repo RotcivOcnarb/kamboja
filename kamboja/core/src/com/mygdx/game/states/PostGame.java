@@ -69,7 +69,7 @@ public class PostGame extends State{
 		
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/dot_to_dot.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/olivers barney.ttf"));
 		param = new FreeTypeFontParameter();
 		param.size = (int) (300 * Gdx.graphics.getDensity());
 		param.color = new Color(255/255f, 201/255f, 14/255f, 1);

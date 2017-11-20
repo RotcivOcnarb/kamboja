@@ -10,7 +10,9 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
@@ -27,6 +29,7 @@ import com.mygdx.game.objects.weapon.Minigun;
 import com.mygdx.game.objects.weapon.Mp5;
 import com.mygdx.game.objects.weapon.Pistol;
 import com.mygdx.game.objects.weapon.Shotgun;
+import com.mygdx.game.states.Assets;
 import com.mygdx.game.states.GameState;
 
 public class KambojaMain extends ApplicationAdapter {
@@ -34,6 +37,10 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	private SpriteBatch sb;
 	private Manager manager; //the list of states
+	
+	Texture loading;
+	
+	static KambojaMain instance;
 	
 	private static ArrayList<PlayerController> controllers; //all controllers connectes
 	private static int deathsNumber = 5;
@@ -45,6 +52,16 @@ public class KambojaMain extends ApplicationAdapter {
 	private static boolean items = true; 
 	public static final double SENSITIVITY = 1.5f;
 	public static boolean[] mapUnlocked = new boolean[]{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
+	
+	AssetManager assets;
+	
+	public static KambojaMain getInstance() {
+		return instance;
+	}
+	
+	public KambojaMain() {
+		assets = new AssetManager();
+	}
 	
 	/**Lists all the controllers connected currently (of people that pressed "start", keyboard and bots
 	 * included)
@@ -155,10 +172,15 @@ public class KambojaMain extends ApplicationAdapter {
 
 	public void create () {
 		GameMusic.initialize();
+		instance = this;
+		Assets.LOADSHIT(assets);
+		
+		loading = new Texture("imgs/loading.png");
+		
 		
 		sb = new SpriteBatch();
-		manager = new Manager();
-		manager.create();
+		
+		
 		
 		try {
 			//SteamAPI.restartAppIfNecessary(747110);
@@ -251,9 +273,15 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	}
 	
-	public void resize(int width, int height){
-		manager.resize(width, height);
+	public static Texture getTexture(String name) {
+		return getInstance().assets.get(name, Texture.class);
 	}
+	
+	public void resize(int width, int height){
+		//manager.resize(width, height);
+	}
+	
+	boolean managerLoaded = false;
 	
 	float gcTimer = 0;
 	public void render () {
@@ -273,8 +301,25 @@ public class KambojaMain extends ApplicationAdapter {
 		Gdx.gl.glEnable(GL20.GL_BLEND); //enables transparency
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.input.setCursorCatched(true); //hides the cursor
-		manager.update(Gdx.graphics.getDeltaTime());
-		manager.render(sb);
+		
+		if(assets.update()) {
+			if(!managerLoaded) {
+				manager = new Manager();
+				manager.create();
+				managerLoaded = true;
+			}
+			manager.update(Gdx.graphics.getDeltaTime());
+			manager.render(sb);
+		}
+		else {
+			float factor = Gdx.graphics.getHeight() / 1080f;
+			sb.begin();
+			sb.draw(loading,
+					(Gdx.graphics.getWidth() - loading.getWidth()*factor)/2f,
+					(Gdx.graphics.getHeight() - loading.getHeight()*factor)/2f,
+					assets.getProgress() * loading.getWidth()*factor, loading.getHeight()*factor);
+			sb.end();
+		}
 
 	}
 	

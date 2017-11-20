@@ -348,7 +348,7 @@ public class GameState extends State{
 
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
-		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/kamboja.ttf"));
+		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 		param = new FreeTypeFontParameter();
 		param.size = (int) (100 * Gdx.graphics.getDensity());
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
