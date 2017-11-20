@@ -388,10 +388,7 @@ public class MenuState extends State{
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	}
 
-	public void update(float delta) {
-		System.out.println(opt);
-		
-		
+	public void update(float delta) {		
 		globalTimer += delta;
 		timer -= delta;
 		timerWrong -= delta;

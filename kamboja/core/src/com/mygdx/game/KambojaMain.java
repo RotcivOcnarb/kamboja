@@ -227,7 +227,7 @@ public class KambojaMain extends ApplicationAdapter {
     	String encrypted;
     	
     	try {
-			BufferedReader fw = new BufferedReader(new FileReader(new File("save.sav")));
+			BufferedReader fw = new BufferedReader(new FileReader(new File("SavesDir/save.sav")));
 			encrypted = fw.readLine();
 			fw.close();
 			
@@ -245,7 +245,8 @@ public class KambojaMain extends ApplicationAdapter {
 	    	
 		}
     	catch(FileNotFoundException e) {
-    		File file = new File("save.sav");
+    		System.out.println("Save file not found, creating new one");
+    		File file = new File("SavesDir/save.sav");
     		if(!file.exists()) {
     			try {
 					file.createNewFile();
@@ -274,7 +275,7 @@ public class KambojaMain extends ApplicationAdapter {
 		//System.out.println(encrypted);
 		
 		try {
-			FileWriter fw = new FileWriter(new File("save.sav"));
+			FileWriter fw = new FileWriter(new File("SavesDir/save.sav"));
 			fw.write(encrypted);
 			fw.close();
 		} catch (IOException e) {
@@ -286,9 +287,7 @@ public class KambojaMain extends ApplicationAdapter {
 		GameMusic.initialize();
 		instance = this;
 		Assets.LOADSHIT(assets);
-		
-		
-		
+
 		loading = new Texture("imgs/loading.png");
 
 		sb = new SpriteBatch();
