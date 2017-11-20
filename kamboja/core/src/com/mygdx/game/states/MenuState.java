@@ -395,15 +395,19 @@ public class MenuState extends State{
 
 				switch(opt){
 				case 0:
+					//Player select
 					manager.changeState(6);
 					break;
 				case 3:
+					//Help
 					manager.changeState(5);
 					break;
 				case 4:
-					manager.changeState(5);
+					//Options
+					manager.changeState(8);
 					break;
 				case 5:
+					//Credits
 					manager.changeState(5);
 					break;
 				}
@@ -506,7 +510,7 @@ public class MenuState extends State{
 	float x_value;
 	
 	public void checkMove(){
-		if(x_value < -0.2){
+		if(x_value > 0.2){
 			if(globalTimer - timeStamp > 0.5f){
 				opt++;
 				if(opt == 6) opt = 0;
@@ -517,7 +521,7 @@ public class MenuState extends State{
 			}
 			
 		}
-		else if(x_value > 0.2){
+		else if(x_value < -0.2){
 			if(globalTimer - timeStamp > 0.5f){
 				opt--;
 				if(opt == -1) opt = 5;
@@ -533,9 +537,9 @@ public class MenuState extends State{
 	@Override
 	public boolean keyDown(int keycode){
 		
-		if(keycode == Keys.LEFT){
-			if(!left){
-				left = true;
+		if(keycode == Keys.RIGHT){
+			if(!right){
+				right = true;
 				if(globalTimer - timeStamp > 0.5f){
 					opt++;
 					if(opt == 6) opt = 0;
@@ -546,9 +550,9 @@ public class MenuState extends State{
 				}
 			}
 		}
-		if(keycode == Keys.RIGHT){
-			if(!right){
-				right = true;
+		if(keycode == Keys.LEFT){
+			if(!left){
+				left = true;
 				if(globalTimer - timeStamp > 0.5f){
 					opt--;
 					if(opt == -1) opt = 5;
@@ -561,28 +565,7 @@ public class MenuState extends State{
 		}
 		
 		if(keycode == Keys.ENTER){
-			switch(opt){
-			case 0:
-				outro = true;
-				intro = false;
-				break;
-			case 1:
-				timerWrong = 0.5f;
-				break;
-			case 2:
-				timerWrong = 0.5f;
-				break;
-			case 3:
-				timerWrong = 0.5f;
-				break;
-			case 4:
-				timerWrong = 0.5f;
-				break;
-			case 5:
-				timerWrong = 0.5f;
-				break;
-			}
-			
+			selectOption();
 		}
 		
 		return false;
@@ -597,6 +580,31 @@ public class MenuState extends State{
 			right = false;
 		}
 		return false;
+	}
+	
+	public void selectOption() {
+		switch(opt){
+		case 0:
+			outro = true;
+			intro = false;
+			break;
+		case 1:
+			timerWrong = 0.5f;
+			break;
+		case 2:
+			timerWrong = 0.5f;
+			break;
+		case 3:
+			timerWrong = 0.5f;
+			break;
+		case 4:
+			outro = true;
+			intro = false;
+			break;
+		case 5:
+			timerWrong = 0.5f;
+			break;
+		}
 	}
 
 	public void connected(Controller controller) {
@@ -621,28 +629,7 @@ public class MenuState extends State{
 		}
 		
 		if(buttonCode == A){
-			switch(opt){
-			case 0:
-				outro = true;
-				intro = false;
-				break;
-			case 1:
-				timerWrong = 0.5f;
-				break;
-			case 2:
-				timerWrong = 0.5f;
-				break;
-			case 3:
-				timerWrong = 0.5f;
-				break;
-			case 4:
-				timerWrong = 0.5f;
-				break;
-			case 5:
-				timerWrong = 0.5f;
-				break;
-			}
-			
+			selectOption();
 		}
 		
 		
