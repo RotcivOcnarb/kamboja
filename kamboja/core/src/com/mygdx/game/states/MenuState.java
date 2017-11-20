@@ -400,7 +400,7 @@ public class MenuState extends State{
 					break;
 				case 3:
 					//Help
-					manager.changeState(5);
+					manager.changeState(9);
 					break;
 				case 4:
 					//Options
@@ -595,7 +595,8 @@ public class MenuState extends State{
 			timerWrong = 0.5f;
 			break;
 		case 3:
-			timerWrong = 0.5f;
+			outro = true;
+			intro = false;
 			break;
 		case 4:
 			outro = true;

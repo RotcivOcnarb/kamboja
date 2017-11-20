@@ -36,13 +36,11 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Util;
 
-public class OptionsState extends State{
+public class OptionsState extends GenericInterface{
 	
-	Texture background;
 	Texture main_sign;
 	Texture above_bar;
 	Texture options_sign;
-	Texture chain;
 	Texture light_sign;
 	Texture debug_sign;
 	Texture back_cog;
@@ -56,48 +54,27 @@ public class OptionsState extends State{
 	float left_debug_scale;
 	float right_debug_scale;
 	
-	ParticleEffect fogo;
-	ParticleEffect bolinha;
 	
 	int opt = 0;
 	
 	Rectangle2D[] bounds = new Rectangle2D[8];
 	Rectangle2D currentBound;
 	
-	boolean intro;
-	boolean outro;
-	
-	float factor;
-	float timer;
-	
+
 	float cog_angle;
 	float cog_speed;
-	
-	FrameBuffer shaderBuffer;
-	ShaderProgram shader;
-	private float shaderIntensity;
-	private float intensityTarget;
-	ShapeRenderer sr;
-	
-	World world;
-	Box2DDebugRenderer b2dr;
-	OrthographicCamera camera;
 	
 	Body light_body;
 	Body debug_body;
 	
 	float val_x;
 	
-	float alpha;
-	
-	ArrayList<Body> chainBody;
-
 	public OptionsState(Manager manager) {
 		super(manager);
 	}
 
 	public void create() {
-		
+		super.create();
 		background = new Texture("menu/options/fundo.jpg");
 		main_sign = new Texture("menu/options/main_sign.png");
 		above_bar = new Texture("menu/options/above_bar.png");
@@ -129,48 +106,6 @@ public class OptionsState extends State{
 		debug_sign = new Texture("menu/options/debug_mode.png");
 		
 		back_cog = new Texture("menu/options/engrenagem.png");
-		
-		factor = Gdx.graphics.getHeight() / 1080f;
-		
-		chainBody = new ArrayList<Body>();
-		chain = new Texture("menu/player_select/chain.png");
-		
-		shaderIntensity = 0;
-		intensityTarget = 0;
-		
-		intro = true;
-		outro = false;
-		alpha = 1;
-		
-		timer = 0;
-		
-		world = new World(new Vector2(0, -9.81f), false);
-		b2dr = new Box2DDebugRenderer();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
-		camera.zoom = 1/100f;
-		
-		sr = new ShapeRenderer();
-		
-		fogo = new ParticleEffect();
-		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-		fogo.scaleEffect(10*factor);
-		
-		bolinha = new ParticleEffect();
-		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-		bolinha.scaleEffect(factor);
-		
-		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
-				Gdx.files.internal("shaders/color_shift.fs"));
-		ShaderProgram.pedantic = false;
-		if(shader.getLog().length() > 0){
-			System.out.println(shader.getLog());
-		}
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-		
 		light_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f + 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(
@@ -195,69 +130,356 @@ public class OptionsState extends State{
 	public void dispose() {
 		
 	}
-	
-	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density) {
-		BodyDef def = new BodyDef();
-		def.type = type;
-		def.linearDamping = 0.2f;
-		def.position.set(pos.cpy().scl(1/100f));
+
+
+	public void update(float delta) {
+		super.update(delta);
+		cog_angle += cog_speed;
 		
-		Body b = world.createBody(def);
+		System.out.println(val_x);
 		
-		PolygonShape s = new PolygonShape();
-		s.setAsBox(size.x / 100f, size.y / 100f);
-		
-		b.createFixture(s, density);
-		
-		return b;
-	}
-	
-	public void buildRopeJoint(int numChains, Body body, float position_x, float spacing) {
-		
-		for(int k = -1; k <= 1; k += 2) {
-			Array<Body> bodies = new Array<Body>();
-			
-			for(int i = 0; i < numChains; i ++) {
-				Body b = createBox(
-						new Vector2(Gdx.graphics.getWidth()/2f + k*spacing + position_x, Gdx.graphics.getHeight()-(30*factor*i) + 50*factor),
-						new Vector2(5f*factor, 20*factor), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f);
-				
-				chainBody.add(b);
-				bodies.add(b);
+		if(opt == 6) {
+			if(Math.abs(val_x) > 0.1f) {
+				GameState.VOLUME += val_x * 0.01f;
+				if(GameState.VOLUME > 1) GameState.VOLUME = 1;
+				if(GameState.VOLUME < 0) GameState.VOLUME = 0;
 			}
-			
-			for(int i = 1; i < numChains; i ++) {
-				RevoluteJointDef def = new RevoluteJointDef();
-				def.bodyA = bodies.get(i-1);
-				def.bodyB = bodies.get(i);
-				def.localAnchorA.set(0, -15f*factor/100f);
-				def.localAnchorB.set(0, 15f*factor/100f);
-				
-				world.createJoint(def);
-			}
-			
-			RevoluteJointDef def = new RevoluteJointDef();
-			def.bodyA = bodies.get(bodies.size - 1);
-			def.bodyB = body;
-			def.localAnchorA.set(0, -7.5f*factor/100f);
-			def.localAnchorB.set(k*spacing /100f,
-					(413/2f*factor - 100*factor) / 100f);
-			
-			world.createJoint(def);
-			
-			bodies.get(1).applyLinearImpulse(new Vector2((float)Math.random()*0.1f, 0), bodies.get(1).getWorldCenter(), true);
-			
 		}
+		else if(opt == 7) {
+			if(Math.abs(val_x) > 0.1f) {
+				GameMusic.MUSIC_VOLUME += val_x * 0.01f;
+				if(GameMusic.MUSIC_VOLUME > 1) GameMusic.MUSIC_VOLUME = 1;
+				if(GameMusic.MUSIC_VOLUME < 0) GameMusic.MUSIC_VOLUME = 0;
+			}
+		}
+		
+		currentBound.setFrame(
+				currentBound.getX() + (bounds[opt].getX() - currentBound.getX())/10.0f,
+				currentBound.getY() + (bounds[opt].getY() - currentBound.getY())/10.0f,
+				currentBound.getWidth() + (bounds[opt].getWidth() - currentBound.getWidth())/10.0f,
+				currentBound.getHeight() + (bounds[opt].getHeight() - currentBound.getHeight())/10.0f);
+		
+
+
+		bounds[6].setFrame(
+				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
+				600*factor, 100*factor, 100*factor);
+		bounds[7].setFrame(
+				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
+				420*factor, 100*factor, 100*factor);
+
+		if(outro){
+			cog_speed += delta*10;
+		}
+		
+		
+		left_light_scale += (1- left_light_scale)/10.0f;
+		right_light_scale += (1- right_light_scale)/10.0f;
+		left_debug_scale += (1- left_debug_scale)/10.0f;
+		right_debug_scale += (1- right_debug_scale)/10.0f;
+		
+		
+		
 		
 	}
 
-	public void render(SpriteBatch sb) {
+	public void connected(Controller controller) {
 		
-		shaderBuffer.begin();
+	}
+
+	public void disconnected(Controller controller) {
+		
+	}
+
+	public boolean buttonDown(Controller controller, int buttonCode) {
+		
+		int back_btn = 0;
+		int select_btn = 0;
+		
+		if(controller.getName().equals(Gamecube.getID())){
+			back_btn = Gamecube.B;
+			select_btn = Gamecube.A;
+		}
+		else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			back_btn = XBox.BUTTON_B;
+			select_btn = XBox.BUTTON_A;
+		}
+		else {
+			back_btn = GenericController.CIRCLE;
+			select_btn = GenericController.X;
+		}
+		
+		if(buttonCode == back_btn) {
+			if(opt == 6) {
+				opt  = 0;
+			}
+			else if(opt == 7) {
+				opt = 1;
+			}
+			else {
+				opt = 5;
+			}
+		}
+		else if(buttonCode == select_btn) {
+			if(opt == 0) {
+				opt = 6;
+			}
+			else if(opt == 1) {
+				opt = 7;
+			}
+			else if(opt == 2) {
+				GameState.DIFFICULTY ++;
+				if(GameState.DIFFICULTY == 5) {
+					GameState.DIFFICULTY = 0;
+				}
+			}
+			else if(opt == 3) {
+				GameState.DEBUG = !GameState.DEBUG;
+			}
+			else if(opt == 4) {
+				GameState.LIGHTS = !GameState.LIGHTS;
+			}
+			else if(opt == 5) {
+				intro = false;
+				outro = true;
+			}
+			else if(opt == 6) {
+				opt = 0;
+			}
+			else if(opt == 7) {
+				opt = 1;
+			}
+		}
+		
+		return false;
+	}
+
+	public boolean buttonUp(Controller controller, int buttonCode) {
+		return false;
+	}
+	
+	/*	0 = SFX unselected
+	 * 	1 = music unselected
+	 *  2 = difficulty
+	 *  3 = debug
+	 *  4 = lights
+	 *  5 = back
+	 *  6 = sfx selected
+	 *  7 = music selected
+	 *  
+	 */
+	
+	public void changeSelectionX(float value) {
+		if(value > 0) {
+			if(opt == 0 || opt == 1 || opt == 2) {
+				opt = 4;
+			}
+			else if(opt == 3) {
+				opt = 0;
+			}
+		}
+		else {
+			if(opt == 0 || opt == 1 || opt == 2) {
+				opt = 3;
+			}
+			else if(opt == 4) {
+				opt = 0;
+			}
+		}
+	}
+	
+	public void changeSelectionY(float value) {
+		if(value < 0) {
+			if(opt == 1 || opt == 2) {
+				opt --;
+			}
+			else if(opt == 5) {
+				opt = 2;
+			}
+		}
+		else {
+			if(opt == 3 || opt == 4 ||opt == 2) {
+				opt = 5;
+			}
+			else if(opt == 0 || opt == 1) {
+				opt ++;
+			}
+		}
+	}
+
+	boolean xMoved = false;
+	boolean yMoved = false;
+	
+	public boolean axisMoved(Controller controller, int axisCode, float value) {
+			if(controller.getName().equals(Gamecube.getID())){
+				if(axisCode == Gamecube.MAIN_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							changeSelectionX(value);
+						}
+					}
+					else {
+						xMoved = false;
+					}
+					
+					val_x = value;
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+				if(axisCode == XBox.AXIS_LEFT_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							changeSelectionX(value);
+						}
+					}
+					else {
+						xMoved = false;
+					}
+					val_x = value;
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+			else {
+				if(axisCode == GenericController.LEFT_X) {
+					if(Math.abs(value) > 0.5f) {
+						if(!xMoved) {
+							xMoved = true;
+							changeSelectionX(value);
+							
+						}
+					}
+					else {
+						xMoved = false;
+					}
+					val_x = value;
+				}
+				if(axisCode == Gamecube.MAIN_Y) {
+					if(Math.abs(value) > 0.5f) {
+						if(!yMoved) {
+							yMoved = true;
+							changeSelectionY(value);
+						}
+					}
+					else {
+						yMoved = false;
+					}
+				}
+			}
+		
+		return false;
+	}
+
+	public void doSelection() {
+			if(opt == 0) {
+				opt = 6;
+			}
+			else if(opt == 1) {
+				opt = 7;
+			}
+			else if(opt == 2) {
+				GameState.DIFFICULTY ++;
+				if(GameState.DIFFICULTY == 5) {
+					GameState.DIFFICULTY = 0;
+				}
+			}
+			else if(opt == 3) {
+				GameState.DEBUG = !GameState.DEBUG;
+			}
+			else if(opt == 4) {
+				GameState.LIGHTS = !GameState.LIGHTS;
+			}
+			else if(opt == 5) {
+				intro = false;
+				outro = true;
+			}
+			else if(opt == 6) {
+				opt = 0;
+			}
+			else if(opt == 7) {
+				opt = 1;
+			}
+		
+	}
+	
+	@Override
+	public boolean keyUp(int keycode) {
+		if(keycode == Keys.LEFT || keycode == Keys.A) {
+			val_x = 0;
+		}
+		if(keycode == Keys.RIGHT || keycode == Keys.D) {
+			val_x = 0;
+		}
+		return false;
+	}
+	
+	public boolean keyDown(int keycode) {
+		
+			if(keycode == Keys.ENTER) {
+				doSelection();
+			}
+			if(keycode == Keys.DOWN || keycode == Keys.S) {
+				changeSelectionY(1);
+			}
+			if(keycode == Keys.UP || keycode == Keys.W) {
+				changeSelectionY(-1);
+			}
+			if(keycode == Keys.LEFT || keycode == Keys.A) {
+				changeSelectionX(-1);
+				val_x = -1;
+			}
+			if(keycode == Keys.RIGHT || keycode == Keys.D) {
+				changeSelectionX(1);
+				val_x = 1;
+			}
+		return false;
+	}
+
+	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
+		return false;
+	}
+
+	public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
+		return false;
+	}
+
+	public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
+		return false;
+	}
+
+	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+		return false;
+	}
+
+	public void resize(int width, int height) {
+		
+	}
+
+	@Override
+	public void insideRender(SpriteBatch sb) {
 		sb.begin();
-		sb.setProjectionMatrix(Util.getNormalProjection());
-		
-		//AQUI É ONDE EU DESENHO AS COISAS
 		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		bolinha.draw(sb);
 		fogo.draw(sb);
@@ -431,27 +653,7 @@ public class OptionsState extends State{
 				false, false);
 		
 		//desenha as correntes
-		
-		for(int i = chainBody.size() - 1; i >= 0; i --) {
-			Body bd = chainBody.get(i);
-			sb.draw(
-					chain,
-					bd.getWorldCenter().x*100f - chain.getWidth()*factor/2f,
-					bd.getWorldCenter().y*100f - chain.getHeight()*factor/2f,
-					chain.getWidth()*factor/2f,
-					chain.getHeight()*factor/2f,
-					chain.getWidth() * factor,
-					chain.getHeight() * factor,
-					2.4f,
-					2.4f,
-					(float)Math.toDegrees(bd.getAngle()),
-					0,
-					0,
-					chain.getWidth(),
-					chain.getHeight(),
-					false,
-					false);
-		}
+		drawChains(sb);
 		
 		sb.draw(back_cog,
 				Gdx.graphics.getWidth()/2f - back_cog.getWidth()/2f*factor,
@@ -548,407 +750,14 @@ public class OptionsState extends State{
 		
 		sb.setColor(1, 1, 1, 1);
 		
-		sb.flush();
+		sb.end();
 		
 		//b2dr.render(world, camera.combined);
 		
-		//fim desenho
-		sb.end();
-		shaderBuffer.end();
-		
-		shader.begin();
-		shader.setUniformf("intensity", shaderIntensity);
-		
-		sb.setShader(shader);
-			sb.begin();
-				sb.draw(shaderBuffer.getColorBufferTexture(),
-						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
-						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
-						false, true);
-			sb.end();	
-		sb.setShader(null);
-		shader.end();
-		
-		
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		
-		sr.setProjectionMatrix(Util.getNormalProjection());
-		sr.begin(ShapeType.Filled);
-		sr.setColor(0, 0, 0, alpha);
-		sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		sr.end();
-		
-		Gdx.gl.glDisable(GL20.GL_BLEND);
-		
 	}
 
-	public void update(float delta) {
-		
-		timer -= delta;
-		cog_angle += cog_speed;
-		
-		if(opt == 6) {
-			if(Math.abs(val_x) > 0.1f) {
-				GameState.VOLUME += val_x * 0.01f;
-				if(GameState.VOLUME > 1) GameState.VOLUME = 1;
-				if(GameState.VOLUME < 0) GameState.VOLUME = 0;
-			}
-		}
-		else if(opt == 7) {
-			if(Math.abs(val_x) > 0.1f) {
-				GameMusic.MUSIC_VOLUME += val_x * 0.01f;
-				if(GameMusic.MUSIC_VOLUME > 1) GameMusic.MUSIC_VOLUME = 1;
-				if(GameMusic.MUSIC_VOLUME < 0) GameMusic.MUSIC_VOLUME = 0;
-			}
-		}
-		
-		currentBound.setFrame(
-				currentBound.getX() + (bounds[opt].getX() - currentBound.getX())/10.0f,
-				currentBound.getY() + (bounds[opt].getY() - currentBound.getY())/10.0f,
-				currentBound.getWidth() + (bounds[opt].getWidth() - currentBound.getWidth())/10.0f,
-				currentBound.getHeight() + (bounds[opt].getHeight() - currentBound.getHeight())/10.0f);
-		
-		bolinha.update(delta);
-		fogo.update(delta);
-		
-		camera.update();
-		world.step(1/60f, 6, 2);
-		
-		bounds[6].setFrame(
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
-				600*factor, 100*factor, 100*factor);
-		bounds[7].setFrame(
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
-				420*factor, 100*factor, 100*factor);
-		
-		shaderIntensity += (intensityTarget - shaderIntensity) / 10.0f;
-		
-		if(intro){
-			alpha -= delta;
-			if(alpha <= 0){
-				intro = false;
-				alpha = 0;
-			}
-			
-		}
-		if(outro){
-			cog_speed += delta*10;
-			alpha += delta;
-			if(alpha >= 1){
-				outro = false;
-				alpha = 1;
-				manager.changeState(5);
-			}
-		}
-		
-		if(timer < 0){
-			timer = (float)Math.random() * 0.5f;
-			intensityTarget = (float)(Math.random() * 0.3f) - 0.15f;
-		}
-		
-		left_light_scale += (1- left_light_scale)/10.0f;
-		right_light_scale += (1- right_light_scale)/10.0f;
-		left_debug_scale += (1- left_debug_scale)/10.0f;
-		right_debug_scale += (1- right_debug_scale)/10.0f;
-		
-		
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
-			val_x = -1;
-		}
-		else if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			val_x = 1;
-		}
-		else {
-			val_x = 0;
-		}
-		
-	}
-
-	public void connected(Controller controller) {
-		
-	}
-
-	public void disconnected(Controller controller) {
-		
-	}
-
-	public boolean buttonDown(Controller controller, int buttonCode) {
-		
-		int back_btn = 0;
-		int select_btn = 0;
-		
-		if(controller.getName().equals(Gamecube.getID())){
-			back_btn = Gamecube.B;
-			select_btn = Gamecube.A;
-		}
-		else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
-			back_btn = XBox.BUTTON_B;
-			select_btn = XBox.BUTTON_A;
-		}
-		else {
-			back_btn = GenericController.CIRCLE;
-			select_btn = GenericController.X;
-		}
-		
-		if(buttonCode == back_btn) {
-			if(opt == 6) {
-				opt  = 0;
-			}
-			else if(opt == 7) {
-				opt = 1;
-			}
-			else {
-				opt = 5;
-			}
-		}
-		else if(buttonCode == select_btn) {
-			if(opt == 0) {
-				opt = 6;
-			}
-			else if(opt == 1) {
-				opt = 7;
-			}
-			else if(opt == 2) {
-				GameState.DIFFICULTY ++;
-				if(GameState.DIFFICULTY == 5) {
-					GameState.DIFFICULTY = 0;
-				}
-			}
-			else if(opt == 3) {
-				GameState.DEBUG = !GameState.DEBUG;
-			}
-			else if(opt == 4) {
-				GameState.LIGHTS = !GameState.LIGHTS;
-			}
-			else if(opt == 5) {
-				intro = false;
-				outro = true;
-			}
-			else if(opt == 6) {
-				opt = 0;
-			}
-			else if(opt == 7) {
-				opt = 1;
-			}
-		}
-		
-		return false;
-	}
-
-	public boolean buttonUp(Controller controller, int buttonCode) {
-		return false;
-	}
-	
-	/*	0 = SFX unselected
-	 * 	1 = music unselected
-	 *  2 = difficulty
-	 *  3 = debug
-	 *  4 = lights
-	 *  5 = back
-	 *  6 = sfx selected
-	 *  7 = music selected
-	 *  
-	 */
-	
-	public void changeSelectionX(float value) {
-		if(value > 0) {
-			if(opt == 0 || opt == 1 || opt == 2) {
-				opt = 4;
-			}
-			else if(opt == 3) {
-				opt = 0;
-			}
-		}
-		else {
-			if(opt == 0 || opt == 1 || opt == 2) {
-				opt = 3;
-			}
-			else if(opt == 4) {
-				opt = 0;
-			}
-		}
-	}
-	
-	public void changeSelectionY(float value) {
-		if(value < 0) {
-			if(opt == 1 || opt == 2) {
-				opt --;
-			}
-			else if(opt == 5) {
-				opt = 2;
-			}
-		}
-		else {
-			if(opt == 3 || opt == 4 ||opt == 2) {
-				opt = 5;
-			}
-			else if(opt == 0 || opt == 1) {
-				opt ++;
-			}
-		}
-	}
-
-	boolean xMoved = false;
-	boolean yMoved = false;
-	
-	public boolean axisMoved(Controller controller, int axisCode, float value) {
-		
-		
-			if(controller.getName().equals(Gamecube.getID())){
-				if(axisCode == Gamecube.MAIN_X) {
-					if(Math.abs(value) > 0.5f) {
-						if(!xMoved) {
-							xMoved = true;
-							changeSelectionX(value);
-						}
-					}
-					else {
-						xMoved = false;
-					}
-					
-					val_x = value;
-				}
-				if(axisCode == Gamecube.MAIN_Y) {
-					if(Math.abs(value) > 0.5f) {
-						if(!yMoved) {
-							yMoved = true;
-							changeSelectionY(value);
-						}
-					}
-					else {
-						yMoved = false;
-					}
-				}
-			}
-			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
-				if(axisCode == XBox.AXIS_LEFT_X) {
-					if(Math.abs(value) > 0.5f) {
-						if(!xMoved) {
-							xMoved = true;
-							changeSelectionX(value);
-						}
-					}
-					else {
-						xMoved = false;
-					}
-					val_x = value;
-				}
-				if(axisCode == Gamecube.MAIN_Y) {
-					if(Math.abs(value) > 0.5f) {
-						if(!yMoved) {
-							yMoved = true;
-							changeSelectionY(value);
-						}
-					}
-					else {
-						yMoved = false;
-					}
-				}
-			}
-			else {
-				if(axisCode == GenericController.LEFT_X) {
-					if(Math.abs(value) > 0.5f) {
-						if(!xMoved) {
-							xMoved = true;
-							changeSelectionX(value);
-							
-						}
-					}
-					else {
-						xMoved = false;
-					}
-					val_x = value;
-				}
-				if(axisCode == Gamecube.MAIN_Y) {
-					if(Math.abs(value) > 0.5f) {
-						if(!yMoved) {
-							yMoved = true;
-							changeSelectionY(value);
-						}
-					}
-					else {
-						yMoved = false;
-					}
-				}
-			}
-		
-		return false;
-	}
-
-	public void doSelection() {
-			if(opt == 0) {
-				opt = 6;
-			}
-			else if(opt == 1) {
-				opt = 7;
-			}
-			else if(opt == 2) {
-				GameState.DIFFICULTY ++;
-				if(GameState.DIFFICULTY == 5) {
-					GameState.DIFFICULTY = 0;
-				}
-			}
-			else if(opt == 3) {
-				GameState.DEBUG = !GameState.DEBUG;
-			}
-			else if(opt == 4) {
-				GameState.LIGHTS = !GameState.LIGHTS;
-			}
-			else if(opt == 5) {
-				intro = false;
-				outro = true;
-			}
-			else if(opt == 6) {
-				opt = 0;
-			}
-			else if(opt == 7) {
-				opt = 1;
-			}
-		
-	}
-	
-	public boolean keyDown(int keycode) {
-		
-			if(keycode == Keys.ENTER) {
-				doSelection();
-			}
-			if(keycode == Keys.DOWN || keycode == Keys.S) {
-				changeSelectionY(1);
-			}
-			if(keycode == Keys.UP || keycode == Keys.W) {
-				changeSelectionY(-1);
-			}
-			if(keycode == Keys.LEFT || keycode == Keys.A) {
-				changeSelectionX(-1);
-			}
-			if(keycode == Keys.RIGHT || keycode == Keys.D) {
-				changeSelectionX(1);
-			}
-		return false;
-	}
-
-	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
-		return false;
-	}
-
-	public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
-		return false;
-	}
-
-	public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
-		return false;
-	}
-
-	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
-		return false;
-	}
-
-	public void resize(int width, int height) {
+	public void changeScreen() {
+		manager.changeState(5);
 		
 	}
 

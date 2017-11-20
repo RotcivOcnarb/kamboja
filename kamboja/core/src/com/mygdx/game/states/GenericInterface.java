@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -51,6 +52,22 @@ public abstract class GenericInterface extends State{
 	
 	public GenericInterface(Manager manager) {
 		super(manager);
+	}
+	
+	public void renderImageInBody(SpriteBatch sb, Texture tex, Body body) {
+		sb.draw(tex,
+				body.getWorldCenter().x * 100f - tex.getWidth()/2f*factor,
+				body.getWorldCenter().y * 100f - tex.getHeight()/2f*factor,
+				tex.getWidth()/2f*factor,
+				tex.getHeight()/2f*factor,
+				tex.getWidth()*factor,
+				tex.getHeight()*factor,
+				1, 1,
+				(float)Math.toDegrees(body.getAngle()),
+				0, 0,
+				tex.getWidth(),
+				tex.getHeight(),
+				false, false);
 	}
 	
 	@Override
@@ -115,6 +132,22 @@ public abstract class GenericInterface extends State{
 		return b;
 	}
 	
+	public Body createBox(Vector2 pos, Vector2 size, BodyType type, float density, boolean sensor) {
+		BodyDef def = new BodyDef();
+		def.type = type;
+		def.linearDamping = 0.2f;
+		def.position.set(pos.cpy().scl(1/100f));
+		
+		Body b = world.createBody(def);
+		
+		PolygonShape s = new PolygonShape();
+		s.setAsBox(size.x / 100f, size.y / 100f);
+		
+		Fixture f = b.createFixture(s, density);
+		f.setSensor(sensor);
+		return b;
+	}
+	
 	public void buildRopeJoint(int numChains, Body body, float position_x, float spacing) {
 		
 		for(int k = -1; k <= 1; k += 2) {
@@ -123,7 +156,7 @@ public abstract class GenericInterface extends State{
 			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
 						new Vector2(Gdx.graphics.getWidth()/2f + k*spacing + position_x, Gdx.graphics.getHeight()-(30*factor*i) + 50*factor),
-						new Vector2(5f*factor, 20*factor), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f);
+						new Vector2(5f*factor, 20*factor), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, true);
 				
 				chainBody.add(b);
 				bodies.add(b);
@@ -182,6 +215,8 @@ public abstract class GenericInterface extends State{
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
 		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		fogo.draw(sb);
+		bolinha.draw(sb);
 		sb.end();
 		insideRender(sb);
 		

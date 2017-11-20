@@ -44,6 +44,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.2"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
+        compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
         
     }
 }
@@ -67,6 +68,7 @@ project(":core") {
         compile "com.kotcrab.vis:vis-ui:0.7.4"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.2"
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
+        compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
     }
 }
 

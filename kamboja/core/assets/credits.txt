@@ -1,0 +1,30 @@
+<title>KAMBOJA</title>
+<space/>
+<subtitle>Programmer</subtitle>
+<info>Victor "Rotciv" Branco</info>
+<space/>
+S<subtitle>Sprites and pixel arts</subtitle>
+<info>João Luis</info>
+<space/>
+<subtitle>Interfaces</subtitle>
+<info>Geovanna Votto</info>
+<space/>
+<subtitle>Level and Map designs</subtitle>
+<info>João Luis</info>
+<info>Victor "Rotciv" Ocnarb</info>
+<info>Fernando Leandro</info>
+<space/>
+<subtitle>Arts, concepts and thumbnails</subtitle>
+<info>Alex Roda</info>
+<space/>
+<subtitle>Sound effects from:</subtitle>
+<info>https://freesound.org</info>
+<space/>
+<subtitle>Musics from</subtitle>
+<info>NÃO SEI AINDA EU NÃO</info>
+<info>COLOQUEI AS MUSICA AAAA</info>
+<space/>
+<subtitle>Special thanks:</subtitle>
+<info>Guilherme Leocádio</info>
+<info>Celso Tito Godoy</info>
+<info>Rafael "Xicuinha" Sales</info>
