@@ -18,7 +18,7 @@ public class Assets {
 	private static void menuState(AssetManager assets) {
 		assets.load("menu/background.png", Texture.class);
 		assets.load("menu/bolinha.png", Texture.class);
-		assets.load("menu/explosão.png", Texture.class);
+		assets.load("menu/explosao.png", Texture.class);
 		assets.load("menu/armas.png", Texture.class);
 		assets.load("menu/fumaca.png", Texture.class);
 		assets.load("menu/placa_letras.png", Texture.class);

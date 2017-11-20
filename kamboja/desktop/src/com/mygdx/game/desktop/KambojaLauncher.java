@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.KambojaMain;
@@ -68,6 +69,7 @@ public class KambojaLauncher{
 			config.foregroundFPS = 60;
 			config.backgroundFPS = 60;
 			config.resizable = false;
+			config.addIcon("icon.png", FileType.Internal);
 			
 		new LwjglApplication(new KambojaMain(), config);
 		}
