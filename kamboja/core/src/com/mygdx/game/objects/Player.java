@@ -84,7 +84,7 @@ public class Player implements Steerable<Vector2>{
 	private float gruntTimer = 0;
 	private boolean inSpace = false;
 	private boolean wearSpaceSuit = false;
-	
+		
 	private Texture aim;
 	private Texture atkTex, defTex, spdTex;
 	private Texture stamina_on, stamina_off;
@@ -369,6 +369,8 @@ public class Player implements Steerable<Vector2>{
 		if(imunity <= 0){
 			life -= amount * def;
 			
+			getState().screenshake(0.3f);
+			
 			if(showBlood)
 			state.showBlood(body.getWorldCenter());
 
@@ -466,7 +468,7 @@ public class Player implements Steerable<Vector2>{
 	
 		
 		sb.begin();
-		
+
 		for(int i = ghosts.size() - 1; i >= 0; i --){
 			Ghost g = ghosts.get(i);
 			

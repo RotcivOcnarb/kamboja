@@ -1072,6 +1072,10 @@ public class MapSelectState extends State{
 			goingBack = true;
 			break;
 		case 17:
+			
+			if(selected_map != mapNames.size() - 1)
+			KambojaMain.setMapName(mapNames.get(selected_map));
+			
 			outro = true;
 			break;
 		case 18:
