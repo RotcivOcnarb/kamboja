@@ -39,7 +39,7 @@ public class KambojaLauncher{
 		int cont = 0;
 		for(DisplayMode mode : md){
 			ScreenSize d = new ScreenSize(mode.getWidth(), mode.getHeight());			
-			if(!contains(combo, d) && Math.abs(d.width / (float)d.height - (16/9f)) < 0.1f){
+			if(!contains(combo, d)) {// && Math.abs(d.width / (float)d.height - (16/9f)) < 0.1f){
 				combo.addItem(d);
 				
 				if(Toolkit.getDefaultToolkit().getScreenSize().getWidth() == d.getWidth() &&
