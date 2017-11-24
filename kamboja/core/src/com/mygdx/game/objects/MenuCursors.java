@@ -33,7 +33,7 @@ public class MenuCursors {
 		if(cursorPosition == null){
 			cursorPosition = new Vector2[4];
 			for(int i = 0; i < 4; i ++){
-				cursorPosition[i] = new Vector2(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
+				cursorPosition[i] = new Vector2(1920/2f, 1920/2f);
 			}
 		}
 		
@@ -65,7 +65,7 @@ public class MenuCursors {
 		for(PlayerController pc : KambojaMain.getControllers()){
 			if(pc instanceof KeyboardController){
 				cursorPosition[cont].x = Gdx.input.getX();
-				cursorPosition[cont].y = Gdx.graphics.getHeight() - Gdx.input.getY();
+				cursorPosition[cont].y = 1920 - Gdx.input.getY();
 			}
 			cont++;
 		}
@@ -81,9 +81,9 @@ public class MenuCursors {
 			
 			cursorPosition[i].add(cursorVelocity[i].cpy().scl(delta*70*speed[i]));
 			if(cursorPosition[i].x < 0) cursorPosition[i].x = 0;
-			if(cursorPosition[i].x > Gdx.graphics.getWidth() - 32) cursorPosition[i].x = Gdx.graphics.getWidth() - 32;
+			if(cursorPosition[i].x > 1920 - 32) cursorPosition[i].x = 1920 - 32;
 			if(cursorPosition[i].y < 0) cursorPosition[i].y = 0;
-			if(cursorPosition[i].y > Gdx.graphics.getHeight() - 32) cursorPosition[i].y = Gdx.graphics.getHeight() - 32;
+			if(cursorPosition[i].y > 1920 - 32) cursorPosition[i].y = 1920 - 32;
 		}
 		
 		

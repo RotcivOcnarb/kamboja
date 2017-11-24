@@ -12,7 +12,7 @@ public class Util {
 	public static Matrix4 getNormalProjection(){
 		if(normalProjection == null){
 			normalProjection = new Matrix4();
-			normalProjection.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			normalProjection.setToOrtho2D(0, 0, 1920, 1080);
 		}
 		
 		return normalProjection;

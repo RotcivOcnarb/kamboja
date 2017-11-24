@@ -165,7 +165,7 @@ public class MenuState extends State{
 		GameMusic.loadMusic(GameMusic.MAIN_MENU);
 		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		
 	}
 
@@ -183,9 +183,7 @@ public class MenuState extends State{
 
 		sb.begin();
 		
-		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		float factor = Gdx.graphics.getHeight() / 1080f;
-		//sb.draw(explosao,(Gdx.graphics.getWidth() - explosao.getWidth()*factor )/2f, 0, explosao.getWidth() * factor, explosao.getHeight() * factor);
+		sb.draw(background, 0, 0, 1920, 1080);
 		
 		for(int i = 0; i < explosions.size(); i ++){
 			ParticleEffect pe = explosions.get(i);
@@ -198,11 +196,11 @@ public class MenuState extends State{
 		}
 				
 		sb.draw(sombra_letras,
-				(Gdx.graphics.getWidth() - sombra_letras.getWidth()*factor )/2f, 0,
-				sombra_letras.getWidth()*factor/2,
-				sombra_letras.getHeight()*factor * (5f/8f),
-				sombra_letras.getWidth() * factor,
-				sombra_letras.getHeight() * factor,
+				(1920 - sombra_letras.getWidth() )/2f, 0,
+				sombra_letras.getWidth()/2,
+				sombra_letras.getHeight() * (5f/8f),
+				sombra_letras.getWidth(),
+				sombra_letras.getHeight(),
 				1, 1,
 				(float)Math.sin(globalTimer)*2f,
 				0, 0,
@@ -211,11 +209,11 @@ public class MenuState extends State{
 				false, false);	
 		
 		sb.draw(armas,
-				(Gdx.graphics.getWidth() - armas.getWidth()*factor )/2f, 0,
-				armas.getWidth()*factor/2,
-				armas.getHeight()*factor * (5f/8f),
-				armas.getWidth() * factor,
-				armas.getHeight() * factor,
+				(1920 - armas.getWidth() )/2f, 0,
+				armas.getWidth()/2,
+				armas.getHeight() * (5f/8f),
+				armas.getWidth(),
+				armas.getHeight(),
 				1, 1,
 				(float)Math.sin(globalTimer + 0.5f)*2f,
 				0, 0,
@@ -224,11 +222,11 @@ public class MenuState extends State{
 				false, false);	
 		
 		sb.draw(placa_letras,
-				(Gdx.graphics.getWidth() - placa_letras.getWidth()*factor )/2f, 0,
-				placa_letras.getWidth()*factor/2,
-				placa_letras.getHeight()*factor * (5f/8f),
-				placa_letras.getWidth() * factor,
-				placa_letras.getHeight() * factor,
+				(1920 - placa_letras.getWidth() )/2f, 0,
+				placa_letras.getWidth()/2,
+				placa_letras.getHeight() * (5f/8f),
+				placa_letras.getWidth(),
+				placa_letras.getHeight(),
 				1, 1,
 				(float)Math.sin(globalTimer)*2f,
 				0, 0,
@@ -237,11 +235,11 @@ public class MenuState extends State{
 				false, false);	
 		
 		sb.draw(fumaca,
-				(Gdx.graphics.getWidth() - fumaca.getWidth()*factor )/2f, 0,
-				fumaca.getWidth()*factor/2,
-				fumaca.getHeight()*factor * (5f/8f),
-				fumaca.getWidth() * factor,
-				fumaca.getHeight() * factor,
+				(1920 - fumaca.getWidth() )/2f, 0,
+				fumaca.getWidth()/2,
+				fumaca.getHeight() * (5f/8f),
+				fumaca.getWidth(),
+				fumaca.getHeight(),
 				1, 1,
 				(float)Math.sin(globalTimer)*2f,
 				0, 0,
@@ -254,11 +252,11 @@ public class MenuState extends State{
 		sb.begin();
 		
 		sb.draw(fumaca_tras,
-				(Gdx.graphics.getWidth() - fumaca_tras.getWidth()*factor )/2f, -engrenagens[3].getHeight()/2*factor,
-				fumaca_tras.getWidth()*factor/2,
-				fumaca_tras.getHeight()*factor/2,
-				fumaca_tras.getWidth() * factor,
-				fumaca_tras.getHeight() * factor,
+				(1920 - fumaca_tras.getWidth() )/2f, -engrenagens[3].getHeight()/2,
+				fumaca_tras.getWidth()/2,
+				fumaca_tras.getHeight()/2,
+				fumaca_tras.getWidth(),
+				fumaca_tras.getHeight(),
 				1, 1,
 				0,
 				0, 0,
@@ -272,12 +270,12 @@ public class MenuState extends State{
 			float fx = 0;
 			if(i == 5) fx = 8;
 			sb.draw(engrenagens[i],
-					eng_pos[i].x*factor - engrenagens[i].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
-					Gdx.graphics.getHeight() - eng_pos[i].y*factor - engrenagens[i].getHeight()*factor/2,
-					engrenagens[i].getWidth()*factor/2,
-					engrenagens[i].getHeight()*factor/2,
-					engrenagens[i].getWidth()*factor,
-					engrenagens[i].getHeight()*factor,
+					eng_pos[i].x - engrenagens[i].getWidth()/2 + 1920/2,
+					1080 - eng_pos[i].y - engrenagens[i].getHeight()/2,
+					engrenagens[i].getWidth()/2,
+					engrenagens[i].getHeight()/2,
+					engrenagens[i].getWidth(),
+					engrenagens[i].getHeight(),
 					1, 1,
 					fx + eng_angle[i],
 					0, 0,
@@ -312,12 +310,12 @@ public class MenuState extends State{
 		}
 		
 			sb.draw(t1,
-				eng_pos[3].x*factor - options[opt].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
-				Gdx.graphics.getHeight() - eng_pos[3].y*factor - options[opt].getHeight()*factor/2,
-				options[opt].getWidth()*factor/2,
-				options[opt].getHeight()*factor/2,
-				options[opt].getWidth()*factor,
-				options[opt].getHeight()*factor,
+				eng_pos[3].x - options[opt].getWidth()/2 + 1920/2,
+				1080 - eng_pos[3].y - options[opt].getHeight()/2,
+				options[opt].getWidth()/2,
+				options[opt].getHeight()/2,
+				options[opt].getWidth(),
+				options[opt].getHeight(),
 				1, 1,
 				eng_angle[3],
 				0, 0,
@@ -326,12 +324,12 @@ public class MenuState extends State{
 				false, false);
 			
 			sb.draw(t2,
-					eng_pos[3].x*factor - options[opt].getWidth()*factor/2 + Gdx.graphics.getWidth()/2,
-					Gdx.graphics.getHeight() - eng_pos[3].y*factor - options[opt].getHeight()*factor/2,
-					options[opt].getWidth()*factor/2,
-					options[opt].getHeight()*factor/2,
-					options[opt].getWidth()*factor,
-					options[opt].getHeight()*factor,
+					eng_pos[3].x - options[opt].getWidth()/2 + 1920/2,
+					1080 - eng_pos[3].y - options[opt].getHeight()/2,
+					options[opt].getWidth()/2,
+					options[opt].getHeight()/2,
+					options[opt].getWidth(),
+					options[opt].getHeight(),
 					1, 1,
 					eng_angle[3] + 180,
 					0, 0,
@@ -340,11 +338,11 @@ public class MenuState extends State{
 					false, false);
 		
 			sb.draw(fumaca_frente,
-					(Gdx.graphics.getWidth() - fumaca_frente.getWidth()*factor )/2f, -engrenagens[3].getHeight()/2*factor,
-					fumaca_frente.getWidth()*factor/2,
-					fumaca_frente.getHeight()*factor/2,
-					fumaca_frente.getWidth() * factor,
-					fumaca_frente.getHeight() * factor,
+					(1920 - fumaca_frente.getWidth() )/2f, -engrenagens[3].getHeight()/2,
+					fumaca_frente.getWidth()/2,
+					fumaca_frente.getHeight()/2,
+					fumaca_frente.getWidth(),
+					fumaca_frente.getHeight(),
 					1, 1,
 					0,
 					0, 0,
@@ -367,11 +365,11 @@ public class MenuState extends State{
 			sb.begin();
 				sb.draw(shaderBuffer.getColorBufferTexture(),
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						false, true);
 			sb.end();	
 		sb.setShader(null);
@@ -384,7 +382,7 @@ public class MenuState extends State{
 		
 		sr.begin(ShapeType.Filled);
 		sr.setColor(0, 0, 0, alpha);
-		sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sr.rect(0, 0, 1920, 1080);
 		sr.end();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -414,19 +412,19 @@ public class MenuState extends State{
 				switch(opt){
 				case 0:
 					//Player select
-					manager.changeState(6);
+					manager.changeState(Manager.PLAYER_SELECT_STATE);
 					break;
 				case 3:
 					//Help
-					manager.changeState(9);
+					manager.changeState(Manager.HELP_STATE);
 					break;
 				case 4:
 					//Options
-					manager.changeState(8);
+					manager.changeState(Manager.OPTIONS_STATE);
 					break;
 				case 5:
 					//Credits
-					manager.changeState(10);
+					manager.changeState(Manager.CREDITS_STATE);
 					break;
 				}
 			}
@@ -465,13 +463,11 @@ public class MenuState extends State{
 			intensityTarget = (float)(Math.random() * 0.3f) - 0.15f;
 		}
 		
-		float factor = Gdx.graphics.getHeight() / 1080f;
-		
-			
+
 			ParticleEffect bolinhaP = 
 					new ParticleEffect(
-							bolinha, new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() * (5f/8f)),
-						new Vector2(0, 0), new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f * factor, (float)((Math.random() - 0.5) * 2) * 0.07f * factor));
+							bolinha, new Vector2(1920/2, 1080 * (5f/8f)),
+						new Vector2(0, 0), new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f, (float)((Math.random() - 0.5) * 2) * 0.07f));
 
 			bolinhaP.setScale(0);
 			bolinhas.add(bolinhaP);
@@ -479,11 +475,11 @@ public class MenuState extends State{
 			
 			
 				ParticleEffect pep = new ParticleEffect(exps[(int)(Math.random()*5)],
-						new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() * (5f/8f)),
+						new Vector2(1920/2, 1080 * (5f/8f)),
 						new Vector2(0, 0),
-						new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f * factor, (float)((Math.random() - 0.5) * 2) * 0.07f * factor));
+						new Vector2((float)((Math.random() - 0.5) * 2) * 0.07f, (float)((Math.random() - 0.5) * 2) * 0.07f));
 				pep.setAlpha(0);
-				pep.setScale(0.7f * factor);
+				pep.setScale(0.7f);
 				explosions.add(pep);
 
 		
@@ -499,20 +495,20 @@ public class MenuState extends State{
 		
 		for(int i = bolinhas.size() - 1; i >= 0; i --){
 			ParticleEffect pe = bolinhas.get(i);
-			pe.setScale(pe.getCounter() * pe.getRandom() * factor);
+			pe.setScale(pe.getCounter() * pe.getRandom());
 			pe.update(delta);
 			
 			if(pe.position.x < 0 - pe.tex.getWidth()/2 * pe.getScale()){
 				bolinhas.remove(pe);
 			}
-			if(pe.position.x > Gdx.graphics.getWidth() + pe.tex.getWidth()/2 * pe.getScale()){
+			if(pe.position.x > 1920 + pe.tex.getWidth()/2 * pe.getScale()){
 				bolinhas.remove(pe);
 			}
 			
 			if(pe.position.y < 0 - pe.tex.getHeight()/2 * pe.getScale()){
 				bolinhas.remove(pe);
 			}
-			if(pe.position.y> Gdx.graphics.getHeight() + pe.tex.getHeight()/2 * pe.getScale()){
+			if(pe.position.y> 1080 + pe.tex.getHeight()/2 * pe.getScale()){
 				bolinhas.remove(pe);
 			}
 		}

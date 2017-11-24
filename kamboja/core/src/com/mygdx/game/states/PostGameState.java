@@ -1,7 +1,6 @@
 package com.mygdx.game.states;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
@@ -12,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -19,7 +19,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
-import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
 
@@ -45,6 +44,8 @@ public class PostGameState extends GenericInterface{
 	
 	ArrayList<PlayerController> players;
 	
+	ShaderProgram waveShader;
+	
 	public PostGameState(Manager manager) {
 		super(manager);
 	}
@@ -54,6 +55,11 @@ public class PostGameState extends GenericInterface{
 		background = KambojaMain.getTexture("menu/postgame/fundo.jpg");
 	
 		oliver = KambojaMain.getInstance().getAssets().get("fonts/olivers barney.ttf", BitmapFont.class);
+		
+		waveShader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"), Gdx.files.internal("shaders/wave.fs"));
+		if(waveShader.getLog().length() > 0) {
+			System.out.println(waveShader.getLog());
+		}
 		
 		capsule = KambojaMain.getTexture("menu/postgame/lvl_capsule.png");
 		capsule_light = KambojaMain.getTexture("menu/postgame/lvl_light.png");
@@ -65,16 +71,16 @@ public class PostGameState extends GenericInterface{
 			name_frame[i] = KambojaMain.getTexture("menu/postgame/n" + (i+1) + ".png");
 			player_frame[i] = KambojaMain.getTexture("menu/postgame/p" + (i+1) + ".png");
 			
-			float margin = (Gdx.graphics.getWidth() - 4*main_frame[i].getWidth()*factor)/5f;
+			float margin = (1920 - 4*main_frame[i].getWidth())/5f;
 			frame_body[i] = createBox(new Vector2(
-					margin + i*(main_frame[i].getWidth()*factor + margin) + main_frame[i].getWidth()*factor/2f,
-					Gdx.graphics.getHeight()),
-					new Vector2(350*factor/2f, 500*factor/2f), BodyType.DynamicBody, 0.01f);
+					margin + i*(main_frame[i].getWidth() + margin) + main_frame[i].getWidth()/2f,
+					1080),
+					new Vector2(350/2f, 500/2f), BodyType.DynamicBody, 0.01f);
 			buildRopeJoint(13,
 					frame_body[i],
-					margin + i*(main_frame[i].getWidth()*factor + margin) + main_frame[i].getWidth()*factor/2f - Gdx.graphics.getWidth()/2f,
-					(413/2f*factor),
-					100*factor);
+					margin + i*(main_frame[i].getWidth() + margin) + main_frame[i].getWidth()/2f - 1920/2f,
+					(413/2f),
+					100);
 			main_buffer[i] = new FrameBuffer(Format.RGBA8888, (int)(350), (int)(500), false);
 			
 		}
@@ -136,7 +142,7 @@ public class PostGameState extends GenericInterface{
 
 	public void insideRender(SpriteBatch sb) {
 		
-		float margin = (Gdx.graphics.getWidth() - 4*main_frame[0].getWidth()*factor)/5f;
+		float margin = (1920 - 4*main_frame[0].getWidth())/5f;
 		
 		sb.begin();
 		for(int i = 0; i < 4; i++) {
@@ -147,15 +153,35 @@ public class PostGameState extends GenericInterface{
 		drawChains(sb);
 		
 		sb.setColor(1, 1, 1, (float)((Math.sin(timer*3) + 1)/2f * 0.5f + 0.5f));
-		sb.draw(crown_light, margin + (main_frame[0].getWidth()*factor - crown_light.getWidth()*factor)/2f,
-				Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - main_frame[0].getHeight()*factor)/2f,
-				crown_light.getWidth()*factor, crown_light.getHeight()*factor);
+		sb.draw(crown_light, margin + (main_frame[0].getWidth() - crown_light.getWidth())/2f,
+				1080 - (1080 - main_frame[0].getHeight())/2f);
 		sb.setColor(1, 1, 1, 1);
 		
-		sb.draw(crown, margin + (main_frame[0].getWidth()*factor - crown.getWidth()*factor)/2f,
-				Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - main_frame[0].getHeight()*factor)/2f,
-				crown.getWidth()*factor, crown.getHeight()*factor);
-		sb.draw(capsule, 50*factor, 50*factor, capsule.getWidth()*factor, capsule.getHeight()*factor);
+		sb.draw(crown, margin + (main_frame[0].getWidth() - crown.getWidth())/2f,
+				1080 - (1080 - main_frame[0].getHeight())/2f);
+
+		sb.draw(progress_case, 200, 50 + (capsule.getHeight() - progress_case.getHeight())/2f);
+		sb.end();
+		
+		sb.begin();
+		waveShader.begin();
+		waveShader.setUniformf("time", timer*2);
+		waveShader.setUniformf("squish", 10f);
+		waveShader.setUniformf("intensity", 0.003f);
+		waveShader.setUniformf("percent_x", KambojaMain.experience / 1500f);
+		
+		sb.setShader(waveShader);
+		sb.draw(progress_bar, 200, 50 + (capsule.getHeight() - progress_case.getHeight())/2f, 0, 0,
+				progress_bar.getWidth(), progress_bar.getHeight());
+		sb.end();
+		
+		waveShader.end();
+		sb.setShader(null);
+		
+		sb.begin();
+		sb.draw(capsule, 50, 50);
+		//oliver.draw(sb, "" + KambojaMain.level, 50, 50);
+		sb.draw(capsule_light, 50, 50);
 
 		//TODO:
 		/*
@@ -183,6 +209,9 @@ public class PostGameState extends GenericInterface{
 	public void update(float delta) {
 		super.update(delta);
 		timer += delta;
+		
+		KambojaMain.experience += 2;
+		if(KambojaMain.experience > 1500) KambojaMain.experience = 1500;
 	}
 
 	public void changeScreen() {

@@ -235,8 +235,8 @@ public class GameState extends State{
 
 		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
-		beforeBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-		afterBlood = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		beforeBlood = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
+		afterBlood = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 
 		overlay = new ShaderProgram(
 				Gdx.files.internal("shaders/default.vs"),
@@ -275,7 +275,7 @@ public class GameState extends State{
 		if(getCamera() == null)
 		setCamera(new OrthographicCamera());
 		
-		getCamera().setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		getCamera().setToOrtho(false, 1920, 1080);
 		getCamera().zoom = 0.00001f;
 		
 		inputBlocked = true;
@@ -910,9 +910,9 @@ public class GameState extends State{
 		sb.begin();
 		sb.draw(beforeBlood.getColorBufferTexture(),
 				0, 0,
-				Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
+				1920, 1080,
 				0, 0,
-				Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
+				1920, 1080,
 				false, true);
 		sb.end();
 		
@@ -1027,26 +1027,26 @@ public class GameState extends State{
 		sb.begin();
 		
 		layout.setText(font, "GAME!");
-		font.draw(sb, "GAME!", (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight()/2 - menuPos + Gdx.graphics.getHeight() * 6 + 100);
+		font.draw(sb, "GAME!", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 * 6 + 100);
 		
 		layout.setText(font, "START!");
-		font.draw(sb, "START!", (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight()/2 - menuPos + Gdx.graphics.getHeight() * 4 + 100);
+		font.draw(sb, "START!", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 * 4 + 100);
 		
 		layout.setText(font, "1");
-		font.draw(sb, "1", (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight()/2 - menuPos + Gdx.graphics.getHeight() * 3 + 100);
+		font.draw(sb, "1", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 * 3 + 100);
 		
 		layout.setText(font, "2");
-		font.draw(sb, "2", (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight()/2 - menuPos + Gdx.graphics.getHeight() * 2 + 100);
+		font.draw(sb, "2", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 * 2 + 100);
 		
 		layout.setText(font, "3");
-		font.draw(sb, "3", (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight()/2 - menuPos + Gdx.graphics.getHeight() + 100);
+		font.draw(sb, "3", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 + 100);
 		
 		int timeNum = (int) (KambojaMain.getGameTime() - timeCount);
 		
 		String time = (KambojaMain.getGameTime() == -1) ? "00:00" : timeNum/60 + ":" + ((timeNum % 60 >= 10) ? timeNum % 60 : "0" + timeNum % 60);
 		
 		layout.setText(timeFont, time);
-		timeFont.draw(sb, time, (Gdx.graphics.getWidth() - layout.width)/2f, Gdx.graphics.getHeight() - 30);
+		timeFont.draw(sb, time, (1920 - layout.width)/2f, 1080 - 30);
 		
 		sb.end();
 	}
@@ -1063,7 +1063,7 @@ public class GameState extends State{
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			sr.begin(ShapeType.Filled);
 			sr.setColor(0, 0, 0, opacity);
-			sr.box(0, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0);
+			sr.box(0, 0, 0, 1920, 1080, 0);
 			sr.end();
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		sb.end();
@@ -1088,9 +1088,9 @@ public class GameState extends State{
 		kambojaMap.update(delta);
 		
 		if(Gdx.input.getX() < 0) Gdx.input.setCursorPosition(0, Gdx.input.getY());
-		if(Gdx.input.getX() > Gdx.graphics.getWidth() - 45) Gdx.input.setCursorPosition(Gdx.graphics.getWidth() - 45, Gdx.input.getY());
+		if(Gdx.input.getX() > 1920 - 45) Gdx.input.setCursorPosition(1920 - 45, Gdx.input.getY());
 		if(Gdx.input.getY() < 0) Gdx.input.setCursorPosition(Gdx.input.getX(), 0);
-		if(Gdx.input.getY() > Gdx.graphics.getHeight() - 45) Gdx.input.setCursorPosition( Gdx.input.getX(), Gdx.graphics.getHeight() - 45);
+		if(Gdx.input.getY() > 1080 - 45) Gdx.input.setCursorPosition( Gdx.input.getX(), 1080 - 45);
 				
 		for(int i = getFlameParticles().size() - 1; i >= 0; i --){
 			Body b = getFlameParticles().get(i);
@@ -1132,7 +1132,7 @@ public class GameState extends State{
 			opacity += delta;
 			if(opacity > 1){
 				opacity = 1;
-				manager.changeState(11);
+				manager.changeState(Manager.POST_GAME_STATE);
 				GameMusic.fadeOut(musicName);
 				return;
 			}
@@ -1145,7 +1145,7 @@ public class GameState extends State{
 		menuPos += (targetMenuPos - menuPos)/10.0f;
 		
 		if(timer > 1){
-			targetMenuPos = Gdx.graphics.getHeight() * 1;
+			targetMenuPos = 1080 * 1;
 			if(!said_three){
 				if(GameState.SFX)
 				three.play(VOLUME);
@@ -1153,7 +1153,7 @@ public class GameState extends State{
 			}
 		}
 		if(timer > 2){
-			targetMenuPos = Gdx.graphics.getHeight() * 2;
+			targetMenuPos = 1080 * 2;
 			if(!said_two){
 				if(GameState.SFX)
 				two.play(VOLUME);
@@ -1161,7 +1161,7 @@ public class GameState extends State{
 			}
 		}
 		if(timer > 3){
-			targetMenuPos = Gdx.graphics.getHeight() * 3;
+			targetMenuPos = 1080 * 3;
 			if(!said_one){
 				if(GameState.SFX)
 				one.play(VOLUME);
@@ -1169,7 +1169,7 @@ public class GameState extends State{
 			}
 		}
 		if(timer > 4){
-			targetMenuPos = Gdx.graphics.getHeight() * 4;
+			targetMenuPos = 1080 * 4;
 			if(!said_start){
 				if(GameState.SFX)
 				start.play(VOLUME);
@@ -1177,7 +1177,7 @@ public class GameState extends State{
 			}
 		}
 		if(timer > 5){
-			targetMenuPos = Gdx.graphics.getHeight() * 5;
+			targetMenuPos = 1080 * 5;
 			if(!isPause())
 			inputBlocked = false;
 			else
@@ -1209,7 +1209,7 @@ public class GameState extends State{
 		
 		if(KambojaMain.getGameTime() != -1){
 			if((int) (KambojaMain.getGameTime() - timeCount) <= 0){
-				targetMenuPos = Gdx.graphics.getHeight() * 6;
+				targetMenuPos = 1080 * 6;
 				inputBlocked = true;
 				setEnd(true);
 				//acabou o tempo
@@ -1257,7 +1257,7 @@ public class GameState extends State{
 			}
 			
 			if(inGame <= 1){
-				targetMenuPos = Gdx.graphics.getHeight() * 6;
+				targetMenuPos = 1080 * 6;
 				inputBlocked = true;
 				if(!isEnd()){
 					if(GameState.SFX)
@@ -1336,7 +1336,7 @@ public class GameState extends State{
 		
 		med.set(minx + (maxx-minx)/2, miny + (maxy-miny)/2);
 		
-		float targetZoom = (float) (Math.max(bounds.getWidth()/Gdx.graphics.getWidth(), bounds.getHeight()/Gdx.graphics.getHeight()));
+		float targetZoom = (float) (Math.max(bounds.getWidth()/1920, bounds.getHeight()/1080));
 		getCamera().zoom += (targetZoom - getCamera().zoom)/10.0f;
 		//camera.zoom = 1;
 		

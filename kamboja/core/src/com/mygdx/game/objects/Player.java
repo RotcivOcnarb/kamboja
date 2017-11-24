@@ -623,7 +623,7 @@ public class Player implements Steerable<Vector2>{
 			}
 			sb.draw(aim,
 					Gdx.input.getX(),
-					Gdx.graphics.getHeight() - Gdx.input.getY() - aim.getHeight()*3,
+					1080 - Gdx.input.getY() - aim.getHeight()*3,
 					aim.getWidth()*3,
 					aim.getHeight()*3
 					);
@@ -654,8 +654,8 @@ public class Player implements Steerable<Vector2>{
 		if(!isDead()){
 		layout.setText(font, KambojaMain.getControllers().get(getId()).getName());
 		font.draw(sb, KambojaMain.getControllers().get(getId()).getName(),
-				(body.getWorldCenter().x - getState().getCamera().position.x) / getState().getCamera().zoom + Gdx.graphics.getWidth()/2 - layout.width/2,
-				(body.getWorldCenter().y - getState().getCamera().position.y) / getState().getCamera().zoom + Gdx.graphics.getHeight()/2 + layout.height*3);
+				(body.getWorldCenter().x - getState().getCamera().position.x) / getState().getCamera().zoom + 1920/2 - layout.width/2,
+				(body.getWorldCenter().y - getState().getCamera().position.y) / getState().getCamera().zoom + 1080/2 + layout.height*3);
 		}
 		sb.end();
 		
@@ -807,8 +807,8 @@ public class Player implements Steerable<Vector2>{
 		if(keyboard && !isDead() && !inputBlocked){
 
 			Vector2 mouseTransformed = new Vector2(
-			getState().getCamera().position.x + (Gdx.input.getX() - Gdx.graphics.getWidth()/2)*getState().getCamera().zoom,
-			getState().getCamera().position.y + (Gdx.graphics.getHeight() - Gdx.input.getY() - Gdx.graphics.getHeight()/2)*getState().getCamera().zoom);
+			getState().getCamera().position.x + (Gdx.input.getX() - 1920/2)*getState().getCamera().zoom,
+			getState().getCamera().position.y + (1080 - Gdx.input.getY() - 1080/2)*getState().getCamera().zoom);
 			
 			angle = mouseTransformed.cpy().sub(body.getWorldCenter().cpy()).nor();
 			angle.y = -angle.y;

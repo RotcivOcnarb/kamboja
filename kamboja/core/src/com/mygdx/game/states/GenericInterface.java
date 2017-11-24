@@ -40,7 +40,6 @@ public abstract class GenericInterface extends State{
 	boolean intro;
 	boolean outro;
 	
-	float factor;
 	float timer;
 	FrameBuffer shaderBuffer;
 	ShaderProgram shader;
@@ -56,7 +55,6 @@ public abstract class GenericInterface extends State{
 	
 	public GenericInterface(Manager manager) {
 		super(manager);
-		factor = Gdx.graphics.getHeight() / 1080f;
 		chainBody = new ArrayList<Body>();
 		chain = new Texture("menu/player_select/chain.png");
 		
@@ -64,17 +62,16 @@ public abstract class GenericInterface extends State{
 		
 		fogo = new ParticleEffect();
 		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-		fogo.scaleEffect(10*factor);
+		fogo.setPosition(1920/2f, -32);
+		fogo.scaleEffect(10);
 		
 		bolinha = new ParticleEffect();
 		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-		bolinha.scaleEffect(factor);
+		bolinha.setPosition(1920/2f, 1080/2f);
 		
 		fumaca_cano = new ParticleEffect();
 		fumaca_cano.load(Gdx.files.internal("particles/cano.par"), Gdx.files.internal("particles"));
-		fumaca_cano.scaleEffect(factor*2);
+		fumaca_cano.scaleEffect(2);
 		
 		cano_pool = new ParticleEffectPool(fumaca_cano, 1, 5);
 
@@ -88,12 +85,12 @@ public abstract class GenericInterface extends State{
 	
 	public void renderImageInBody(SpriteBatch sb, Texture tex, Body body) {
 		sb.draw(tex,
-				body.getWorldCenter().x * 100f - tex.getWidth()/2f*factor,
-				body.getWorldCenter().y * 100f - tex.getHeight()/2f*factor,
-				tex.getWidth()/2f*factor,
-				tex.getHeight()/2f*factor,
-				tex.getWidth()*factor,
-				tex.getHeight()*factor,
+				body.getWorldCenter().x * 100f - tex.getWidth()/2f,
+				body.getWorldCenter().y * 100f - tex.getHeight()/2f,
+				tex.getWidth()/2f,
+				tex.getHeight()/2f,
+				tex.getWidth(),
+				tex.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(body.getAngle()),
 				0, 0,
@@ -104,12 +101,12 @@ public abstract class GenericInterface extends State{
 	
 	public void renderImageInBody(SpriteBatch sb, Texture tex, Body body, boolean flipY) {
 		sb.draw(tex,
-				body.getWorldCenter().x * 100f - tex.getWidth()/2f*factor,
-				body.getWorldCenter().y * 100f - tex.getHeight()/2f*factor,
-				tex.getWidth()/2f*factor,
-				tex.getHeight()/2f*factor,
-				tex.getWidth()*factor,
-				tex.getHeight()*factor,
+				body.getWorldCenter().x * 100f - tex.getWidth()/2f,
+				body.getWorldCenter().y * 100f - tex.getHeight()/2f,
+				tex.getWidth()/2f,
+				tex.getHeight()/2f,
+				tex.getWidth(),
+				tex.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(body.getAngle()),
 				0, 0,
@@ -135,12 +132,12 @@ public abstract class GenericInterface extends State{
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
+		camera.setToOrtho(false, 1920, 1080);
+		camera.position.set(1920/2/100f, 1080/2f/100f, 0);
 		camera.zoom = 1/100f;
 		
 		
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		
 		
 	}
@@ -184,8 +181,8 @@ public abstract class GenericInterface extends State{
 			
 			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
-						new Vector2(Gdx.graphics.getWidth()/2f + k*spacing + position_x, Gdx.graphics.getHeight()-(30*factor*i) + 50*factor),
-						new Vector2(5f*factor, 20*factor), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, true);
+						new Vector2(1920/2f + k*spacing + position_x, 1080-(30*i) + 50),
+						new Vector2(5f, 20), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, true);
 				
 				chainBody.add(b);
 				bodies.add(b);
@@ -195,8 +192,8 @@ public abstract class GenericInterface extends State{
 				RevoluteJointDef def = new RevoluteJointDef();
 				def.bodyA = bodies.get(i-1);
 				def.bodyB = bodies.get(i);
-				def.localAnchorA.set(0, -15f*factor/100f);
-				def.localAnchorB.set(0, 15f*factor/100f);
+				def.localAnchorA.set(0, -15f/100f);
+				def.localAnchorB.set(0, 15f/100f);
 				
 				world.createJoint(def);
 			}
@@ -204,9 +201,9 @@ public abstract class GenericInterface extends State{
 			RevoluteJointDef def = new RevoluteJointDef();
 			def.bodyA = bodies.get(bodies.size - 1);
 			def.bodyB = body;
-			def.localAnchorA.set(0, -7.5f*factor/100f);
+			def.localAnchorA.set(0, -7.5f/100f);
 			def.localAnchorB.set(k*spacing /100f,
-					position_y / 100f); //(413/2f*factor - 100*factor) / 100f);
+					position_y / 100f); //(413/2f - 100) / 100f);
 			
 			world.createJoint(def);
 			
@@ -221,12 +218,12 @@ public abstract class GenericInterface extends State{
 			Body bd = chainBody.get(i);
 			sb.draw(
 					chain,
-					bd.getWorldCenter().x*100f - chain.getWidth()*factor/2f,
-					bd.getWorldCenter().y*100f - chain.getHeight()*factor/2f,
-					chain.getWidth()*factor/2f,
-					chain.getHeight()*factor/2f,
-					chain.getWidth() * factor,
-					chain.getHeight() * factor,
+					bd.getWorldCenter().x*100f - chain.getWidth()/2f,
+					bd.getWorldCenter().y*100f - chain.getHeight()/2f,
+					chain.getWidth()/2f,
+					chain.getHeight()/2f,
+					chain.getWidth(),
+					chain.getHeight(),
 					2.4f,
 					2.4f,
 					(float)Math.toDegrees(bd.getAngle()),
@@ -243,7 +240,7 @@ public abstract class GenericInterface extends State{
 		shaderBuffer.begin();
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
-		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sb.draw(background, 0, 0, 1920, 1080);
 		fogo.draw(sb);
 		bolinha.draw(sb);
 		sb.end();
@@ -258,11 +255,11 @@ public abstract class GenericInterface extends State{
 			sb.begin();
 				sb.draw(shaderBuffer.getColorBufferTexture(),
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						false, true);
 			sb.end();	
 		sb.setShader(null);
@@ -275,7 +272,7 @@ public abstract class GenericInterface extends State{
 		sr.setProjectionMatrix(Util.getNormalProjection());
 		sr.begin(ShapeType.Filled);
 		sr.setColor(0, 0, 0, alpha);
-		sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sr.rect(0, 0, 1920, 1080);
 		sr.end();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);

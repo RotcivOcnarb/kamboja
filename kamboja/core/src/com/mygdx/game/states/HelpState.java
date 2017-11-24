@@ -64,29 +64,29 @@ public class HelpState extends GenericInterface{
 	public void create() {
 		super.create();
 		shootBody = createBox(
-				new Vector2(Gdx.graphics.getWidth()/2 -700*factor, Gdx.graphics.getHeight()),
-				new Vector2(shoot.getWidth()*factor/2f, shoot.getHeight()*factor/2f),
+				new Vector2(1920/2 -700, 1080),
+				new Vector2(shoot.getWidth()/2f, shoot.getHeight()/2f),
 				BodyType.DynamicBody, 0.1f);
 		
 		sprintBody = createBox(
-				new Vector2(Gdx.graphics.getWidth()/2 + 700*factor, Gdx.graphics.getHeight()),
-				new Vector2(sprint.getWidth()*factor/2f, sprint.getHeight()*factor/2f),
+				new Vector2(1920/2 + 700, 1080),
+				new Vector2(sprint.getWidth()/2f, sprint.getHeight()/2f),
 				BodyType.DynamicBody, 0.1f);
 		
 		moveBody = createBox(
-				new Vector2(Gdx.graphics.getWidth()/2 -700*factor, Gdx.graphics.getHeight()),
-				new Vector2(move.getWidth()*factor/2f, move.getHeight()*factor/2f),
+				new Vector2(1920/2 -700, 1080),
+				new Vector2(move.getWidth()/2f, move.getHeight()/2f),
 				BodyType.DynamicBody, 0.1f);
 		
 		aimBody = createBox(
-				new Vector2(Gdx.graphics.getWidth()/2 + 700*factor, Gdx.graphics.getHeight()),
-				new Vector2(aim.getWidth()*factor/2f, aim.getHeight()*factor/2f),
+				new Vector2(1920/2 + 700, 1080),
+				new Vector2(aim.getWidth()/2f, aim.getHeight()/2f),
 				BodyType.DynamicBody, 0.1f);
 		
-		buildRopeJoint(8, shootBody, -700*factor, (413/2f*factor - 100*factor), 100);
-		buildRopeJoint(10, sprintBody, 700*factor, (413/2f*factor - 100*factor), 100);
-		buildRopeJoint(18, moveBody, -700*factor, (413/2f*factor - 100*factor), 50);
-		buildRopeJoint(22, aimBody, 700*factor, (413/2f*factor - 100*factor), 50);
+		buildRopeJoint(8, shootBody, -700, (413/2f - 100), 100);
+		buildRopeJoint(10, sprintBody, 700, (413/2f - 100), 100);
+		buildRopeJoint(18, moveBody, -700, (413/2f - 100), 50);
+		buildRopeJoint(22, aimBody, 700, (413/2f - 100), 50);
 		
 		cog_angle = 0;
 		cog_speed = 0;
@@ -95,14 +95,14 @@ public class HelpState extends GenericInterface{
 	public void insideRender(SpriteBatch sb) {
 		sb.begin();
 		
-			sb.draw(base, (Gdx.graphics.getWidth() - base.getWidth()*factor)/2f, 0, base.getWidth()*factor, base.getHeight()*factor);
+			sb.draw(base, (1920 - base.getWidth())/2f, 0, base.getWidth(), base.getHeight());
 			sb.draw(back_cog,
-					Gdx.graphics.getWidth()/2f - back_cog.getWidth()/2f*factor,
-					-back_cog.getHeight()*factor/2f,
-					back_cog.getWidth()/2f*factor,
-					back_cog.getHeight()/2f*factor,
-					back_cog.getWidth()*factor,
-					back_cog.getHeight()*factor,
+					1920/2f - back_cog.getWidth()/2f,
+					-back_cog.getHeight()/2f,
+					back_cog.getWidth()/2f,
+					back_cog.getHeight()/2f,
+					back_cog.getWidth(),
+					back_cog.getHeight(),
 					1, 1,
 					cog_angle,
 					0, 0,
@@ -117,10 +117,10 @@ public class HelpState extends GenericInterface{
 			renderImageInBody(sb, move, moveBody);
 			renderImageInBody(sb, aim, aimBody);
 			
-			 fumaca[0].setPosition(680*factor, 160*factor);
+			 fumaca[0].setPosition(680, 160);
 			 fumaca[0].draw(sb, Gdx.graphics.getDeltaTime());
 			
-			 fumaca[1].setPosition(1330*factor, 90*factor);
+			 fumaca[1].setPosition(1330, 90);
 			 fumaca[1].draw(sb, Gdx.graphics.getDeltaTime());
 			
 			sb.flush();
@@ -139,7 +139,7 @@ public class HelpState extends GenericInterface{
 	}
 
 	public void changeScreen() {
-		manager.changeState(5);
+		manager.changeState(Manager.MENU_STATE);
 	}
 
 	public void dispose() {

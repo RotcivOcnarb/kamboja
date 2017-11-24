@@ -114,7 +114,6 @@ public class PlayerSelectState extends State{
 	
 	float timer;
 	float intensityTarget;
-	float factor;
 	
 	World world;
 	Box2DDebugRenderer b2dr;
@@ -144,9 +143,7 @@ public class PlayerSelectState extends State{
 	
 	public PlayerSelectState(Manager manager) {
 		super(manager);
-		
-		factor = Gdx.graphics.getHeight() / 1080f;
-		
+				
 		sr = new ShapeRenderer();
 		selection_tex = KambojaMain.getTexture("menu/player_select/selection.png");
 		chainBody = new ArrayList<Body>();
@@ -182,9 +179,9 @@ public class PlayerSelectState extends State{
 			ok = KambojaMain.getTexture("menu/player_select/ok.png");
 			
 			camera = new OrthographicCamera();
-			camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			camera.setToOrtho(false, 1920, 1080);
 			camera.zoom = 1/100f;
-			camera.position.set(Gdx.graphics.getWidth()/2f / 100f, Gdx.graphics.getHeight() / 2f / 100f, 0);
+			camera.position.set(1920/2f / 100f, 1080 / 2f / 100f, 0);
 			
 			setKeys();
 			
@@ -203,12 +200,12 @@ public class PlayerSelectState extends State{
 				FreeTypeFontParameter param;
 				ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 				param = new FreeTypeFontParameter();
-				param.size = (int) (50f * factor);
+				param.size = (int) (50f);
 				param.color = new Color(0.5f, 0.5f, 0.5f, 1).mul(getPlayerColor(i));
 				param.borderColor = new Color(0.7f, 0.7f,0.7f, 1).add(getPlayerColor(i).mul(0.3f));
-				param.borderWidth = 2*factor;
+				param.borderWidth = 2;
 				outlander[i] = ftfg.generateFont(param);
-				param.size = (int) (200f * factor);
+				param.size = (int) (120f);
 				outlanderBig[i] = ftfg.generateFont(param);
 				ftfg.dispose();	
 			}
@@ -218,13 +215,12 @@ public class PlayerSelectState extends State{
 			
 			fogo = new ParticleEffect();
 			fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-			fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-			fogo.scaleEffect(10*factor);
+			fogo.setPosition(1920/2f, -32);
+			fogo.scaleEffect(10);
 			
 			bolinha = new ParticleEffect();
 			bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-			bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-			bolinha.scaleEffect(factor);
+			bolinha.setPosition(1920/2f, 1080/2f);
 			
 			bufferProjectionPlayer = new Matrix4();
 			bufferProjectionPlayer.setToOrtho2D(0, 0, 181, 280);
@@ -269,7 +265,7 @@ public class PlayerSelectState extends State{
 
 
 		
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		
 
 		for(int i = 0; i < 4; i ++) {
@@ -292,15 +288,15 @@ public class PlayerSelectState extends State{
 		b2dr = new Box2DDebugRenderer();
 		
 		pressStartBody = createBox(
-				new Vector2(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()*2),
-				new Vector2(772*factor, 181*factor),
+				new Vector2(1920/2f, 1080*2),
+				new Vector2(772, 181),
 				BodyType.DynamicBody, 0.01f, true);
 		
-		buildStartRopeJoint((int)(20 * factor));
+		buildStartRopeJoint((int)(20));
 		
 		
-		float targetwidth = (452*3 + player_frames[0].getWidth()) * factor;
-		float targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
+		float targetwidth = (452*3 + player_frames[0].getWidth());
+		float targetoffset = (1920 - targetwidth)/2f;
 		
 	
 		
@@ -309,36 +305,36 @@ public class PlayerSelectState extends State{
 			playerReady[i] = false;
 			typing[i] = false;
 			
-			targetwidth = (452*3 + player_frames[0].getWidth()) * factor;
-			targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
+			targetwidth = (452*3 + player_frames[0].getWidth());
+			targetoffset = (1920 - targetwidth)/2f;
 			
 			body_frames[i] = createBox(
 					new Vector2(
-							targetoffset + (i * 452)*factor 
-							+ (player_frames[i].getWidth()*0.9f * factor / 2f),
-							Gdx.graphics.getHeight() - factor*(138 + player_frames[i].getHeight()*0.9f)
-							+ (player_frames[i].getHeight()*0.9f * factor)/2f
+							targetoffset + (i * 452) 
+							+ (player_frames[i].getWidth()*0.9f / 2f),
+							1080 - (138 + player_frames[i].getHeight()*0.9f)
+							+ (player_frames[i].getHeight()*0.9f)/2f
 					), 
 					new Vector2(
-							player_frames[i].getWidth()*0.9f * factor / 2f,
-							player_frames[i].getHeight()*0.9f * factor / 2f
+							player_frames[i].getWidth()*0.9f / 2f,
+							player_frames[i].getHeight()*0.9f / 2f
 							),
 					BodyType.StaticBody, 0f, true
 					);		
 			
-			targetwidth = (452*3 + player_subframes[0].getWidth()) * factor;
-			targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
+			targetwidth = (452*3 + player_subframes[0].getWidth());
+			targetoffset = (1920 - targetwidth)/2f;
 			
 			body_subframes[i] = createBox(
 					new Vector2(
-							targetoffset + (i * 452)*factor 
-							+ player_subframes[i].getWidth()*0.7f * factor / 2f,
-							Gdx.graphics.getHeight() - factor*(700 + player_subframes[i].getHeight()*0.7f)
-							+ (player_subframes[i].getHeight()*0.7f * factor)/2f
+							targetoffset + (i * 452) 
+							+ player_subframes[i].getWidth()*0.7f / 2f,
+							1080 - (700 + player_subframes[i].getHeight()*0.7f)
+							+ (player_subframes[i].getHeight()*0.7f)/2f
 					), 
 					new Vector2(
-							player_subframes[i].getWidth()*0.7f * factor / 2f,
-							player_subframes[i].getHeight()*0.7f * factor / 2f
+							player_subframes[i].getWidth()*0.7f / 2f,
+							player_subframes[i].getHeight()*0.7f / 2f
 							),
 					BodyType.DynamicBody, 0.03f, false
 					);	
@@ -351,36 +347,36 @@ public class PlayerSelectState extends State{
 		for(int i = 0; i < 4; i ++) {
 			
 			selection_bounds[i][4] = new Rectangle2D.Double(
-					(Gdx.graphics.getWidth() - back_tex.getWidth()*factor)/2f,
-					Gdx.graphics.getHeight() - back_tex.getHeight()*(1/3f) * factor - 15*factor,
-					back_tex.getWidth()*factor,
-					back_tex.getHeight() * factor - 10*factor
+					(1920 - back_tex.getWidth())/2f,
+					1080 - back_tex.getHeight()*(1/3f) - 15,
+					back_tex.getWidth(),
+					back_tex.getHeight() - 10
 					);
 			
 			selection_bounds[i][3] = new Rectangle2D.Double(
-					body_frames[i].getWorldCenter().x*100f - 181*factor/2f - 25*factor,
-					body_frames[i].getWorldCenter().y*100f - 280*factor/2f + 5*factor,
-					231*factor, 330*factor
+					body_frames[i].getWorldCenter().x*100f - 181/2f - 25,
+					body_frames[i].getWorldCenter().y*100f - 280/2f + 5,
+					231, 330
 					);
 			
 			selection_bounds[i][2] = new Rectangle2D.Double(
-					body_frames[i].getWorldCenter().x*100f - 181*factor/2f - 60*factor,
-					body_frames[i].getWorldCenter().y*100f - 280*factor/2f - 90*factor,
-					301*factor, 100*factor
+					body_frames[i].getWorldCenter().x*100f - 181/2f - 60,
+					body_frames[i].getWorldCenter().y*100f - 280/2f - 90,
+					301, 100
 					);
 			
 			selection_bounds[i][1] = new Rectangle2D.Double(
-					Gdx.graphics.getWidth()/4f * i,
-					Gdx.graphics.getHeight()/5f * 1,
-					Gdx.graphics.getWidth()/4f,
-					Gdx.graphics.getHeight()/5f
+					1920/4f * i,
+					1080/5f * 1,
+					1920/4f,
+					1080/5f
 					);
 			
 			selection_bounds[i][0] = new Rectangle2D.Double(
-					Gdx.graphics.getWidth()/4f * i + 130*factor,
-					- 120*factor,
-					Gdx.graphics.getWidth()/4f - 200*factor,
-					Gdx.graphics.getHeight()/5f
+					1920/4f * i + 130,
+					- 120,
+					1920/4f - 200,
+					1080/5f
 					);
 			
 			selection_bound_tween[i] = (Rectangle2D) selection_bounds[i][3].clone();
@@ -457,15 +453,15 @@ public class PlayerSelectState extends State{
 		for(int k = -1; k <= 1; k += 2) {
 			Array<Body> bodies = new Array<Body>();
 			
-			float targetwidth = (452*3 + player_frames[0].getWidth()) * factor;
-			float targetoffset = (Gdx.graphics.getWidth() - targetwidth)/2f;
+			float targetwidth = (452*3 + player_frames[0].getWidth());
+			float targetoffset = (1920 - targetwidth)/2f;
 			
 			for(int i = 0; i < 5; i ++) {
 				Body b = createBox(
-						new Vector2(targetoffset + (p * 452)*factor 
-								+ player_frames[p].getWidth()*0.9f * factor / 2f + k*(player_frames[p].getWidth()*0.9f * factor / 2f)/2f,
-								Gdx.graphics.getHeight() - factor*(138 + player_frames[p].getHeight()*0.9f)
-								+ (player_frames[p].getHeight()*0.9f * factor)/2f - player_frames[p].getHeight()*0.9f * factor / 2f
+						new Vector2(targetoffset + (p * 452) 
+								+ player_frames[p].getWidth()*0.9f / 2f + k*(player_frames[p].getWidth()*0.9f / 2f)/2f,
+								1080 - (138 + player_frames[p].getHeight()*0.9f)
+								+ (player_frames[p].getHeight()*0.9f)/2f - player_frames[p].getHeight()*0.9f / 2f
 								- (15*i)),
 						new Vector2(2.5f, 10), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, false);
 				
@@ -488,8 +484,8 @@ public class PlayerSelectState extends State{
 			def.bodyB = body_subframes[p];
 			def.localAnchorA.set(0, -7.5f/100f);
 			def.localAnchorB.set(
-					(k*(player_frames[p].getWidth()*0.9f * factor / 2f)/2f) / 100f,
-					((player_subframes[p].getHeight()*0.7f * factor / 2f) - 7.5f) / 100f
+					(k*(player_frames[p].getWidth()*0.9f / 2f)/2f) / 100f,
+					((player_subframes[p].getHeight()*0.7f / 2f) - 7.5f) / 100f
 					);
 			
 			world.createJoint(def);
@@ -507,7 +503,7 @@ public class PlayerSelectState extends State{
 			
 			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
-						new Vector2(Gdx.graphics.getWidth()/2 + k*(Gdx.graphics.getWidth()/4f), Gdx.graphics.getHeight()-(30*i) + 250*factor),
+						new Vector2(1920/2 + k*(1920/4f), 1080-(30*i) + 250),
 						new Vector2(5f, 20), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f, true);
 				
 				chainBody.add(b);
@@ -528,8 +524,8 @@ public class PlayerSelectState extends State{
 			def.bodyA = bodies.get(bodies.size - 1);
 			def.bodyB = pressStartBody;
 			def.localAnchorA.set(0, -7.5f/100f);
-			def.localAnchorB.set((k*Gdx.graphics.getWidth()/4f) /100f,
-					(413/2f*factor - 50*factor) / 100f);
+			def.localAnchorB.set((k*1920/4f) /100f,
+					(413/2f - 50) / 100f);
 			
 			world.createJoint(def);
 			
@@ -579,7 +575,7 @@ public class PlayerSelectState extends State{
 	@Override
 	public void render(SpriteBatch sb) {	
 		
-		float factor = Gdx.graphics.getHeight() / 1080f;
+		float factor = 1080 / 1080f;
 		
 		for(int i = 0; i < 4; i ++) {
 			
@@ -705,7 +701,7 @@ public class PlayerSelectState extends State{
 		sb.begin();
 		//DESENHA MENU
 		
-			sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			sb.draw(background, 0, 0, 1920, 1080);
 			
 			bolinha.draw(sb);
 			fogo.draw(sb);
@@ -714,25 +710,25 @@ public class PlayerSelectState extends State{
 				
 				sb.draw(
 						player_frames[i],
-						body_frames[i].getWorldCenter().x*100f - player_frames[0].getWidth()*factor/2f,
-						body_frames[i].getWorldCenter().y*100f - player_frames[0].getHeight()*factor/2f,
-						player_frames[i].getWidth() * factor,
-						player_frames[i].getHeight() * factor);
+						body_frames[i].getWorldCenter().x*100f - player_frames[0].getWidth()/2f,
+						body_frames[i].getWorldCenter().y*100f - player_frames[0].getHeight()/2f,
+						player_frames[i].getWidth(),
+						player_frames[i].getHeight());
 				
 				if(KambojaMain.getControllers().size()-1 >= i){
 					if(KambojaMain.getControllers().get(i) != null) {
 					//desenha a arma e o player selecionado
 					Texture pt = playerBuffer[i].getColorBufferTexture();
 					sb.draw(pt,
-							body_frames[i].getWorldCenter().x*100f - pt.getWidth()*factor/2f,
-							body_frames[i].getWorldCenter().y*100f - pt.getHeight()*factor/2f + 30*factor,
-							pt.getWidth()*factor, pt.getHeight()*factor);
+							body_frames[i].getWorldCenter().x*100f - pt.getWidth()/2f,
+							body_frames[i].getWorldCenter().y*100f - pt.getHeight()/2f + 30,
+							pt.getWidth(), pt.getHeight());
 					
 					layout.setText(outlander[i], KambojaMain.getControllers().get(i).getName());
 					
 					outlander[i].draw(sb, KambojaMain.getControllers().get(i).getName(),
 							body_frames[i].getWorldCenter().x*100f - layout.width/2f,
-							body_frames[i].getWorldCenter().y*100f - 160*factor
+							body_frames[i].getWorldCenter().y*100f - 160
 							);
 					sb.setColor(1, 1, 1, 1);
 					}
@@ -741,19 +737,19 @@ public class PlayerSelectState extends State{
 
 				sb.draw(
 						player_glass[i],
-						body_frames[i].getWorldCenter().x*100f - player_glass[0].getWidth()*factor/2f,
-						body_frames[i].getWorldCenter().y*100f - player_glass[0].getHeight()*factor/2f,
-						player_glass[i].getWidth() * factor,
-						player_glass[i].getHeight() * factor);
+						body_frames[i].getWorldCenter().x*100f - player_glass[0].getWidth()/2f,
+						body_frames[i].getWorldCenter().y*100f - player_glass[0].getHeight()/2f,
+						player_glass[i].getWidth(),
+						player_glass[i].getHeight());
 				
 				sb.draw(
 						player_subframes[i],
-						body_subframes[i].getWorldCenter().x*100f - player_subframes[0].getWidth()*factor/2f,
-						body_subframes[i].getWorldCenter().y*100f - player_subframes[0].getHeight()*factor/2f,
-						player_subframes[i].getWidth()*factor/2f,
-						player_subframes[i].getHeight()*factor/2f,
-						player_subframes[i].getWidth() * factor,
-						player_subframes[i].getHeight() * factor,
+						body_subframes[i].getWorldCenter().x*100f - player_subframes[0].getWidth()/2f,
+						body_subframes[i].getWorldCenter().y*100f - player_subframes[0].getHeight()/2f,
+						player_subframes[i].getWidth()/2f,
+						player_subframes[i].getHeight()/2f,
+						player_subframes[i].getWidth(),
+						player_subframes[i].getHeight(),
 						1,
 						1,
 						(float)Math.toDegrees(body_subframes[i].getAngle()),
@@ -779,12 +775,12 @@ public class PlayerSelectState extends State{
 					
 					sb.draw(
 							pt,
-							body_subframes[i].getWorldCenter().x*100f - pt.getWidth()*factor/2f - 7*factor,
-							body_subframes[i].getWorldCenter().y*100f - pt.getHeight()*factor/2f - 10*factor,
-							pt.getWidth()*factor/2f,
-							pt.getHeight()*factor/2f,
-							pt.getWidth()*factor,
-							pt.getHeight()*factor,
+							body_subframes[i].getWorldCenter().x*100f - pt.getWidth()/2f - 7,
+							body_subframes[i].getWorldCenter().y*100f - pt.getHeight()/2f - 10,
+							pt.getWidth()/2f,
+							pt.getHeight()/2f,
+							pt.getWidth(),
+							pt.getHeight(),
 							1,
 							1,
 							(float)Math.toDegrees(body_subframes[i].getAngle()),
@@ -801,12 +797,12 @@ public class PlayerSelectState extends State{
 				
 				sb.draw(
 						player_subglass[i],
-						body_subframes[i].getWorldCenter().x*100f - player_subglass[0].getWidth()*factor/2f,
-						body_subframes[i].getWorldCenter().y*100f - player_subglass[0].getHeight()*factor/2f,
-						player_subglass[i].getWidth()*factor/2f,
-						player_subglass[i].getHeight()*factor/2f,
-						player_subglass[i].getWidth() * factor,
-						player_subglass[i].getHeight() * factor,
+						body_subframes[i].getWorldCenter().x*100f - player_subglass[0].getWidth()/2f,
+						body_subframes[i].getWorldCenter().y*100f - player_subglass[0].getHeight()/2f,
+						player_subglass[i].getWidth()/2f,
+						player_subglass[i].getHeight()/2f,
+						player_subglass[i].getWidth(),
+						player_subglass[i].getHeight(),
 						1,
 						1,
 						(float)Math.toDegrees(body_subframes[i].getAngle()),
@@ -819,12 +815,12 @@ public class PlayerSelectState extends State{
 				
 				sb.draw(
 						select_gear[i],
-						body_frames[i].getWorldCenter().x*100f - select_gear[i].getWidth()*factor/2f,
-						-select_gear[i].getHeight()*factor*(2f/3f),
-						select_gear[i].getWidth()*factor/2f,
-						select_gear[i].getHeight()*factor/2f,
-						select_gear[i].getWidth() * factor,
-						select_gear[i].getHeight() * factor,
+						body_frames[i].getWorldCenter().x*100f - select_gear[i].getWidth()/2f,
+						-select_gear[i].getHeight()*(2f/3f),
+						select_gear[i].getWidth()/2f,
+						select_gear[i].getHeight()/2f,
+						select_gear[i].getWidth(),
+						select_gear[i].getHeight(),
 						1,
 						1,
 						gear_angle[i],
@@ -847,11 +843,11 @@ public class PlayerSelectState extends State{
 				sb.draw(
 						selection_tex,
 						(float)boundingBox.getX(),
-						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight(),
 						(float)boundingBox.getWidth()/2f,
 						-(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -865,12 +861,12 @@ public class PlayerSelectState extends State{
 				//UPPER RIGHT
 				sb.draw(
 						selection_tex,
-						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
-						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth(),
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight(),
 						-(float)boundingBox.getWidth()/2f,
 						-(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -888,8 +884,8 @@ public class PlayerSelectState extends State{
 						(float)boundingBox.getY(),
 						(float)boundingBox.getWidth()/2f,
 						(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -903,12 +899,12 @@ public class PlayerSelectState extends State{
 				//BOTTOM RIGHT
 				sb.draw(
 						selection_tex,
-						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth(),
 						(float)boundingBox.getY(),
 						-(float)boundingBox.getWidth()/2f,
 						(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -934,12 +930,12 @@ public class PlayerSelectState extends State{
 				
 				sb.setColor(1, 1, 1, okAlpha[i]);
 					sb.draw(ok,
-							body_frames[i].getWorldCenter().x*100f - ok.getWidth()*factor/2f,
-							body_frames[i].getWorldCenter().y*100f - ok.getHeight()*factor/2f,
-							ok.getWidth() * factor/2f,
-							ok.getHeight() * factor/2f,
-							ok.getWidth() * factor,
-							ok.getHeight() * factor,
+							body_frames[i].getWorldCenter().x*100f - ok.getWidth()/2f,
+							body_frames[i].getWorldCenter().y*100f - ok.getHeight()/2f,
+							ok.getWidth()/2f,
+							ok.getHeight()/2f,
+							ok.getWidth(),
+							ok.getHeight(),
 							okScale[i],
 							okScale[i],
 							okAngle[i],
@@ -957,12 +953,12 @@ public class PlayerSelectState extends State{
 				Body bd = chainBody.get(i);
 				sb.draw(
 						chain,
-						bd.getWorldCenter().x*100f - chain.getWidth()*factor/2f,
-						bd.getWorldCenter().y*100f - chain.getHeight()*factor/2f,
-						chain.getWidth()*factor/2f,
-						chain.getHeight()*factor/2f,
-						chain.getWidth() * factor,
-						chain.getHeight() * factor,
+						bd.getWorldCenter().x*100f - chain.getWidth()/2f,
+						bd.getWorldCenter().y*100f - chain.getHeight()/2f,
+						chain.getWidth()/2f,
+						chain.getHeight()/2f,
+						chain.getWidth(),
+						chain.getHeight(),
 						1.7f,
 						1.7f,
 						(float)Math.toDegrees(bd.getAngle()),
@@ -979,12 +975,12 @@ public class PlayerSelectState extends State{
 			sb.begin();
 			
 			sb.draw(back_tex,
-					(Gdx.graphics.getWidth() - back_tex.getWidth()*factor)/2f,
-					Gdx.graphics.getHeight() - back_tex.getHeight()*(1/3f) * factor,
-					back_tex.getWidth()*factor/2f,
-					back_tex.getHeight() * factor/2f,
-					back_tex.getWidth()*factor,
-					back_tex.getHeight() * factor,
+					(1920 - back_tex.getWidth())/2f,
+					1080 - back_tex.getHeight()*(1/3f),
+					back_tex.getWidth()/2f,
+					back_tex.getHeight()/2f,
+					back_tex.getWidth(),
+					back_tex.getHeight(),
 					1,
 					1,
 					back_angle,
@@ -998,12 +994,12 @@ public class PlayerSelectState extends State{
 
 			sb.draw(
 					pressStart,
-					pressStartBody.getWorldCenter().x*100f - pressStart.getWidth()*factor/2f,
-					pressStartBody.getWorldCenter().y*100f - pressStart.getHeight()*factor/2f,
-					pressStart.getWidth()*factor/2f,
-					pressStart.getHeight()*factor/2f,
-					pressStart.getWidth() * factor,
-					pressStart.getHeight() * factor,
+					pressStartBody.getWorldCenter().x*100f - pressStart.getWidth()/2f,
+					pressStartBody.getWorldCenter().y*100f - pressStart.getHeight()/2f,
+					pressStart.getWidth()/2f,
+					pressStart.getHeight()/2f,
+					pressStart.getWidth(),
+					pressStart.getHeight(),
 					1,
 					1,
 					(float)Math.toDegrees(pressStartBody.getAngle()),
@@ -1028,11 +1024,11 @@ public class PlayerSelectState extends State{
 			sb.begin();
 				sb.draw(shaderBuffer.getColorBufferTexture(),
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						false, true);
 			sb.end();	
 		sb.setShader(null);
@@ -1045,7 +1041,7 @@ public class PlayerSelectState extends State{
 		sr.setProjectionMatrix(Util.getNormalProjection());
 		sr.begin(ShapeType.Filled);
 		sr.setColor(0, 0, 0, alpha);
-		sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sr.rect(0, 0, 1920, 1080);
 		sr.end();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -1066,7 +1062,7 @@ public class PlayerSelectState extends State{
 		
 		if(allReady) {
 			if(!hasFallen) {
-				pressStartBody.setTransform(new Vector2(Gdx.graphics.getWidth()/2f / 100f,  Gdx.graphics.getHeight()*2 / 100f), 0);
+				pressStartBody.setTransform(new Vector2(1920/2f / 100f,  1080*2 / 100f), 0);
 				pressStartBody.setLinearVelocity(0, 0);
 				hasFallen = true;
 			}
@@ -1116,10 +1112,10 @@ public class PlayerSelectState extends State{
 				alpha = 1;
 				if(goingBack) {
 					goingBack = false;
-					manager.changeState(5);
+					manager.changeState(Manager.MENU_STATE);
 				}
 				else {
-					manager.changeState(7);
+					manager.changeState(Manager.MAP_SELECT_STATE);
 				}
 				
 			}
@@ -1158,10 +1154,10 @@ public class PlayerSelectState extends State{
 			}
 			
 			selection_bounds[i][1].setRect(
-					body_subframes[i].getWorldCenter().x*100f - player_subframes[0].getWidth()*factor/2f,
-					body_subframes[i].getWorldCenter().y*100f - player_subframes[0].getHeight()*factor/2f,
-					player_subframes[i].getWidth() * factor,
-					player_subframes[i].getHeight() * factor
+					body_subframes[i].getWorldCenter().x*100f - player_subframes[0].getWidth()/2f,
+					body_subframes[i].getWorldCenter().y*100f - player_subframes[0].getHeight()/2f,
+					player_subframes[i].getWidth(),
+					player_subframes[i].getHeight()
 					);
 		}
 		
@@ -1278,6 +1274,7 @@ public class PlayerSelectState extends State{
 							break;
 						case 4:
 							outro = true;
+							intro = false;
 							goingBack = true;
 							break;
 					}
@@ -1340,6 +1337,7 @@ public class PlayerSelectState extends State{
 				}
 				else if(allReady) {
 					outro = true;
+					intro = false;
 				}
 			}
 		}
@@ -1620,6 +1618,7 @@ public class PlayerSelectState extends State{
 					if(playerReady[id]) {
 						if(allReady) {
 							outro = true;
+							intro = false;
 						}
 					}
 					else {
@@ -1634,6 +1633,7 @@ public class PlayerSelectState extends State{
 								break;
 							case 4:
 								outro = true;
+								intro = false;
 								goingBack = true;
 								break;
 						}

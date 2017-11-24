@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.Manager;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
@@ -44,7 +45,7 @@ public class GamePause {
 				
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
-		param.size = (int) (50 * Gdx.graphics.getDensity());
+		param.size = 50;
 		param.color = new Color(0.03f, 0.03f, 0.03f, 1);
 		param.borderWidth = 2;
 		param.borderColor = new Color(1, 0.9f, 0.9f, 1);
@@ -56,11 +57,11 @@ public class GamePause {
 		offset1 = -1000;
 		offset2 = 1000;
 		
-		exit = new Rectangle2D.Float((Gdx.graphics.getWidth() - 130)/2.0f + offset1, 300, 130, 50);
-		resume = new Rectangle2D.Float((Gdx.graphics.getWidth() - 210)/2.0f + offset2, 400, 210, 50);
+		exit = new Rectangle2D.Float((1920 - 130)/2.0f + offset1, 300, 130, 50);
+		resume = new Rectangle2D.Float((1920 - 210)/2.0f + offset2, 400, 210, 50);
 		
-		yes = new Rectangle2D.Float((Gdx.graphics.getWidth() - 100)/2.0f + offset1, 300, 100, 50);
-		no = new Rectangle2D.Float((Gdx.graphics.getWidth() - 60)/2.0f + offset2, 400, 60, 50);
+		yes = new Rectangle2D.Float((1920 - 100)/2.0f + offset1, 300, 100, 50);
+		no = new Rectangle2D.Float((1920 - 60)/2.0f + offset2, 400, 60, 50);
 		
 		cursors = new MenuCursors();
 		
@@ -72,11 +73,11 @@ public class GamePause {
 		offset1 += (-offset1)/20.0f;
 		offset2 += (-offset2)/20.0f;
 		
-		exit.setRect((Gdx.graphics.getWidth() - 130)/2.0f + offset1, 300, 130, 50);
-		resume.setRect((Gdx.graphics.getWidth() - 210)/2.0f + offset2, 400, 210, 50);
+		exit.setRect((1920 - 130)/2.0f + offset1, 300, 130, 50);
+		resume.setRect((1920 - 210)/2.0f + offset2, 400, 210, 50);
 		
-		yes.setRect((Gdx.graphics.getWidth() - 100)/2.0f + offset1, 300, 100, 50);
-		no.setRect((Gdx.graphics.getWidth() - 60)/2.0f + offset2, 400, 60, 50);
+		yes.setRect((1920 - 100)/2.0f + offset1, 300, 100, 50);
+		no.setRect((1920 - 60)/2.0f + offset2, 400, 60, 50);
 
 		sb.begin();
 		if(!confirm){
@@ -147,7 +148,7 @@ public class GamePause {
 			}
 			else{
 				if(yes.contains(p)){
-					state.manager.changeState(7);
+					state.manager.changeState(Manager.PLAYER_SELECT_STATE);
 					return;
 				}
 				else if(no.contains(p)){

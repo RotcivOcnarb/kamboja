@@ -13,36 +13,37 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.states.CreditsState;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.HelpState;
-import com.mygdx.game.states.MainMenu;
-import com.mygdx.game.states.MapSelect;
 import com.mygdx.game.states.MapSelectState;
 import com.mygdx.game.states.MenuState;
-import com.mygdx.game.states.Options;
 import com.mygdx.game.states.OptionsState;
 import com.mygdx.game.states.PlayerSelectState;
-import com.mygdx.game.states.PostGame;
 import com.mygdx.game.states.PostGameState;
 
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
-	private int currentState = 11;
+	private int currentState = POST_GAME_STATE;
 	private boolean disposed = false; //so it doesnt dispose the same state twice
+	
+	public static final int GAME_STATE = 0;
+	public static final int MENU_STATE = 1;
+	public static final int PLAYER_SELECT_STATE = 2;
+	public static final int MAP_SELECT_STATE = 3;
+	public static final int HELP_STATE = 4;
+	public static final int CREDITS_STATE = 5;
+	public static final int POST_GAME_STATE = 6;
+	public static final int OPTIONS_STATE = 7;
 	
 	public Manager(){
 		states = new ArrayList<State>();
-		states.add(new MainMenu(this));
-		states.add(new MapSelect(this));
 		states.add(new GameState(this));
-		states.add(new PostGame(this));
-		states.add(new Options(this));
 		states.add(new MenuState(this));
 		states.add(new PlayerSelectState(this));
 		states.add(new MapSelectState(this));
-		states.add(new OptionsState(this));
 		states.add(new HelpState(this));
 		states.add(new CreditsState(this));
 		states.add(new PostGameState(this));
+		states.add(new OptionsState(this));
 		
 		Controllers.addListener(this);
 		Gdx.input.setInputProcessor(this);

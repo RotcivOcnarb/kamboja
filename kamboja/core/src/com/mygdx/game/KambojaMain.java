@@ -12,6 +12,7 @@ import java.util.HashMap;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.swing.text.Utilities;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -34,6 +35,7 @@ import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.SaveObject;
+import com.mygdx.game.objects.Util;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Turret;
 import com.mygdx.game.objects.weapon.Bazooka;
@@ -437,6 +439,7 @@ public class KambojaMain extends ApplicationAdapter {
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.input.setCursorCatched(true); //hides the cursor
 		
+		
 		if(alpha == 1) {
 			if(!managerLoaded) {
 				manager = new Manager();
@@ -448,36 +451,35 @@ public class KambojaMain extends ApplicationAdapter {
 		}
 		else {
 			
-			
+			sb.setProjectionMatrix(Util.getNormalProjection());
 			smoothProgress += (assets.getProgress() - smoothProgress)/5.0f;
-			float factor = Gdx.graphics.getHeight() / 1080f;
 			sb.begin();
 			
 			sb.draw(loading_case,
-					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f + capsule.getWidth()*factor - 50*factor,
-					(Gdx.graphics.getHeight() - loading_case.getHeight()*factor)/2f,
+					(1920 - (capsule.getWidth() + loading_bar.getWidth()))/2f + capsule.getWidth() - 50,
+					(1080 - loading_case.getHeight())/2f,
 					0, 0, 
-					loading_case.getWidth()*factor, loading_case.getHeight()*factor,
+					loading_case.getWidth(), loading_case.getHeight(),
 					1, 1, 0,
 					0, 0,
 					loading_case.getWidth(),
 					loading_case.getHeight(),
 					false, false);
 			sb.draw(loading_bar,
-					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f + capsule.getWidth()*factor - 50*factor,
-					(Gdx.graphics.getHeight() - loading_bar.getHeight()*factor)/2f,
+					(1920 - (capsule.getWidth() + loading_bar.getWidth()))/2f + capsule.getWidth() - 50,
+					(1080 - loading_bar.getHeight())/2f,
 					0, 0, 
-					smoothProgress * loading_bar.getWidth()*factor, loading_bar.getHeight()*factor,
+					smoothProgress * loading_bar.getWidth(), loading_bar.getHeight(),
 					1, 1, 0,
 					0, 0,
 					(int)(smoothProgress * loading_bar.getWidth()),
 					loading_bar.getHeight(),
 					false, false);
 			sb.draw(capsule,
-					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f,
-					(Gdx.graphics.getHeight() - capsule.getHeight()*factor)/2f,
-					capsule.getWidth()*factor/2f, capsule.getHeight()*factor/2f, 
-					capsule.getWidth()*factor, capsule.getHeight()*factor,
+					(1920 - (capsule.getWidth() + loading_bar.getWidth()))/2f,
+					(1080 - capsule.getHeight())/2f,
+					capsule.getWidth()/2f, capsule.getHeight()/2f, 
+					capsule.getWidth(), capsule.getHeight(),
 					1, 1, smoothProgress * 1080,
 					0, 0,
 					capsule.getWidth(),
@@ -490,7 +492,7 @@ public class KambojaMain extends ApplicationAdapter {
 			
 			sr.begin(ShapeType.Filled);
 			sr.setColor(0, 0, 0, alpha);
-			sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			sr.rect(0, 0, 1920, 1080);
 			sr.end();
 			
 			if(assets.update()) {

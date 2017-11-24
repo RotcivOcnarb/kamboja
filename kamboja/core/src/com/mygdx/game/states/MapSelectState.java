@@ -84,9 +84,7 @@ public class MapSelectState extends State{
 	int selected_map = 0;
 	
 	int selection[] = new int[4];
-	
-	float factor;
-	
+		
 	private ArrayList<Texture> thumbs;
 	private ArrayList<String> mapNames;
 	private ArrayList<String> mapTitles;
@@ -117,7 +115,6 @@ public class MapSelectState extends State{
 	
 	public MapSelectState(Manager manager) {
 		super(manager);
-		factor = Gdx.graphics.getHeight() / 1080f;
 		
 		chain = KambojaMain.getTexture("menu/player_select/chain.png");
 		map_name = KambojaMain.getTexture("menu/map_select/map_name.png");
@@ -149,12 +146,12 @@ public class MapSelectState extends State{
 		FreeTypeFontParameter param;
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/outlander.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (100f * factor);
+		param.size = (int) (100f);
 		param.color = new Color(199/255f, 224/255f, 243/255f, 1f).mul(0.9f);
 		outlander = ftfg.generateFont(param);
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/olivers barney.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (60 * factor);
+		param.size = (int) (60);
 		param.color = new Color(255/255f, 48/255f, 77/255f, 1f);
 		oliver_barney = ftfg.generateFont(param);
 		ftfg.dispose();
@@ -163,13 +160,12 @@ public class MapSelectState extends State{
 		
 		fogo = new ParticleEffect();
 		fogo.load(Gdx.files.internal("particles/fogo.par"), Gdx.files.internal("particles"));
-		fogo.setPosition(Gdx.graphics.getWidth()/2f, -32*factor);
-		fogo.scaleEffect(10*factor);
+		fogo.setPosition(1920/2f, -32);
+		fogo.scaleEffect(10);
 		
 		bolinha = new ParticleEffect();
 		bolinha.load(Gdx.files.internal("particles/bolinha.par"), Gdx.files.internal("particles"));
-		bolinha.setPosition(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
-		bolinha.scaleEffect(factor);
+		bolinha.setPosition(1920/2f, 1080/2f);
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/color_shift.fs"));
@@ -177,7 +173,7 @@ public class MapSelectState extends State{
 		if(shader.getLog().length() > 0){
 			System.out.println(shader.getLog());
 		}
-		shaderBuffer = new FrameBuffer(Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		
 		thumbs = new ArrayList<Texture>();
 		mapTitles = new ArrayList<String>();
@@ -205,26 +201,26 @@ public class MapSelectState extends State{
 			int x = i % 4;
 			int y = i / 4;
 			selection_bounds[i] = new Rectangle2D.Double(
-					x*250*factor - 217*factor/2f + 190*factor,
-					Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 360*factor,
-					237*factor,
-					219*factor
+					x*250 - 217/2f + 190,
+					1080 - (y*250 - 199/2f) - 360,
+					237,
+					219
 					);
 
 		}
 		
 		selection_bounds[16] = new Rectangle2D.Double(
-				Gdx.graphics.getWidth()* (1/4f) - gear_back.getWidth()/2f*factor,
-				-30*factor - gear_back.getHeight()/2f*factor,
-				gear_back.getWidth()*factor,
-				gear_back.getHeight()*factor
+				1920* (1/4f) - gear_back.getWidth()/2f,
+				-30 - gear_back.getHeight()/2f,
+				gear_back.getWidth(),
+				gear_back.getHeight()
 				);
 		
 		selection_bounds[17] = new Rectangle2D.Double(
-				Gdx.graphics.getWidth()/2f - gear_start.getWidth()/2f*factor,
-				-30*factor - gear_start.getHeight()/2f*factor,
-				gear_start.getWidth()*factor,
-				gear_start.getHeight()*factor
+				1920/2f - gear_start.getWidth()/2f,
+				-30 - gear_start.getHeight()/2f,
+				gear_start.getWidth(),
+				gear_start.getHeight()
 				);
 		
 		
@@ -232,20 +228,20 @@ public class MapSelectState extends State{
 			KambojaMain.getGameTime()/60 + ":" + ((KambojaMain.getGameTime() % 60 >= 10) ? KambojaMain.getGameTime() % 60 : "0" + KambojaMain.getGameTime() % 60));
 	
 		layout.setText(oliver_barney, tm);
-		selection_bounds[18] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
-				190* factor, 550*factor, 120*factor);
+		selection_bounds[18] = new Rectangle2D.Double(1920 - 650,
+				190, 550, 120);
 
 		tm = "" + (KambojaMain.getDeathsNumber() == -1  ? "Inf." : KambojaMain.getDeathsNumber());
 
 		layout.setText(oliver_barney, tm);
-		selection_bounds[19] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
-				120* factor, 550*factor, 120*factor);
+		selection_bounds[19] = new Rectangle2D.Double(1920 - 650,
+				120, 550, 120);
 
 		tm = "" + (KambojaMain.hasItems()  ? "on" : "off");
 		
 		layout.setText(oliver_barney, tm);
-		selection_bounds[20] = new Rectangle2D.Double(Gdx.graphics.getWidth() - 650*factor,
-				50* factor, 550*factor, 120*factor);
+		selection_bounds[20] = new Rectangle2D.Double(1920 - 650,
+				50, 550, 120);
 
 	}
 
@@ -270,29 +266,27 @@ public class MapSelectState extends State{
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.set(Gdx.graphics.getWidth()/2/100f, Gdx.graphics.getHeight()/2f/100f, 0);
+		camera.setToOrtho(false, 1920, 1080);
+		camera.position.set(1920/2/100f, 1080/2f/100f, 0);
 		camera.zoom = 1/100f;
 		
-		options_x = Gdx.graphics.getWidth()/2f;
+		options_x = 1920/2f;
 
 		shaderIntensity = 0;
 		intensityTarget = 0;
 		
 		sr = new ShapeRenderer();
-		
-		factor = Gdx.graphics.getHeight() / 1080f;
-		
+				
 		mapBody = createBox(
-				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight() * (3/4f)),
-				new Vector2(444/2f*factor, 413/2f*factor), BodyType.DynamicBody, 0.1f);
+				new Vector2(1920 * (3/4f), 1080 * (3/4f)),
+				new Vector2(444/2f, 413/2f), BodyType.DynamicBody, 0.1f);
 		
 		mapNameBody = createBox(
-				new Vector2(Gdx.graphics.getWidth() * (3/4f), Gdx.graphics.getHeight()/2f),
-				new Vector2(402/2f*factor, 88/2f*factor), BodyType.DynamicBody, 0.1f);
+				new Vector2(1920 * (3/4f), 1080/2f),
+				new Vector2(402/2f, 88/2f), BodyType.DynamicBody, 0.1f);
 		
-		buildRopeJoint((int)(10 * factor));
-		buildRopeJoint2((int)(3 * factor));
+		buildRopeJoint((int)(10));
+		buildRopeJoint2((int)(3));
 
 		
 		for(int i = 0; i < 4; i ++) {
@@ -328,7 +322,7 @@ public class MapSelectState extends State{
 			
 			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
-						new Vector2(Gdx.graphics.getWidth()*(3/4f) + k*100, Gdx.graphics.getHeight()-(30*i) + 50*factor),
+						new Vector2(1920*(3/4f) + k*100, 1080-(30*i) + 50),
 						new Vector2(5f, 20), i == 0 ? BodyType.StaticBody : BodyType.DynamicBody, 1f);
 				
 				chainBody.add(b);
@@ -349,8 +343,8 @@ public class MapSelectState extends State{
 			def.bodyA = bodies.get(bodies.size - 1);
 			def.bodyB = mapBody;
 			def.localAnchorA.set(0, -7.5f/100f);
-			def.localAnchorB.set((Gdx.graphics.getWidth()*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
-					(413/2f*factor - 50*factor) / 100f);
+			def.localAnchorB.set((1920*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
+					(413/2f - 50) / 100f);
 			
 			world.createJoint(def);
 			
@@ -367,7 +361,7 @@ public class MapSelectState extends State{
 			
 			for(int i = 0; i < numChains; i ++) {
 				Body b = createBox(
-						new Vector2(Gdx.graphics.getWidth()*(3/4f) + k*100, Gdx.graphics.getHeight()-(30*i) - 600*factor),
+						new Vector2(1920*(3/4f) + k*100, 1080-(30*i) - 600),
 						new Vector2(5f, 20), BodyType.DynamicBody, 1f);
 				
 				chainBody.add(b);
@@ -377,8 +371,8 @@ public class MapSelectState extends State{
 			RevoluteJointDef def = new RevoluteJointDef();
 			def.bodyA = mapBody;
 			def.bodyB = bodies.get(0);
-			def.localAnchorA.set((Gdx.graphics.getWidth()*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
-					-(413/2f*factor - 50*factor) / 100f);
+			def.localAnchorA.set((1920*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
+					-(413/2f - 50) / 100f);
 			def.localAnchorB.set(0, 15f/100f);
 			
 			world.createJoint(def);
@@ -397,8 +391,8 @@ public class MapSelectState extends State{
 			def.bodyA = bodies.get(bodies.size - 1);
 			def.bodyB = mapNameBody;
 			def.localAnchorA.set(0, -7.5f/100f);
-			def.localAnchorB.set((Gdx.graphics.getWidth()*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
-					(200/2f*factor - 50*factor) / 100f);
+			def.localAnchorB.set((1920*(3/4f) + k*100) /100f - mapBody.getWorldCenter().x,
+					(200/2f - 50) / 100f);
 			
 			world.createJoint(def);
 			
@@ -451,24 +445,24 @@ public class MapSelectState extends State{
 		sb.begin();
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		
-		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sb.draw(background, 0, 0, 1920, 1080);
 	
 		bolinha.draw(sb);
 		fogo.draw(sb);
 	
 		sb.draw(options_frame,
 				options_x,
-				-100*factor,
-				options_frame.getWidth() * factor,
-				options_frame.getHeight() * factor);
+				-100,
+				options_frame.getWidth(),
+				options_frame.getHeight());
 		
 		sb.draw(map_frame,
-				mapBody.getWorldCenter().x * 100f - map_frame.getWidth()/2f*factor,
-				mapBody.getWorldCenter().y * 100f - map_frame.getHeight()/2f*factor,
-				map_frame.getWidth()/2f*factor,
-				map_frame.getHeight()/2f*factor,
-				map_frame.getWidth()*factor,
-				map_frame.getHeight()*factor,
+				mapBody.getWorldCenter().x * 100f - map_frame.getWidth()/2f,
+				mapBody.getWorldCenter().y * 100f - map_frame.getHeight()/2f,
+				map_frame.getWidth()/2f,
+				map_frame.getHeight()/2f,
+				map_frame.getWidth(),
+				map_frame.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(mapBody.getAngle()),
 				0, 0,
@@ -477,12 +471,12 @@ public class MapSelectState extends State{
 				false, false);
 		
 		sb.draw(thumbs.get(selected_map),
-				mapBody.getWorldCenter().x * 100f - map_frame.getWidth()/2f*factor * 0.6f,
-				mapBody.getWorldCenter().y * 100f - map_frame.getHeight()/2f*factor * 0.6f - 20*factor,
-				map_frame.getWidth()/2f*factor * 0.6f,
-				map_frame.getHeight()/2f*factor * 0.6f,
-				map_frame.getWidth()*factor * 0.6f,
-				map_frame.getHeight()*factor * 0.6f,
+				mapBody.getWorldCenter().x * 100f - map_frame.getWidth()/2f * 0.6f,
+				mapBody.getWorldCenter().y * 100f - map_frame.getHeight()/2f * 0.6f - 20,
+				map_frame.getWidth()/2f * 0.6f,
+				map_frame.getHeight()/2f * 0.6f,
+				map_frame.getWidth() * 0.6f,
+				map_frame.getHeight() * 0.6f,
 				1, 1,
 				(float)Math.toDegrees(mapBody.getAngle()),
 				0, 0,
@@ -491,12 +485,12 @@ public class MapSelectState extends State{
 				false, false);
 		
 		sb.draw(map_name,
-				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f*factor,
-				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f*factor,
-				map_name.getWidth()/2f*factor,
-				map_name.getHeight()/2f*factor,
-				map_name.getWidth()*factor,
-				map_name.getHeight()*factor,
+				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f,
+				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f,
+				map_name.getWidth()/2f,
+				map_name.getHeight()/2f,
+				map_name.getWidth(),
+				map_name.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(mapNameBody.getAngle()),
 				0, 0,
@@ -505,12 +499,12 @@ public class MapSelectState extends State{
 				false, false);
 		
 		sb.draw(mapNameBuffer.getColorBufferTexture(),
-				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f*factor,
-				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f*factor,
-				map_name.getWidth()/2f*factor,
-				map_name.getHeight()/2f*factor,
-				map_name.getWidth()*factor,
-				map_name.getHeight()*factor,
+				mapNameBody.getWorldCenter().x * 100f - map_name.getWidth()/2f,
+				mapNameBody.getWorldCenter().y * 100f - map_name.getHeight()/2f,
+				map_name.getWidth()/2f,
+				map_name.getHeight()/2f,
+				map_name.getWidth(),
+				map_name.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(mapNameBody.getAngle()),
 				0, 0,
@@ -519,12 +513,12 @@ public class MapSelectState extends State{
 				false, true);
 		
 		sb.draw(gear_start,
-				Gdx.graphics.getWidth()/2f - gear_start.getWidth()/2f*factor,
-				-30*factor - gear_start.getHeight()/2f*factor,
-				gear_start.getWidth()/2f*factor,
-				gear_start.getHeight()/2f*factor,
-				gear_start.getWidth()*factor,
-				gear_start.getHeight()*factor,
+				1920/2f - gear_start.getWidth()/2f,
+				-30 - gear_start.getHeight()/2f,
+				gear_start.getWidth()/2f,
+				gear_start.getHeight()/2f,
+				gear_start.getWidth(),
+				gear_start.getHeight(),
 				1, 1,
 				start_angle,
 				0, 0,
@@ -533,12 +527,12 @@ public class MapSelectState extends State{
 				false, false);
 		
 		sb.draw(gear_back,
-				Gdx.graphics.getWidth()* (1/4f) - gear_back.getWidth()/2f*factor,
-				-30*factor - gear_back.getHeight()/2f*factor,
-				gear_back.getWidth()/2f*factor,
-				gear_back.getHeight()/2f*factor,
-				gear_back.getWidth()*factor,
-				gear_back.getHeight()*factor,
+				1920* (1/4f) - gear_back.getWidth()/2f,
+				-30 - gear_back.getHeight()/2f,
+				gear_back.getWidth()/2f,
+				gear_back.getHeight()/2f,
+				gear_back.getWidth(),
+				gear_back.getHeight(),
 				1, 1,
 				back_angle,
 				0, 0,
@@ -551,22 +545,22 @@ public class MapSelectState extends State{
 	
 		layout.setText(oliver_barney, tm);
 		oliver_barney.draw(sb, tm,
-				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
-				275* factor);
+				1920 - 400 + options_x - layout.width/2f,
+				275);
 		
 		tm = "" + (KambojaMain.getDeathsNumber() == -1  ? "Inf." : KambojaMain.getDeathsNumber());
 
 		layout.setText(oliver_barney, tm);
 		oliver_barney.draw(sb, tm,
-				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
-				210* factor);
+				1920 - 400 + options_x - layout.width/2f,
+				210);
 		
 		tm = "" + (KambojaMain.hasItems()  ? "on" : "off");
 		
 		layout.setText(oliver_barney, tm);
 		oliver_barney.draw(sb, tm,
-				Gdx.graphics.getWidth() - 400*factor + options_x - layout.width/2f,
-				140* factor);
+				1920 - 400 + options_x - layout.width/2f,
+				140);
 				
 		for(int i = 0; i < mapNames.size(); i ++){
 			int x = i % 4;
@@ -574,17 +568,17 @@ public class MapSelectState extends State{
 			if(i < thumbs.size()) {
 				
 				sb.draw(map_container[i],
-						x*250*factor - 217*factor/2f + 200*factor,
-						Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 350*factor,
-						217*factor,
-						199*factor
+						x*250 - 217/2f + 200,
+						1080 - (y*250 - 199/2f) - 350,
+						217,
+						199
 						);
 				
 				sb.draw(thumbs.get(i),
-						x*250*factor - 192*factor/2f + 200*factor,
-						Gdx.graphics.getHeight() - (y*250*factor - 174*factor/2f) - 325*factor,
-						192*factor,
-						174*factor
+						x*250 - 192/2f + 200,
+						1080 - (y*250 - 174/2f) - 325,
+						192,
+						174
 						);
 				
 				if(KambojaMain.mapUnlocked[i]  || i == KambojaMain.mapUnlocked.length-1)
@@ -593,10 +587,10 @@ public class MapSelectState extends State{
 				sb.setColor(0.3f, 0.3f, 0.3f, 1f);
 				
 				sb.draw(map_container[i],
-						x*250*factor - 217*factor/2f + 200*factor,
-						Gdx.graphics.getHeight() - (y*250*factor - 199*factor/2f) - 350*factor,
-						217*factor,
-						199*factor
+						x*250 - 217/2f + 200,
+						1080 - (y*250 - 199/2f) - 350,
+						217,
+						199
 						);
 				
 				sb.setColor(1, 1, 1, 1);
@@ -607,12 +601,12 @@ public class MapSelectState extends State{
 			Body bd = chainBody.get(i);
 			sb.draw(
 					chain,
-					bd.getWorldCenter().x*100f - chain.getWidth()*factor/2f,
-					bd.getWorldCenter().y*100f - chain.getHeight()*factor/2f,
-					chain.getWidth()*factor/2f,
-					chain.getHeight()*factor/2f,
-					chain.getWidth() * factor,
-					chain.getHeight() * factor,
+					bd.getWorldCenter().x*100f - chain.getWidth()/2f,
+					bd.getWorldCenter().y*100f - chain.getHeight()/2f,
+					chain.getWidth()/2f,
+					chain.getHeight()/2f,
+					chain.getWidth(),
+					chain.getHeight(),
 					2.4f,
 					2.4f,
 					(float)Math.toDegrees(bd.getAngle()),
@@ -635,11 +629,11 @@ public class MapSelectState extends State{
 				sb.draw(
 						selection_tex,
 						(float)boundingBox.getX(),
-						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight(),
 						(float)boundingBox.getWidth()/2f,
 						-(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -653,12 +647,12 @@ public class MapSelectState extends State{
 				//UPPER RIGHT
 				sb.draw(
 						selection_tex,
-						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
-						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight()*factor,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth(),
+						(float)(boundingBox.getY() + boundingBox.getHeight()) - selection_tex.getHeight(),
 						-(float)boundingBox.getWidth()/2f,
 						-(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -676,8 +670,8 @@ public class MapSelectState extends State{
 						(float)boundingBox.getY(),
 						(float)boundingBox.getWidth()/2f,
 						(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -691,12 +685,12 @@ public class MapSelectState extends State{
 				//BOTTOM RIGHT
 				sb.draw(
 						selection_tex,
-						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth()*factor,
+						(float)(boundingBox.getX() + boundingBox.getWidth()) - selection_tex.getWidth(),
 						(float)boundingBox.getY(),
 						-(float)boundingBox.getWidth()/2f,
 						(float)boundingBox.getHeight()/2f,
-						selection_tex.getWidth()*factor,
-						selection_tex.getHeight()*factor,
+						selection_tex.getWidth(),
+						selection_tex.getHeight(),
 						1,
 						1,
 						0,
@@ -725,11 +719,11 @@ public class MapSelectState extends State{
 			sb.begin();
 				sb.draw(shaderBuffer.getColorBufferTexture(),
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						0, 0,
-						Gdx.graphics.getWidth(),
-						Gdx.graphics.getHeight(),
+						1920,
+						1080,
 						false, true);
 			sb.end();	
 		sb.setShader(null);
@@ -742,7 +736,7 @@ public class MapSelectState extends State{
 		sr.setProjectionMatrix(Util.getNormalProjection());
 		sr.begin(ShapeType.Filled);
 		sr.setColor(0, 0, 0, alpha);
-		sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sr.rect(0, 0, 1920, 1080);
 		sr.end();
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -783,10 +777,10 @@ public class MapSelectState extends State{
 				outro = false;
 				alpha = 1;
 				if(goingBack) {
-					manager.changeState(6);
+					manager.changeState(Manager.PLAYER_SELECT_STATE);
 				}
 				else {
-					manager.changeState(2);
+					manager.changeState(Manager.GAME_STATE);
 				}
 			}
 		}

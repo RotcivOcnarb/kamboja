@@ -109,25 +109,25 @@ public class OptionsState extends GenericInterface{
 		debug_sign = KambojaMain.getTexture("menu/options/debug_mode.png");
 		
 		back_cog = KambojaMain.getTexture("menu/options/engrenagem.png");
-		light_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f + 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
+		light_body = createBox(new Vector2(1920/2f + 700, 1080*(3/4f)), new Vector2(394/2f, 241/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(
-				10, light_body, 750*factor, (413/2f*factor - 100*factor), 80);
+				10, light_body, 750, (413/2f - 100), 80);
 		
-		debug_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f - 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
+		debug_body = createBox(new Vector2(1920/2f - 700, 1080*(3/4f)), new Vector2(394/2f, 241/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(
-				10, debug_body, -750*factor, (413/2f*factor - 100*factor), 80);
+				10, debug_body, -750, (413/2f - 100), 80);
 		
 		
-		bounds[0] = new Rectangle2D.Double(670*factor, Gdx.graphics.getHeight() - 485*factor, 595*factor, 187*factor);
-		bounds[1] = new Rectangle2D.Double(632*factor, Gdx.graphics.getHeight() - 663*factor, 708*factor, 185*factor);
-		bounds[2] = new Rectangle2D.Double(607*factor, Gdx.graphics.getHeight() - 782*factor, 759*factor, 123*factor);
-		bounds[3] = new Rectangle2D.Double(0*factor, Gdx.graphics.getHeight() - 530*factor, 440*factor, 351*factor);
-		bounds[4] = new Rectangle2D.Double(1510*factor, Gdx.graphics.getHeight() - 530*factor, 429*factor, 390*factor);
-		bounds[5] = new Rectangle2D.Double(750*factor, Gdx.graphics.getHeight() - 1200*factor, 420*factor, 300*factor);
-		bounds[6] = new Rectangle2D.Double(100*factor, Gdx.graphics.getHeight() - 100*factor, 100*factor, 100*factor);
-		bounds[7] = new Rectangle2D.Double(100*factor, Gdx.graphics.getHeight() - 200*factor, 100*factor, 100*factor);
+		bounds[0] = new Rectangle2D.Double(670, 1080 - 485, 595, 187);
+		bounds[1] = new Rectangle2D.Double(632, 1080 - 663, 708, 185);
+		bounds[2] = new Rectangle2D.Double(607, 1080 - 782, 759, 123);
+		bounds[3] = new Rectangle2D.Double(0, 1080 - 530, 440, 351);
+		bounds[4] = new Rectangle2D.Double(1510, 1080 - 530, 429, 390);
+		bounds[5] = new Rectangle2D.Double(750, 1080 - 1200, 420, 300);
+		bounds[6] = new Rectangle2D.Double(100, 1080 - 100, 100, 100);
+		bounds[7] = new Rectangle2D.Double(100, 1080 - 200, 100, 100);
 	}
 
 	public void dispose() {
@@ -165,11 +165,11 @@ public class OptionsState extends GenericInterface{
 
 
 		bounds[6].setFrame(
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
-				600*factor, 100*factor, 100*factor);
+				(1920 - small_cog.getWidth())/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*0.9f)) - 20,
+				600, 100, 100);
 		bounds[7].setFrame(
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)) - 20*factor,
-				420*factor, 100*factor, 100*factor);
+				(1920 - small_cog.getWidth())/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*0.9f)) - 20,
+				420, 100, 100);
 
 		if(outro){
 			cog_speed += delta*10;
@@ -483,30 +483,30 @@ public class OptionsState extends GenericInterface{
 	@Override
 	public void insideRender(SpriteBatch sb) {
 		sb.begin();
-		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sb.draw(background, 0, 0, 1920, 1080);
 		bolinha.draw(sb);
 		fogo.draw(sb);
 		
 		sb.draw(above_bar,
-				(Gdx.graphics.getWidth() - above_bar.getWidth()*factor)/ 2, Gdx.graphics.getHeight() - above_bar.getHeight()*factor,
-				above_bar.getWidth() * factor, above_bar.getHeight() * factor);
+				(1920 - above_bar.getWidth())/ 2, 1080 - above_bar.getHeight(),
+				above_bar.getWidth(), above_bar.getHeight());
 		
 		sb.draw(main_sign,
-				(Gdx.graphics.getWidth() - main_sign.getWidth()*factor)/ 2, 0,
-				main_sign.getWidth() * factor, main_sign.getHeight() * factor);
+				(1920 - main_sign.getWidth())/ 2, 0,
+				main_sign.getWidth(), main_sign.getHeight());
 		
 		sb.draw(options_sign,
-				(Gdx.graphics.getWidth() - options_sign.getWidth()*factor)/ 2, Gdx.graphics.getHeight() - options_sign.getHeight()*factor,
-				options_sign.getWidth() * factor, options_sign.getHeight() * factor);
+				(1920 - options_sign.getWidth())/ 2, 1080 - options_sign.getHeight(),
+				options_sign.getWidth(), options_sign.getHeight());
 		
 		//Light sign
 		sb.draw(light_sign,
-				light_body.getWorldCenter().x * 100f - light_sign.getWidth()/2f*factor,
-				light_body.getWorldCenter().y * 100f - light_sign.getHeight()/2f*factor,
-				light_sign.getWidth()/2f*factor,
-				light_sign.getHeight()/2f*factor,
-				light_sign.getWidth()*factor,
-				light_sign.getHeight()*factor,
+				light_body.getWorldCenter().x * 100f - light_sign.getWidth()/2f,
+				light_body.getWorldCenter().y * 100f - light_sign.getHeight()/2f,
+				light_sign.getWidth()/2f,
+				light_sign.getHeight()/2f,
+				light_sign.getWidth(),
+				light_sign.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(light_body.getAngle()),
 				0, 0,
@@ -515,12 +515,12 @@ public class OptionsState extends GenericInterface{
 				false, false);
 		
 		sb.draw(left_arrow,
-				light_body.getWorldCenter().x * 100f - left_arrow.getWidth()/2f*factor,
-				light_body.getWorldCenter().y * 100f - left_arrow.getHeight()/2f*factor,
-				left_arrow.getWidth()/2f*factor,
-				left_arrow.getHeight()/2f*factor,
-				left_arrow.getWidth()*factor,
-				left_arrow.getHeight()*factor,
+				light_body.getWorldCenter().x * 100f - left_arrow.getWidth()/2f,
+				light_body.getWorldCenter().y * 100f - left_arrow.getHeight()/2f,
+				left_arrow.getWidth()/2f,
+				left_arrow.getHeight()/2f,
+				left_arrow.getWidth(),
+				left_arrow.getHeight(),
 				left_light_scale, left_light_scale,
 				(float)Math.toDegrees(light_body.getAngle()),
 				0, 0,
@@ -529,12 +529,12 @@ public class OptionsState extends GenericInterface{
 				false, false);
 		
 		sb.draw(right_arrow,
-				light_body.getWorldCenter().x * 100f - right_arrow.getWidth()/2f*factor,
-				light_body.getWorldCenter().y * 100f - right_arrow.getHeight()/2f*factor,
-				right_arrow.getWidth()/2f*factor,
-				right_arrow.getHeight()/2f*factor,
-				right_arrow.getWidth()*factor,
-				right_arrow.getHeight()*factor,
+				light_body.getWorldCenter().x * 100f - right_arrow.getWidth()/2f,
+				light_body.getWorldCenter().y * 100f - right_arrow.getHeight()/2f,
+				right_arrow.getWidth()/2f,
+				right_arrow.getHeight()/2f,
+				right_arrow.getWidth(),
+				right_arrow.getHeight(),
 				right_light_scale, right_light_scale,
 				(float)Math.toDegrees(light_body.getAngle()),
 				0, 0,
@@ -545,12 +545,12 @@ public class OptionsState extends GenericInterface{
 		Texture light_state = GameState.LIGHTS ? on : off;
 		
 		sb.draw(light_state,
-				light_body.getWorldCenter().x * 100f - light_state.getWidth()/2f*factor,
-				light_body.getWorldCenter().y * 100f - light_state.getHeight()/2f*factor,
-				light_state.getWidth()/2f*factor,
-				light_state.getHeight()/2f*factor,
-				light_state.getWidth()*factor,
-				light_state.getHeight()*factor,
+				light_body.getWorldCenter().x * 100f - light_state.getWidth()/2f,
+				light_body.getWorldCenter().y * 100f - light_state.getHeight()/2f,
+				light_state.getWidth()/2f,
+				light_state.getHeight()/2f,
+				light_state.getWidth(),
+				light_state.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(light_body.getAngle()),
 				0, 0,
@@ -560,12 +560,12 @@ public class OptionsState extends GenericInterface{
 		
 		//Debug sign
 		sb.draw(debug_sign,
-				debug_body.getWorldCenter().x * 100f - debug_sign.getWidth()/2f*factor,
-				debug_body.getWorldCenter().y * 100f - debug_sign.getHeight()/2f*factor,
-				debug_sign.getWidth()/2f*factor,
-				debug_sign.getHeight()/2f*factor,
-				debug_sign.getWidth()*factor,
-				debug_sign.getHeight()*factor,
+				debug_body.getWorldCenter().x * 100f - debug_sign.getWidth()/2f,
+				debug_body.getWorldCenter().y * 100f - debug_sign.getHeight()/2f,
+				debug_sign.getWidth()/2f,
+				debug_sign.getHeight()/2f,
+				debug_sign.getWidth(),
+				debug_sign.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(debug_body.getAngle()),
 				0, 0,
@@ -574,12 +574,12 @@ public class OptionsState extends GenericInterface{
 				false, false);
 		
 		sb.draw(left_arrow,
-				debug_body.getWorldCenter().x * 100f - left_arrow.getWidth()/2f*factor,
-				debug_body.getWorldCenter().y * 100f - left_arrow.getHeight()/2f*factor,
-				left_arrow.getWidth()/2f*factor,
-				left_arrow.getHeight()/2f*factor,
-				left_arrow.getWidth()*factor,
-				left_arrow.getHeight()*factor,
+				debug_body.getWorldCenter().x * 100f - left_arrow.getWidth()/2f,
+				debug_body.getWorldCenter().y * 100f - left_arrow.getHeight()/2f,
+				left_arrow.getWidth()/2f,
+				left_arrow.getHeight()/2f,
+				left_arrow.getWidth(),
+				left_arrow.getHeight(),
 				left_debug_scale, left_debug_scale,
 				(float)Math.toDegrees(debug_body.getAngle()),
 				0, 0,
@@ -588,12 +588,12 @@ public class OptionsState extends GenericInterface{
 				false, false);
 		
 		sb.draw(right_arrow,
-				debug_body.getWorldCenter().x * 100f - right_arrow.getWidth()/2f*factor,
-				debug_body.getWorldCenter().y * 100f - right_arrow.getHeight()/2f*factor,
-				right_arrow.getWidth()/2f*factor,
-				right_arrow.getHeight()/2f*factor,
-				right_arrow.getWidth()*factor,
-				right_arrow.getHeight()*factor,
+				debug_body.getWorldCenter().x * 100f - right_arrow.getWidth()/2f,
+				debug_body.getWorldCenter().y * 100f - right_arrow.getHeight()/2f,
+				right_arrow.getWidth()/2f,
+				right_arrow.getHeight()/2f,
+				right_arrow.getWidth(),
+				right_arrow.getHeight(),
 				right_debug_scale, right_debug_scale,
 				(float)Math.toDegrees(debug_body.getAngle()),
 				0, 0,
@@ -604,12 +604,12 @@ public class OptionsState extends GenericInterface{
 		Texture debug_state = GameState.DEBUG ? on : off;
 		
 		sb.draw(debug_state,
-				debug_body.getWorldCenter().x * 100f - debug_state.getWidth()/2f*factor,
-				debug_body.getWorldCenter().y * 100f - debug_state.getHeight()/2f*factor,
-				debug_state.getWidth()/2f*factor,
-				debug_state.getHeight()/2f*factor,
-				debug_state.getWidth()*factor,
-				debug_state.getHeight()*factor,
+				debug_body.getWorldCenter().x * 100f - debug_state.getWidth()/2f,
+				debug_body.getWorldCenter().y * 100f - debug_state.getHeight()/2f,
+				debug_state.getWidth()/2f,
+				debug_state.getHeight()/2f,
+				debug_state.getWidth(),
+				debug_state.getHeight(),
 				1, 1,
 				(float)Math.toDegrees(debug_body.getAngle()),
 				0, 0,
@@ -620,36 +620,36 @@ public class OptionsState extends GenericInterface{
 		//desenha as barras de volume de SFX e musica
 		
 		sb.draw(bar,
-				(Gdx.graphics.getWidth() - bar.getWidth()*factor)/ 2, 630*factor,
-				bar.getWidth() * factor, bar.getHeight() * factor);
+				(1920 - bar.getWidth())/ 2, 630,
+				bar.getWidth(), bar.getHeight());
 		
 		sb.draw(small_cog,
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)),
-				618*factor,
-				small_cog.getWidth()/2f*factor,
-				small_cog.getHeight()/2f*factor,
-				small_cog.getWidth()*factor,
-				small_cog.getHeight()*factor,
+				(1920 - small_cog.getWidth())/ 2  + ((GameState.VOLUME - 0.5f) * (bar.getWidth()*0.9f)),
+				618,
+				small_cog.getWidth()/2f,
+				small_cog.getHeight()/2f,
+				small_cog.getWidth(),
+				small_cog.getHeight(),
 				1, 1,
-				-((GameState.VOLUME - 0.5f) * (bar.getWidth()*factor)) * 10,
+				-((GameState.VOLUME - 0.5f) * (bar.getWidth())) * 10,
 				0, 0,
 				small_cog.getWidth(),
 				small_cog.getHeight(),
 				false, false);
 		
 		sb.draw(bar,
-				(Gdx.graphics.getWidth() - bar.getWidth()*factor)/ 2, 450*factor,
-				bar.getWidth() * factor, bar.getHeight() * factor);
+				(1920 - bar.getWidth())/ 2, 450,
+				bar.getWidth(), bar.getHeight());
 		
 		sb.draw(small_cog,
-				(Gdx.graphics.getWidth() - small_cog.getWidth()*factor)/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*factor*0.9f)),
-				438*factor,
-				small_cog.getWidth()/2f*factor,
-				small_cog.getHeight()/2f*factor,
-				small_cog.getWidth()*factor,
-				small_cog.getHeight()*factor,
+				(1920 - small_cog.getWidth())/ 2  + ((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*0.9f)),
+				438,
+				small_cog.getWidth()/2f,
+				small_cog.getHeight()/2f,
+				small_cog.getWidth(),
+				small_cog.getHeight(),
 				1, 1,
-				-((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth()*factor)) * 10,
+				-((GameMusic.MUSIC_VOLUME - 0.5f) * (bar.getWidth())) * 10,
 				0, 0,
 				small_cog.getWidth(),
 				small_cog.getHeight(),
@@ -659,12 +659,12 @@ public class OptionsState extends GenericInterface{
 		drawChains(sb);
 		
 		sb.draw(back_cog,
-				Gdx.graphics.getWidth()/2f - back_cog.getWidth()/2f*factor,
-				-back_cog.getHeight()*factor/2f,
-				back_cog.getWidth()/2f*factor,
-				back_cog.getHeight()/2f*factor,
-				back_cog.getWidth()*factor,
-				back_cog.getHeight()*factor,
+				1920/2f - back_cog.getWidth()/2f,
+				-back_cog.getHeight()/2f,
+				back_cog.getWidth()/2f,
+				back_cog.getHeight()/2f,
+				back_cog.getWidth(),
+				back_cog.getHeight(),
 				1, 1,
 				cog_angle,
 				0, 0,
@@ -679,11 +679,11 @@ public class OptionsState extends GenericInterface{
 		sb.draw(
 				selection_tex,
 				(float)currentBound.getX(),
-				(float)(currentBound.getY() + currentBound.getHeight()) - selection_tex.getHeight()*factor,
+				(float)(currentBound.getY() + currentBound.getHeight()) - selection_tex.getHeight(),
 				(float)currentBound.getWidth()/2f,
 				-(float)currentBound.getHeight()/2f,
-				selection_tex.getWidth()*factor,
-				selection_tex.getHeight()*factor,
+				selection_tex.getWidth(),
+				selection_tex.getHeight(),
 				1,
 				1,
 				0,
@@ -697,12 +697,12 @@ public class OptionsState extends GenericInterface{
 		//UPPER RIGHT
 		sb.draw(
 				selection_tex,
-				(float)(currentBound.getX() + currentBound.getWidth()) - selection_tex.getWidth()*factor,
-				(float)(currentBound.getY() + currentBound.getHeight()) - selection_tex.getHeight()*factor,
+				(float)(currentBound.getX() + currentBound.getWidth()) - selection_tex.getWidth(),
+				(float)(currentBound.getY() + currentBound.getHeight()) - selection_tex.getHeight(),
 				-(float)currentBound.getWidth()/2f,
 				-(float)currentBound.getHeight()/2f,
-				selection_tex.getWidth()*factor,
-				selection_tex.getHeight()*factor,
+				selection_tex.getWidth(),
+				selection_tex.getHeight(),
 				1,
 				1,
 				0,
@@ -720,8 +720,8 @@ public class OptionsState extends GenericInterface{
 				(float)currentBound.getY(),
 				(float)currentBound.getWidth()/2f,
 				(float)currentBound.getHeight()/2f,
-				selection_tex.getWidth()*factor,
-				selection_tex.getHeight()*factor,
+				selection_tex.getWidth(),
+				selection_tex.getHeight(),
 				1,
 				1,
 				0,
@@ -735,12 +735,12 @@ public class OptionsState extends GenericInterface{
 		//BOTTOM RIGHT
 		sb.draw(
 				selection_tex,
-				(float)(currentBound.getX() + currentBound.getWidth()) - selection_tex.getWidth()*factor,
+				(float)(currentBound.getX() + currentBound.getWidth()) - selection_tex.getWidth(),
 				(float)currentBound.getY(),
 				-(float)currentBound.getWidth()/2f,
 				(float)currentBound.getHeight()/2f,
-				selection_tex.getWidth()*factor,
-				selection_tex.getHeight()*factor,
+				selection_tex.getWidth(),
+				selection_tex.getHeight(),
 				1,
 				1,
 				0,
@@ -760,7 +760,7 @@ public class OptionsState extends GenericInterface{
 	}
 
 	public void changeScreen() {
-		manager.changeState(5);
+		manager.changeState(Manager.MENU_STATE);
 		
 	}
 

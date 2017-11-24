@@ -58,10 +58,10 @@ public class CreditsState extends GenericInterface{
 		FreeTypeFontParameter param;
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/olivers barney.ttf"));
 		param = new FreeTypeFontParameter();
-		param.size = (int) (50f * factor);
+		param.size = (int) (50f);
 		param.color = new Color(171/255f, 205/255f, 230/255f, 1);
 		olivers_barney = ftfg.generateFont(param);
-		param.size = (int) (70 * factor);
+		param.size = (int) (70);
 		param.color = new Color(127/255f, 176/255f, 210/255f, 1);
 		olivers_barney_big = ftfg.generateFont(param);
 		ftfg.dispose();
@@ -80,7 +80,7 @@ public class CreditsState extends GenericInterface{
 	@Override
 	public void create() {
 		super.create();
-		credit_y = -3620*factor;
+		credit_y = -3620;
 	}
 
 	public void insideRender(SpriteBatch sb) {
@@ -92,39 +92,39 @@ public class CreditsState extends GenericInterface{
 				dy += 60;
 				if(e.nodeName().equals("title")) {
 					dy += 40;
-					olivers_barney_big.draw(sb, e.ownText(), 0, Gdx.graphics.getHeight() + credit_y + dy*factor, Gdx.graphics.getWidth(), 1, true);
+					olivers_barney_big.draw(sb, e.ownText(), 0, 1080 + credit_y + dy, 1920, 1, true);
 				}
 				else if(e.nodeName().equals("subtitle")) {
 					dy += 80;
-					olivers_barney_big.draw(sb, e.ownText(), 0, Gdx.graphics.getHeight() + credit_y + dy*factor, Gdx.graphics.getWidth(), 1, true);
+					olivers_barney_big.draw(sb, e.ownText(), 0, 1080 + credit_y + dy, 1920, 1, true);
 				}
 				else if(e.nodeName().equals("info")) {
-					olivers_barney.draw(sb, e.ownText(), 0, Gdx.graphics.getHeight() + credit_y + dy*factor, Gdx.graphics.getWidth(), 1, true);
+					olivers_barney.draw(sb, e.ownText(), 0, 1080 + credit_y + dy, 1920, 1, true);
 				}
 			}
 			
-			sb.draw(sign, (Gdx.graphics.getWidth() - sign.getWidth()*factor)/2f, Gdx.graphics.getHeight() - sign.getHeight()*factor,
-					sign.getWidth()*factor, sign.getHeight()*factor);
+			sb.draw(sign, (1920 - sign.getWidth())/2f, 1080 - sign.getHeight(),
+					sign.getWidth(), sign.getHeight());
 			
 
-			sb.draw(cano_e_b, 0, Gdx.graphics.getHeight() - cano_e_b.getHeight()*factor,
-					cano_e_b.getWidth()*factor, cano_e_b.getHeight()*factor);
+			sb.draw(cano_e_b, 0, 1080 - cano_e_b.getHeight(),
+					cano_e_b.getWidth(), cano_e_b.getHeight());
 			
-			sb.draw(cano_e_c, 0, Gdx.graphics.getHeight() - cano_e_c.getHeight()*factor,
-					cano_e_c.getWidth()*factor, cano_e_c.getHeight()*factor);
+			sb.draw(cano_e_c, 0, 1080 - cano_e_c.getHeight(),
+					cano_e_c.getWidth(), cano_e_c.getHeight());
 			
-			sb.draw(cano_d, Gdx.graphics.getWidth() - cano_d.getWidth()*factor, Gdx.graphics.getHeight() - cano_d.getHeight()*factor,
-					cano_d.getWidth()*factor, cano_d.getHeight()*factor);
+			sb.draw(cano_d, 1920 - cano_d.getWidth(), 1080 - cano_d.getHeight(),
+					cano_d.getWidth(), cano_d.getHeight());
 			
 			sb.flush();
 			
-			 fumaca[0].setPosition(240*factor, 360*factor);
+			 fumaca[0].setPosition(240, 360);
 			 fumaca[0].draw(sb, Gdx.graphics.getDeltaTime());
 			
-			 fumaca[1].setPosition(340*factor, 230*factor);
+			 fumaca[1].setPosition(340, 230);
 			 fumaca[1].draw(sb, Gdx.graphics.getDeltaTime());
 		
-			 fumaca[2].setPosition(1770*factor, 390*factor);
+			 fumaca[2].setPosition(1770, 390);
 			 fumaca[2].draw(sb, Gdx.graphics.getDeltaTime());
 			
 		sb.end();
@@ -139,7 +139,7 @@ public class CreditsState extends GenericInterface{
 	}
 
 	public void changeScreen() {
-		manager.changeState(5);
+		manager.changeState(Manager.MENU_STATE);
 	}
 
 	public void dispose() {
