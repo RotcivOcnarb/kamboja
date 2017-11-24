@@ -1132,7 +1132,7 @@ public class GameState extends State{
 			opacity += delta;
 			if(opacity > 1){
 				opacity = 1;
-				manager.changeState(3);
+				manager.changeState(11);
 				GameMusic.fadeOut(musicName);
 				return;
 			}

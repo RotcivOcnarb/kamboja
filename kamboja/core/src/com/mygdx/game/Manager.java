@@ -21,11 +21,12 @@ import com.mygdx.game.states.Options;
 import com.mygdx.game.states.OptionsState;
 import com.mygdx.game.states.PlayerSelectState;
 import com.mygdx.game.states.PostGame;
+import com.mygdx.game.states.PostGameState;
 
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
-	private int currentState = 5;
+	private int currentState = 11;
 	private boolean disposed = false; //so it doesnt dispose the same state twice
 	
 	public Manager(){
@@ -41,6 +42,7 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new OptionsState(this));
 		states.add(new HelpState(this));
 		states.add(new CreditsState(this));
+		states.add(new PostGameState(this));
 		
 		Controllers.addListener(this);
 		Gdx.input.setInputProcessor(this);

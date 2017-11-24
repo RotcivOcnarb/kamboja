@@ -176,6 +176,8 @@ public class MenuState extends State{
 	public void render(SpriteBatch sb) {
 		GameMusic.fadeIn(GameMusic.MAIN_MENU);
 		
+		
+		
 		//desenha menu no frameBuffer
 		shaderBuffer.begin();
 
@@ -388,7 +390,8 @@ public class MenuState extends State{
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	}
 
-	public void update(float delta) {		
+	public void update(float delta) {
+		if(delta > 0.5) delta = 0;
 		globalTimer += delta;
 		timer -= delta;
 		timerWrong -= delta;

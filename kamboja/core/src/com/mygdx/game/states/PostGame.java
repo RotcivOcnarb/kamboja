@@ -88,7 +88,10 @@ public class PostGame extends State{
 
 		KambojaMain.getPostGamePlayers().sort(new Comparator<Player>(){
 			public int compare(Player arg0, Player arg1) {
-				return (int) (((float)arg1.getKills() - (float)arg0.getKills()));
+				if(arg1.getKills() - arg0.getKills() == 0) {
+					return (int)(arg1.getScore() - arg0.getScore());
+				}
+				return  arg1.getKills() - arg0.getKills();
 			}
 		});
 		

@@ -1,8 +1,14 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
-import com.mygdx.game.KambojaMain;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 
 public class Assets {
 	
@@ -13,8 +19,51 @@ public class Assets {
 		playerSelectState(assets);
 		helpState(assets);
 		creditsState(assets);
+		postGameState(assets);
 	}
 	
+	private static void postGameState(AssetManager assets) {
+		
+		assets.load("menu/postgame/bar_back.png", Texture.class);
+		assets.load("menu/postgame/bar_front.png", Texture.class);
+		assets.load("menu/postgame/coroa.png", Texture.class);
+		assets.load("menu/postgame/crown_light.png", Texture.class);
+		assets.load("menu/postgame/engrenagem.png", Texture.class);
+		assets.load("menu/postgame/f1.png", Texture.class);
+		assets.load("menu/postgame/f2.png", Texture.class);
+		assets.load("menu/postgame/f3.png", Texture.class);
+		assets.load("menu/postgame/f4.png", Texture.class);
+		assets.load("menu/postgame/fundo.jpg", Texture.class);
+		assets.load("menu/postgame/icon_skull.png", Texture.class);
+		assets.load("menu/postgame/icon_weapon.png", Texture.class);
+		assets.load("menu/postgame/lvl_capsule.png", Texture.class);
+		assets.load("menu/postgame/lvl_light.png", Texture.class);
+		assets.load("menu/postgame/n1.png", Texture.class);
+		assets.load("menu/postgame/n2.png", Texture.class);
+		assets.load("menu/postgame/n3.png", Texture.class);
+		assets.load("menu/postgame/n4.png", Texture.class);
+		assets.load("menu/postgame/p1.png", Texture.class);
+		assets.load("menu/postgame/p2.png", Texture.class);
+		assets.load("menu/postgame/p3.png", Texture.class);
+		assets.load("menu/postgame/p4.png", Texture.class);
+		
+		FileHandleResolver resolver = new InternalFileHandleResolver();
+		assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+		assets.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
+		
+		// First, let's define the params and then load our smaller font
+		FreeTypeFontLoaderParameter mySmallFont = new FreeTypeFontLoaderParameter();
+		mySmallFont.fontFileName = "fonts/olivers barney.ttf";
+		mySmallFont.fontParameters.size = 23;
+		assets.load("fonts/olivers barney.ttf", BitmapFont.class, mySmallFont);
+		
+		FreeTypeFontLoaderParameter myBigFont = new FreeTypeFontLoaderParameter();
+		myBigFont.fontFileName = "fonts/olivers barney.ttf";
+		myBigFont.fontParameters.size = 48;
+		assets.load("fonts/olivers barney.ttf", BitmapFont.class, myBigFont);
+		
+	}
+
 	private static void menuState(AssetManager assets) {
 		assets.load("menu/background.png", Texture.class);
 		assets.load("menu/bolinha.png", Texture.class);

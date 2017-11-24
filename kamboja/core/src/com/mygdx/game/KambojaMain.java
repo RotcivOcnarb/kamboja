@@ -21,6 +21,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Json;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamAuth.AuthSessionResponse;
@@ -72,12 +74,18 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	AssetManager assets;
 	
+	ShapeRenderer sr;
+	
 	public static KambojaMain getInstance() {
 		return instance;
 	}
 	
 	public KambojaMain() {
 		assets = new AssetManager();
+	}
+	
+	public AssetManager getAssets() {
+		return assets;
 	}
 	
 	/**Lists all the controllers connected currently (of people that pressed "start", keyboard and bots
@@ -286,6 +294,7 @@ public class KambojaMain extends ApplicationAdapter {
 	public void create () {
 		GameMusic.initialize();
 		instance = this;
+		sr = new ShapeRenderer();
 		Assets.LOADSHIT(assets);
 
 		loading = new Texture("imgs/loading.png");
@@ -386,8 +395,13 @@ public class KambojaMain extends ApplicationAdapter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+		
+		capsule = new Texture("menu/postgame/lvl_capsule.png");
+		loading_bar = new Texture("menu/postgame/bar_front.png");
+		loading_case = new Texture("menu/postgame/bar_back.png");
 	}
+	
+	Texture capsule, loading_bar, loading_case;
 	
 	public static Texture getTexture(String name) {
 		return getInstance().assets.get(name, Texture.class);
@@ -400,10 +414,13 @@ public class KambojaMain extends ApplicationAdapter {
 	boolean managerLoaded = false;
 	
 	float gcTimer = 0;
+	float smoothProgress = 0;
+	float alpha = 0;
 	public void render () {
 		if (SteamAPI.isSteamRunning()) {
 			SteamAPI.runCallbacks();
 		}
+		
 		//summons the garbage collector every 30 seconds
 		//not really sure if it makes any difference but nah, whatever
 		gcTimer += Gdx.graphics.getDeltaTime();
@@ -412,13 +429,15 @@ public class KambojaMain extends ApplicationAdapter {
 			System.gc();
 		}
 		
+		
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);//clear screen
 		Gdx.gl.glEnable(GL20.GL_BLEND); //enables transparency
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.input.setCursorCatched(true); //hides the cursor
 		
-		if(assets.update()) {
+		if(alpha == 1) {
 			if(!managerLoaded) {
 				manager = new Manager();
 				manager.create();
@@ -428,13 +447,58 @@ public class KambojaMain extends ApplicationAdapter {
 			manager.render(sb);
 		}
 		else {
+			
+			
+			smoothProgress += (assets.getProgress() - smoothProgress)/5.0f;
 			float factor = Gdx.graphics.getHeight() / 1080f;
 			sb.begin();
-			sb.draw(loading,
-					(Gdx.graphics.getWidth() - loading.getWidth()*factor)/2f,
-					(Gdx.graphics.getHeight() - loading.getHeight()*factor)/2f,
-					assets.getProgress() * loading.getWidth()*factor, loading.getHeight()*factor);
+			
+			sb.draw(loading_case,
+					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f + capsule.getWidth()*factor - 50*factor,
+					(Gdx.graphics.getHeight() - loading_case.getHeight()*factor)/2f,
+					0, 0, 
+					loading_case.getWidth()*factor, loading_case.getHeight()*factor,
+					1, 1, 0,
+					0, 0,
+					loading_case.getWidth(),
+					loading_case.getHeight(),
+					false, false);
+			sb.draw(loading_bar,
+					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f + capsule.getWidth()*factor - 50*factor,
+					(Gdx.graphics.getHeight() - loading_bar.getHeight()*factor)/2f,
+					0, 0, 
+					smoothProgress * loading_bar.getWidth()*factor, loading_bar.getHeight()*factor,
+					1, 1, 0,
+					0, 0,
+					(int)(smoothProgress * loading_bar.getWidth()),
+					loading_bar.getHeight(),
+					false, false);
+			sb.draw(capsule,
+					(Gdx.graphics.getWidth() - (capsule.getWidth()*factor + loading_bar.getWidth()*factor))/2f,
+					(Gdx.graphics.getHeight() - capsule.getHeight()*factor)/2f,
+					capsule.getWidth()*factor/2f, capsule.getHeight()*factor/2f, 
+					capsule.getWidth()*factor, capsule.getHeight()*factor,
+					1, 1, smoothProgress * 1080,
+					0, 0,
+					capsule.getWidth(),
+					capsule.getHeight(),
+					false, false);
 			sb.end();
+			
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			
+			sr.begin(ShapeType.Filled);
+			sr.setColor(0, 0, 0, alpha);
+			sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			sr.end();
+			
+			if(assets.update()) {
+				alpha += Gdx.graphics.getDeltaTime();
+				if(alpha > 1) alpha = 1;
+			}
+			
+			Gdx.gl.glDisable(GL20.GL_BLEND);
 		}
 
 	}

@@ -102,6 +102,22 @@ public abstract class GenericInterface extends State{
 				false, false);
 	}
 	
+	public void renderImageInBody(SpriteBatch sb, Texture tex, Body body, boolean flipY) {
+		sb.draw(tex,
+				body.getWorldCenter().x * 100f - tex.getWidth()/2f*factor,
+				body.getWorldCenter().y * 100f - tex.getHeight()/2f*factor,
+				tex.getWidth()/2f*factor,
+				tex.getHeight()/2f*factor,
+				tex.getWidth()*factor,
+				tex.getHeight()*factor,
+				1, 1,
+				(float)Math.toDegrees(body.getAngle()),
+				0, 0,
+				tex.getWidth(),
+				tex.getHeight(),
+				false, flipY);
+	}
+	
 	@Override
 	public void create() {
 		
@@ -161,7 +177,7 @@ public abstract class GenericInterface extends State{
 		return b;
 	}
 	
-	public void buildRopeJoint(int numChains, Body body, float position_x, float spacing) {
+	public void buildRopeJoint(int numChains, Body body, float position_x, float position_y, float spacing) {
 		
 		for(int k = -1; k <= 1; k += 2) {
 			Array<Body> bodies = new Array<Body>();
@@ -190,7 +206,7 @@ public abstract class GenericInterface extends State{
 			def.bodyB = body;
 			def.localAnchorA.set(0, -7.5f*factor/100f);
 			def.localAnchorB.set(k*spacing /100f,
-					(413/2f*factor - 100*factor) / 100f);
+					position_y / 100f); //(413/2f*factor - 100*factor) / 100f);
 			
 			world.createJoint(def);
 			
@@ -269,6 +285,7 @@ public abstract class GenericInterface extends State{
 
 	@Override
 	public void update(float delta) {
+		if(delta > 1) delta = 0;
 		timer -= delta;
 		
 		bolinha.update(delta);

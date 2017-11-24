@@ -186,16 +186,13 @@ public class MapSelectState extends State{
 		
 		for(File f : folder.listFiles()){
 			if(f.getName().endsWith(".tmx")){
-				
-				System.out.println("path " + f.getPath());
+
 				mapNames.add(f.getPath());
 				
 				String thumbnailPath = "maps/thumb_" + f.getName().split("\\.")[0] + ".png";
-				System.out.println(thumbnailPath);
 				thumbs.add(new Texture(new FileHandle(new File(thumbnailPath))));
 				
 				String mapTitle = f.getName().replaceFirst(f.getName().substring(0, 1), f.getName().substring(0, 1).toUpperCase());
-				System.out.println(mapTitle.split("\\.")[0]);
 				String tf = mapTitle.split("\\.")[0];
 				mapTitles.add(tf.substring(1, tf.length()));
 			}
@@ -1123,7 +1120,6 @@ public class MapSelectState extends State{
 					
 					KambojaMain.setMapName(mapNames.get(randomMap));
 					
-					System.out.println("map generated: (" + KambojaMain.getMapName() + ")");
 				}
 				
 			}

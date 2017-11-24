@@ -74,6 +74,7 @@ public class Player implements Steerable<Vector2>{
 	private float spd = 1;
 	private float atk = 1;
 	private float def = 1;
+	private float score = 0;
 	private float buffTimer = 0;
 	private float fallingTimer = 1;
 	private float deathTimer = 0;
@@ -365,12 +366,18 @@ public class Player implements Steerable<Vector2>{
 	        return difference;
 	}
 	
+	public float getScore() {
+		return score;
+	}
+	
 	public void takeDamage(float amount, Player owner, boolean showBlood){
 		if(imunity <= 0){
 			life -= amount * def;
 			
-			getState().screenshake(0.3f);
-			
+			if(owner != null) {
+				owner.score += amount*def;
+			}
+						
 			if(showBlood)
 			state.showBlood(body.getWorldCenter());
 
@@ -381,6 +388,7 @@ public class Player implements Steerable<Vector2>{
 					if(owner != null){
 						owner.kills ++;
 						owner.ghosts.add(new Ghost(getID(), getPosition()));
+						owner.score += 100;
 					}
 					setDead(true);
 					body.getFixtureList().get(0).setSensor(true);

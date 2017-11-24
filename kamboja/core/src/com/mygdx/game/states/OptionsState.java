@@ -112,12 +112,12 @@ public class OptionsState extends GenericInterface{
 		light_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f + 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(
-				10, light_body, 750*factor, 80);
+				10, light_body, 750*factor, (413/2f*factor - 100*factor), 80);
 		
 		debug_body = createBox(new Vector2(Gdx.graphics.getWidth()/2f - 700*factor, Gdx.graphics.getHeight()*(3/4f)), new Vector2(394*factor/2f, 241*factor/2f), BodyType.DynamicBody, 0.05f);
 		
 		buildRopeJoint(
-				10, debug_body, -750*factor, 80);
+				10, debug_body, -750*factor, (413/2f*factor - 100*factor), 80);
 		
 		
 		bounds[0] = new Rectangle2D.Double(670*factor, Gdx.graphics.getHeight() - 485*factor, 595*factor, 187*factor);

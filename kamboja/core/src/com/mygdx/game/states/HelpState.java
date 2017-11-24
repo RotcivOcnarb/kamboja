@@ -83,10 +83,10 @@ public class HelpState extends GenericInterface{
 				new Vector2(aim.getWidth()*factor/2f, aim.getHeight()*factor/2f),
 				BodyType.DynamicBody, 0.1f);
 		
-		buildRopeJoint(8, shootBody, -700*factor, 100);
-		buildRopeJoint(10, sprintBody, 700*factor, 100);
-		buildRopeJoint(18, moveBody, -700*factor, 50);
-		buildRopeJoint(22, aimBody, 700*factor, 50);
+		buildRopeJoint(8, shootBody, -700*factor, (413/2f*factor - 100*factor), 100);
+		buildRopeJoint(10, sprintBody, 700*factor, (413/2f*factor - 100*factor), 100);
+		buildRopeJoint(18, moveBody, -700*factor, (413/2f*factor - 100*factor), 50);
+		buildRopeJoint(22, aimBody, 700*factor, (413/2f*factor - 100*factor), 50);
 		
 		cog_angle = 0;
 		cog_speed = 0;
