@@ -1485,6 +1485,7 @@ public class PlayerSelectState extends State{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
@@ -1508,7 +1509,7 @@ public class PlayerSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == XBox.AXIS_LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -1525,6 +1526,7 @@ public class PlayerSelectState extends State{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else {
 				if(axisCode == GenericController.LEFT_X) {
@@ -1549,7 +1551,7 @@ public class PlayerSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == GenericController.LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -1566,6 +1568,7 @@ public class PlayerSelectState extends State{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 		}
 		return false;

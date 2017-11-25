@@ -339,6 +339,7 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
@@ -353,7 +354,7 @@ public class OptionsState extends GenericInterface{
 					}
 					val_x = value;
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == XBox.AXIS_LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -364,6 +365,7 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else {
 				if(axisCode == GenericController.LEFT_X) {
@@ -379,7 +381,7 @@ public class OptionsState extends GenericInterface{
 					}
 					val_x = value;
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == GenericController.LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -390,9 +392,8 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
-		
-		return false;
 	}
 
 	public void doSelection() {

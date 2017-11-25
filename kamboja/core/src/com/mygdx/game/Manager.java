@@ -45,7 +45,18 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new PostGameState(this));
 		states.add(new OptionsState(this));
 		
+		Controllers.clearListeners();
 		Controllers.addListener(this);
+		int cont = 0;
+		for(int i = Controllers.getControllers().size - 1; i >= 0 ; i --) {
+			if(Controllers.getControllers().get(i).getName().contains("XBOX 360")) {
+				if(cont < 2) {
+					Controllers.getControllers().removeIndex(i);
+					cont++;
+				}
+				
+			}
+		}		
 		Gdx.input.setInputProcessor(this);
 	}
 
@@ -70,8 +81,6 @@ public class Manager implements ControllerListener, InputProcessor{
 	public void update(float delta){
 		if(!disposed)
 		states.get(currentState).update(delta);
-		
-		
 	}
 
 	public void connected(Controller controller) {
@@ -83,15 +92,21 @@ public class Manager implements ControllerListener, InputProcessor{
 	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
+		if(Controllers.getControllers().contains(controller, false))
 		return states.get(currentState).buttonDown(controller, buttonCode);
+		else return false;
 	}
 
 	public boolean buttonUp(Controller controller, int buttonCode) {
+		if(Controllers.getControllers().contains(controller, false))
 		return states.get(currentState).buttonUp(controller, buttonCode);
+		else return false;
 	}
 
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
+		if(Controllers.getControllers().contains(controller, false))
 		return states.get(currentState).axisMoved(controller, axisCode, value);
+		else return false;
 	}
 
 	public boolean povMoved(Controller controller, int povCode, PovDirection value) {

@@ -90,13 +90,31 @@ public class BazookaBullet extends Bullet{
 	
 	public boolean render(SpriteBatch sb){
 		
-		body.applyForceToCenter(body.getLinearVelocity().cpy().nor().scl(0.2f), true);
+		//body.applyForceToCenter(body.getLinearVelocity().cpy().nor().scl(0.2f), true);
 		if(!disposed)
 		trail.renderTrail(sb, !destroyed);
 		
 		globalTime += Gdx.graphics.getDeltaTime();
 		
 		Texture tex = bulletAnimation.getKeyFrame(globalTime).getTexture();
+		
+		Player closestP = null;
+		float closestD = 1000;
+		
+		for(int i = getPlayer().getState().getPlayers().size() - 1; i >= 0; i --) {
+			if(!getPlayer().getState().getPlayers().get(i).equals(getPlayer())) {
+				float dist = getPlayer().getState().getPlayers().get(i).getPosition().cpy().sub(body.getWorldCenter()).len();
+				if(dist < closestD) {
+					closestD = dist;
+					closestP = getPlayer().getState().getPlayers().get(i);
+				}
+			}
+		}
+		
+		if(closestP != null) {
+			body.setLinearVelocity(body.getLinearVelocity().add(closestP.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(.1f)));
+		}
+		//body.applyForceToCenter(closestP.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(1f), true);
 		
 		expShake -= Gdx.graphics.getDeltaTime();
 		if(expShake <= 0) expShake = 0;

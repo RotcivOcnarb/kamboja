@@ -525,6 +525,9 @@ public class GameState extends State{
 				}
 			}
 		}
+		else {
+			kambojaMap = null;
+		}
 
 		BodyDef def = new BodyDef();
 		def.type = BodyType.StaticBody;
