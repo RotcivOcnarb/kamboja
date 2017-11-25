@@ -22,7 +22,7 @@ import com.mygdx.game.states.PostGameState;
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
-	private int currentState = MENU_STATE;
+	private int currentState = POST_GAME_STATE;
 	private boolean disposed = false; //so it doesnt dispose the same state twice
 	
 	public static final int GAME_STATE = 0;

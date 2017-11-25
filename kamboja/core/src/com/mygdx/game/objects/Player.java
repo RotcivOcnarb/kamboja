@@ -145,6 +145,17 @@ public class Player implements Steerable<Vector2>{
 		this.wearSpaceSuit = wearSpaceSuit;
 	}
 	
+	public static int getSkinPositionByWeapon(int weapon) {
+		switch (weapon) {
+		case 0:
+			return 2;
+		case 1:
+			return 0;
+		default:
+			return 1;
+		}
+	}
+
 	public float getAngle(){
 		return angle.angle() - (float)Math.sin(angle_walking)*5;
 	}

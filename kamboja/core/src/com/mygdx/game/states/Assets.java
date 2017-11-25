@@ -3,6 +3,7 @@ package com.mygdx.game.states;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -52,15 +53,12 @@ public class Assets {
 		assets.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
 		
 		// First, let's define the params and then load our smaller font
-		FreeTypeFontLoaderParameter mySmallFont = new FreeTypeFontLoaderParameter();
-		mySmallFont.fontFileName = "fonts/olivers barney.ttf";
-		mySmallFont.fontParameters.size = 23;
-		assets.load("fonts/olivers barney.ttf", BitmapFont.class, mySmallFont);
-		
-		FreeTypeFontLoaderParameter myBigFont = new FreeTypeFontLoaderParameter();
-		myBigFont.fontFileName = "fonts/olivers barney.ttf";
-		myBigFont.fontParameters.size = 48;
-		assets.load("fonts/olivers barney.ttf", BitmapFont.class, myBigFont);
+		FreeTypeFontLoaderParameter font = new FreeTypeFontLoaderParameter();
+		font.fontFileName = "fonts/olivers barney.ttf";
+		font.fontParameters.size = 32;
+		font.fontParameters.color = new Color(212/255f, 231/255f, 237/255f, 1);
+		assets.load("fonts/olivers barney.ttf", BitmapFont.class, font);
+
 		
 	}
 

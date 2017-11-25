@@ -561,16 +561,7 @@ public class PlayerSelectState extends State{
 		font.setColor(getPlayerColor(id));
 	}
 	
-	public int getSkinPositionByWeapon(int weapon) {
-		switch (weapon) {
-		case 0:
-			return 2;
-		case 1:
-			return 0;
-		default:
-			return 1;
-		}
-	}
+
 
 	@Override
 	public void render(SpriteBatch sb) {	
@@ -590,7 +581,7 @@ public class PlayerSelectState extends State{
 				int shift = positionPlayerOffset[i] / KambojaMain.getPlayerSkinsSize();
 				for(int k = shift - 1; k <= shift + 1; k ++) {
 					for(int j = 0; j < KambojaMain.getPlayerSkinsSize(); j ++) {
-						TextureRegion tex = Player.getTexture(j, getSkinPositionByWeapon(
+						TextureRegion tex = Player.getTexture(j, Player.getSkinPositionByWeapon(
 								KambojaMain.getControllers().get(i).getWeapon()
 								));
 							

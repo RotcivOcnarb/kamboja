@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
@@ -19,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
+import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
 
@@ -46,6 +49,8 @@ public class PostGameState extends GenericInterface{
 	
 	ShaderProgram waveShader;
 	
+	Texture[] inGameWep;
+	
 	public PostGameState(Manager manager) {
 		super(manager);
 	}
@@ -60,6 +65,16 @@ public class PostGameState extends GenericInterface{
 		if(waveShader.getLog().length() > 0) {
 			System.out.println(waveShader.getLog());
 		}
+		
+		inGameWep = new Texture[KambojaMain.getWeaponSize()];
+		inGameWep[0] = KambojaMain.getTexture("Weapons/In-game/Taurus.png");
+		inGameWep[1] = KambojaMain.getTexture("Weapons/In-game/Taurus Akimbo.png");
+		inGameWep[2] = KambojaMain.getTexture("Weapons/In-game/Minigun.png");
+		inGameWep[3] = KambojaMain.getTexture("Weapons/In-game/sss.png");
+		inGameWep[4] = KambojaMain.getTexture("Weapons/In-game/MP5.png");
+		inGameWep[5] = KambojaMain.getTexture("Weapons/In-game/flahme.png");
+		inGameWep[6] = KambojaMain.getTexture("Weapons/In-game/Bazooka.png");
+		inGameWep[7] = KambojaMain.getTexture("Weapons/In-game/Laser.png");
 		
 		capsule = KambojaMain.getTexture("menu/postgame/lvl_capsule.png");
 		capsule_light = KambojaMain.getTexture("menu/postgame/lvl_light.png");
@@ -80,7 +95,7 @@ public class PostGameState extends GenericInterface{
 					frame_body[i],
 					margin + i*(main_frame[i].getWidth() + margin) + main_frame[i].getWidth()/2f - 1920/2f,
 					(413/2f),
-					100);
+					160);
 			main_buffer[i] = new FrameBuffer(Format.RGBA8888, (int)(350), (int)(500), false);
 			
 		}
@@ -98,7 +113,16 @@ public class PostGameState extends GenericInterface{
 		
 		players.add(new PlayerController(
 				(int)(Math.random() * KambojaMain.getWeaponSize()),
-				null, (int)(Math.random() * KambojaMain.getPlayerSkinsSize()), "Monark"));
+				null, (int)(Math.random() * KambojaMain.getPlayerSkinsSize()), "Sr. Wilson"));
+		players.add(new PlayerController(
+				(int)(Math.random() * KambojaMain.getWeaponSize()),
+				null, (int)(Math.random() * KambojaMain.getPlayerSkinsSize()), "Rik"));
+		players.add(new PlayerController(
+				(int)(Math.random() * KambojaMain.getWeaponSize()),
+				null, (int)(Math.random() * KambojaMain.getPlayerSkinsSize()), "Emisu"));
+		players.add(new PlayerController(
+				(int)(Math.random() * KambojaMain.getWeaponSize()),
+				null, (int)(Math.random() * KambojaMain.getPlayerSkinsSize()), "Felino"));
 		
 //		KambojaMain.getPostGamePlayers().sort(new Comparator<Player>(){
 //			public int compare(Player arg0, Player arg1) {
@@ -114,7 +138,10 @@ public class PostGameState extends GenericInterface{
 	public void render(SpriteBatch sb) {
 		for(int i = 0; i < 4; i ++) {
 			main_buffer[i].begin();
-
+			
+			Gdx.gl.glClearColor(1, 1, 1, 0);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			
 			sb.begin();
 			sb.setProjectionMatrix(bufferProjection);
 			sb.draw(name_frame[i],
@@ -122,7 +149,7 @@ public class PostGameState extends GenericInterface{
 					name_frame[i].getWidth(), name_frame[i].getHeight());
 			
 			oliver.draw(sb,
-					"Custom Name",
+					players.get(i).getName(),
 					(main_buffer[i].getWidth() - name_frame[i].getWidth())/2f,
 					main_buffer[i].getHeight() - name_frame[i].getHeight() + 40,
 					name_frame[i].getWidth(), 1, false);
@@ -131,6 +158,25 @@ public class PostGameState extends GenericInterface{
 					(main_buffer[i].getWidth() - player_frame[i].getWidth())/2f, main_buffer[i].getHeight() - player_frame[i].getHeight() - 100,
 					player_frame[i].getWidth(), player_frame[i].getHeight());
 			
+			TextureRegion playerTexture = Player.getTexture(players.get(i).getPlayer(), Player.getSkinPositionByWeapon(players.get(i).getWeapon()));
+			Texture wep = inGameWep[players.get(i).getWeapon()];
+			int size = i == 0 ? 200 : 150;
+			sb.draw(playerTexture, (main_buffer[i].getWidth() - size)/2f, 147 + (240 - size)/2f, size/2f, size/2f, size, size, 1, 1, timer*size);
+			float factor = i == 0 ? 200 / (float)playerTexture.getRegionWidth() : 150 / (float)playerTexture.getRegionWidth();
+			sb.draw(wep,
+					(main_buffer[i].getWidth() - wep.getWidth())/2f,
+					147 + (240 - wep.getHeight())/2f,
+					wep.getWidth()/2f,
+					wep.getHeight()/2f,
+					wep.getWidth(), wep.getHeight(),
+					factor, factor, timer*size, 0, 0,
+					wep.getWidth(), wep.getHeight(), false, false);
+			
+			sb.setColor(1, 1, 1, 0.3f);
+			sb.draw(player_frame[i],
+					(main_buffer[i].getWidth() - player_frame[i].getWidth())/2f, main_buffer[i].getHeight() - player_frame[i].getHeight() - 100,
+					player_frame[i].getWidth(), player_frame[i].getHeight());
+			sb.setColor(1, 1, 1, 1);
 			
 			sb.end();
 			main_buffer[i].end();
@@ -149,7 +195,7 @@ public class PostGameState extends GenericInterface{
 			renderImageInBody(sb, main_frame[i], frame_body[i]);
 			renderImageInBody(sb, main_buffer[i].getColorBufferTexture(), frame_body[i], true);
 		}
-		
+
 		drawChains(sb);
 		
 		sb.setColor(1, 1, 1, (float)((Math.sin(timer*3) + 1)/2f * 0.5f + 0.5f));
@@ -200,7 +246,7 @@ public class PostGameState extends GenericInterface{
 		
 		sb.flush();
 		
-		b2dr.render(world, camera.combined);
+		//b2dr.render(world, camera.combined);
 		
 		sb.end();
 		
