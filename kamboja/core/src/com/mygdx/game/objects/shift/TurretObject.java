@@ -202,7 +202,7 @@ public class TurretObject {
 				
 				shape.dispose();
 				
-				Bullet bullet = new Bullet(bul, turret.player.getID(), Turret.DAMAGE * turret.player.getAtk(), radius, turret.player);
+				Bullet bullet = new Bullet(bul, turret.player.getId(), Turret.DAMAGE * turret.player.getAtk(), radius, turret.player);
 				
 				f.setUserData(bullet);
 				bul.setUserData(bullet);

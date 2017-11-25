@@ -79,15 +79,15 @@ public class MenuState extends State{
 	public MenuState(Manager manager) {
 		super(manager);
 		
-		background = KambojaMain.getTexture("menu/background.png");
-		bolinha = KambojaMain.getTexture("menu/bolinha.png");
-		explosao = KambojaMain.getTexture("menu/explosao.png");
-		armas = KambojaMain.getTexture("menu/armas.png");
-		fumaca = KambojaMain.getTexture("menu/fumaca.png");
-		placa_letras = KambojaMain.getTexture("menu/placa_letras.png");
-		sombra_letras = KambojaMain.getTexture("menu/sombra_letras.png");
-		fumaca_tras = KambojaMain.getTexture("menu/fumaca_back.png");
-		fumaca_frente = KambojaMain.getTexture("menu/fumaca_front.png");
+		background = KambojaMain.getTexture("menu/main_menu/background.png");
+		bolinha = KambojaMain.getTexture("menu/main_menu/bolinha.png");
+		explosao = KambojaMain.getTexture("menu/main_menu/explosao.png");
+		armas = KambojaMain.getTexture("menu/main_menu/armas.png");
+		fumaca = KambojaMain.getTexture("menu/main_menu/fumaca.png");
+		placa_letras = KambojaMain.getTexture("menu/main_menu/placa_letras.png");
+		sombra_letras = KambojaMain.getTexture("menu/main_menu/sombra_letras.png");
+		fumaca_tras = KambojaMain.getTexture("menu/main_menu/fumaca_back.png");
+		fumaca_frente = KambojaMain.getTexture("menu/main_menu/fumaca_front.png");
 		
 		eng_pos[0] = new Vector2(-981, 1009);
 		eng_pos[1] = new Vector2(-677, 969);
@@ -103,21 +103,21 @@ public class MenuState extends State{
 		eng_size[4] = 171.5f;
 		eng_size[5] = 217.5f;
 		
-		options[0] = KambojaMain.getTexture("menu/VERSUS.png");
-		options[1] = KambojaMain.getTexture("menu/COOP_off.png");
-		options[2] = KambojaMain.getTexture("menu/ONLINE_off.png");
-		options[3] = KambojaMain.getTexture("menu/HELP.png");
-		options[4] = KambojaMain.getTexture("menu/OPTIONS.png");
-		options[5] = KambojaMain.getTexture("menu/CREDITS.png");
+		options[0] = KambojaMain.getTexture("menu/main_menu/VERSUS.png");
+		options[1] = KambojaMain.getTexture("menu/main_menu/COOP_off.png");
+		options[2] = KambojaMain.getTexture("menu/main_menu/ONLINE_off.png");
+		options[3] = KambojaMain.getTexture("menu/main_menu/HELP.png");
+		options[4] = KambojaMain.getTexture("menu/main_menu/OPTIONS.png");
+		options[5] = KambojaMain.getTexture("menu/main_menu/CREDITS.png");
 		
 		for(int i = 0; i < 6; i ++){
-			engrenagens[i] = KambojaMain.getTexture("menu/E" + (i+1) + ".png");
+			engrenagens[i] = KambojaMain.getTexture("menu/main_menu/E" + (i+1) + ".png");
 		}
 		
 		explosions = new ArrayList<MenuState.ParticleEffect>();
 		
 		for(int i = 0; i < 5; i ++){
-			exps[i] = KambojaMain.getTexture("menu/exp" + (i+1) + ".png");
+			exps[i] = KambojaMain.getTexture("menu/main_menu/exp" + (i+1) + ".png");
 		}
 		
 		sr = new ShapeRenderer();

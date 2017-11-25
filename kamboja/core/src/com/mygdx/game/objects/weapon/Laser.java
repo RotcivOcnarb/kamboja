@@ -116,7 +116,7 @@ public class Laser extends Weapon{
 				
 				if(fixture.getUserData() instanceof Player){
 					Player pl = (Player) fixture.getUserData();
-					if(pl.getID() != player.getID()){
+					if(pl.getId() != player.getId()){
 						if(fraction < closestFraction){
 							closestFraction = fraction;
 							closestFixture = fixture;
@@ -205,7 +205,7 @@ public class Laser extends Weapon{
 					(float)(Math.cos(Math.random() * Math.PI*2) * (Math.random()*10 / GameState.UNIT_SCALE))
 					)));
 		}
-		switch(player.getID()){
+		switch(player.getId()){
 		case 0:
 			sr.setColor(0, 0, 1, opacity);
 			break;
@@ -291,7 +291,7 @@ public class Laser extends Weapon{
 					if(closestFixture != null){
 						if(closestFixture.getUserData() instanceof Player){
 							Player pl = (Player) closestFixture.getUserData();
-							if(pl.getID() != player.getID()){
+							if(pl.getId() != player.getId()){
 								pl.takeDamage(getDamage() * player.getAtk(), player, true);
 							}
 						}

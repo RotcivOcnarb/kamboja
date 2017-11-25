@@ -97,7 +97,7 @@ public class Shotgun extends Weapon{
 					
 					shape.dispose();
 					
-					Bullet bullet = new Bullet(bul, getPlayer().getID(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+					Bullet bullet = new Bullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 					bullet.setTexture(this.bullet);
 					
 					f.setUserData(bullet);

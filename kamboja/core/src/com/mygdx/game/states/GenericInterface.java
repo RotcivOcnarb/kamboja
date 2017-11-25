@@ -41,6 +41,7 @@ public abstract class GenericInterface extends State{
 	boolean outro;
 	
 	float timer;
+	float globalTimer;
 	FrameBuffer shaderBuffer;
 	ShaderProgram shader;
 	private float shaderIntensity;
@@ -128,6 +129,7 @@ public abstract class GenericInterface extends State{
 		alpha = 1;
 		
 		timer = 0;
+		globalTimer = 0;
 		
 		world = new World(new Vector2(0, -9.81f), false);
 		b2dr = new Box2DDebugRenderer();
@@ -284,6 +286,8 @@ public abstract class GenericInterface extends State{
 	public void update(float delta) {
 		if(delta > 1) delta = 0;
 		timer -= delta;
+		
+		globalTimer += delta;
 		
 		bolinha.update(delta);
 		fogo.update(delta);

@@ -88,7 +88,7 @@ public class Pistol extends Weapon{
 				
 				shape.dispose();
 				
-				Bullet bullet = new Bullet(bul, getPlayer().getID(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+				Bullet bullet = new Bullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 				
 				f.setUserData(bullet);
 				bul.setUserData(bullet);

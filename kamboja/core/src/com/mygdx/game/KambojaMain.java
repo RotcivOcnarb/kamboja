@@ -70,8 +70,9 @@ public class KambojaMain extends ApplicationAdapter {
 	public static final double SENSITIVITY = 1.5f;
 	public static boolean[] mapUnlocked = new boolean[]{true, true, true, true, true, true, true, true};
 	public static boolean[] weaponUnlocked = new boolean[] {true, true, true, true, true, true, true, true};
-	public static int level = 30;
+	public static int level = 1;
 	public static int experience = 0;
+	public static int maxExperience = 10000;
 	static SteamUser steamUser;
 	
 	AssetManager assets;

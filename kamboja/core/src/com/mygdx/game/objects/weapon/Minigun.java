@@ -109,7 +109,7 @@ public class Minigun extends Weapon{
 					Fixture f = bul.createFixture(shape, 1);
 					f.setSensor(true);
 					shape.dispose();
-					Bullet bullet = new Bullet(bul, getPlayer().getID(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+					Bullet bullet = new Bullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 					
 					f.setUserData(bullet);
 					bul.setUserData(bullet);

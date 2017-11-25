@@ -182,7 +182,7 @@ public class MyContactListener implements ContactListener{
 			
 			
 			
-			if(b.getID() != player.getID()){
+			if(b.getID() != player.getId()){
 				if(!player.isDead()){
 					player.takeDamage(b.getDamage(), b.getPlayer(), true);
 				}
@@ -205,7 +205,7 @@ public class MyContactListener implements ContactListener{
 			Player player = (Player) contact.getFixtureB().getUserData();
 			Bullet b = (Bullet) contact.getFixtureA().getUserData();
 			
-			if(b.getID() != player.getID()){
+			if(b.getID() != player.getId()){
 				if(!player.isDead()){
 					player.takeDamage(b.getDamage(), b.getPlayer(), true);
 				}

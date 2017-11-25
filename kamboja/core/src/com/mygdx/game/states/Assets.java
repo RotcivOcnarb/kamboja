@@ -63,28 +63,28 @@ public class Assets {
 	}
 
 	private static void menuState(AssetManager assets) {
-		assets.load("menu/background.png", Texture.class);
-		assets.load("menu/bolinha.png", Texture.class);
-		assets.load("menu/explosao.png", Texture.class);
-		assets.load("menu/armas.png", Texture.class);
-		assets.load("menu/fumaca.png", Texture.class);
-		assets.load("menu/placa_letras.png", Texture.class);
-		assets.load("menu/sombra_letras.png", Texture.class);
-		assets.load("menu/fumaca_back.png", Texture.class);
-		assets.load("menu/fumaca_front.png", Texture.class);
+		assets.load("menu/main_menu/background.png", Texture.class);
+		assets.load("menu/main_menu/bolinha.png", Texture.class);
+		assets.load("menu/main_menu/explosao.png", Texture.class);
+		assets.load("menu/main_menu/armas.png", Texture.class);
+		assets.load("menu/main_menu/fumaca.png", Texture.class);
+		assets.load("menu/main_menu/placa_letras.png", Texture.class);
+		assets.load("menu/main_menu/sombra_letras.png", Texture.class);
+		assets.load("menu/main_menu/fumaca_back.png", Texture.class);
+		assets.load("menu/main_menu/fumaca_front.png", Texture.class);
 		
-		assets.load("menu/VERSUS.png", Texture.class);
-		assets.load("menu/COOP_off.png", Texture.class);
-		assets.load("menu/ONLINE_off.png", Texture.class);
-		assets.load("menu/HELP.png", Texture.class);
-		assets.load("menu/OPTIONS.png", Texture.class);
-		assets.load("menu/CREDITS.png", Texture.class);
+		assets.load("menu/main_menu/VERSUS.png", Texture.class);
+		assets.load("menu/main_menu/COOP_off.png", Texture.class);
+		assets.load("menu/main_menu/ONLINE_off.png", Texture.class);
+		assets.load("menu/main_menu/HELP.png", Texture.class);
+		assets.load("menu/main_menu/OPTIONS.png", Texture.class);
+		assets.load("menu/main_menu/CREDITS.png", Texture.class);
 		
 		for(int i = 0; i < 6; i ++)
-		assets.load("menu/E" + (i+1) + ".png", Texture.class);
+		assets.load("menu/main_menu/E" + (i+1) + ".png", Texture.class);
 		
 		for(int i = 0; i < 5; i ++)
-		assets.load("menu/exp" + (i+1) + ".png", Texture.class);
+		assets.load("menu/main_menu/exp" + (i+1) + ".png", Texture.class);
 	}
 	
 	private static void optionsState(AssetManager assets) {

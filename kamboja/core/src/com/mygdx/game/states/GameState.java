@@ -1390,7 +1390,7 @@ public class GameState extends State{
 		if(!inputBlocked){
 			
 			for(Player p : getPlayers()){
-				if(id == p.getID()){
+				if(id == p.getId()){
 					if(!p.isFalling())
 					p.buttonDown(controller, buttonCode);
 				}
@@ -1421,7 +1421,7 @@ public class GameState extends State{
 			int id = Util.getControllerID(controller);
 			if(id != -1){
 			for(Player p : getPlayers()){
-				if(id == p.getID()){
+				if(id == p.getId()){
 					if(!p.isFalling())
 					p.buttonUp(controller, buttonCode);
 				}
@@ -1437,7 +1437,7 @@ public class GameState extends State{
 			int id = Util.getControllerID(controller);
 			if(id != -1){
 			for(Player p : getPlayers()){
-				if(id == p.getID()){
+				if(id == p.getId()){
 					if(!p.isFalling())
 					p.axisMoved(controller, axisCode, value);
 				}
@@ -1457,7 +1457,7 @@ public class GameState extends State{
 			int id = Util.getControllerID(controller);
 			if(id != -1){
 			for(Player p : getPlayers()){
-				if(id == p.getID()){
+				if(id == p.getId()){
 					if(!p.isFalling())
 					p.povMoved(controller, povCode, value);
 				}

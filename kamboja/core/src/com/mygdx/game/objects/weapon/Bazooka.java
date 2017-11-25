@@ -96,7 +96,7 @@ public class Bazooka extends Weapon{
 				
 				shape.dispose();
 				
-				BazookaBullet bullet = new BazookaBullet(bul, getPlayer().getID(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+				BazookaBullet bullet = new BazookaBullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 				bullet.setTexture(bulletBazooka);
 				
 				f.setUserData(bullet);

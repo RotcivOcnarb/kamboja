@@ -131,12 +131,12 @@ public class PostGame extends State{
 		for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++){
 			Player p = KambojaMain.getPostGamePlayers().get(i);
 			if(KambojaMain.getPostGamePlayers().get(0).equals(p)){
-				String text = KambojaMain.getControllers().get(p.getID()).getName() + ": " + p.getKills() + "/" + p.getDeaths();
+				String text = KambojaMain.getControllers().get(p.getId()).getName() + ": " + p.getKills() + "/" + p.getDeaths();
 				layout.setText(first, text);
 				first.draw(sb, text, (Gdx.graphics.getWidth() - layout.width)/2f - pos, Gdx.graphics.getHeight() - i * (Gdx.graphics.getHeight() /4f) - Gdx.graphics.getHeight() /8f);
 			}
 			else{
-				String text = KambojaMain.getControllers().get(p.getID()).getName() + ": " + p.getKills() + "/" + p.getDeaths();
+				String text = KambojaMain.getControllers().get(p.getId()).getName() + ": " + p.getKills() + "/" + p.getDeaths();
 				layout.setText(other, text);
 				other.draw(sb, text, (Gdx.graphics.getWidth() - layout.width)/2f - pos, Gdx.graphics.getHeight() - i * (Gdx.graphics.getHeight() /4f) - Gdx.graphics.getHeight() /8f);
 			}

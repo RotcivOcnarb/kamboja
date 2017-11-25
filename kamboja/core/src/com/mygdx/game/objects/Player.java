@@ -381,6 +381,10 @@ public class Player implements Steerable<Vector2>{
 		return score;
 	}
 	
+	public void reduceScore(float amount) {
+		score -= amount;
+	}
+	
 	public void takeDamage(float amount, Player owner, boolean showBlood){
 		if(imunity <= 0){
 			life -= amount * def;
@@ -398,7 +402,7 @@ public class Player implements Steerable<Vector2>{
 					deaths++;
 					if(owner != null){
 						owner.kills ++;
-						owner.ghosts.add(new Ghost(getID(), getPosition()));
+						owner.ghosts.add(new Ghost(getId(), getPosition()));
 						owner.score += 100;
 					}
 					setDead(true);
@@ -417,11 +421,7 @@ public class Player implements Steerable<Vector2>{
 	public Body getBody(){
 		return body;
 	}
-	
-	public int getID(){
-		return getId();
-	}
-	
+
 	public float getWidth(){
 		return player.getRegionWidth();
 	}
