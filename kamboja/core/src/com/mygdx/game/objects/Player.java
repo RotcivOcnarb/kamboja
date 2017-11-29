@@ -71,7 +71,7 @@ public class Player implements Steerable<Vector2>{
 	private float angle_walking = 0;
 	private float sprintCooldown = 0;
 	private float hitTimer = 0;
-	private float spd = 1;
+	protected float spd = 1;
 	private float atk = 1;
 	private float def = 1;
 	private float score = 0;
@@ -108,7 +108,7 @@ public class Player implements Steerable<Vector2>{
 	private GameState state;
 	private Weapon weapon;
 	private Shift shift;
-	private ShapeRenderer sr;
+	protected ShapeRenderer sr;
 	private static Sound sprint;
 	private static Sound grunt[] = new Sound[5];
 	private float legTimer = 0;

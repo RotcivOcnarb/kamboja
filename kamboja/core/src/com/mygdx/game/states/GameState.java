@@ -4,7 +4,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -50,8 +49,8 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.BotController;
-import com.mygdx.game.objects.BotPlayer;
 import com.mygdx.game.objects.Bullet;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.GamePause;
@@ -687,7 +686,7 @@ public class GameState extends State{
 		
 		Player player = null;
 		if(KambojaMain.getControllers().get(id) instanceof BotController){
-			player = new BotPlayer(body, id, this);
+			player = new BetterBot(body, id, this);
 		}
 		else{
 			player = new Player(body, id, this);
@@ -752,7 +751,7 @@ public class GameState extends State{
 	//Render stuff
 	
 	public void render(SpriteBatch sb) {
-		
+				
 		
 		beforeBlood.begin();
 		Gdx.gl.glClearColor(0.0f, 0.6f, 0.9f, 0.0f);
@@ -763,33 +762,18 @@ public class GameState extends State{
 		if(kambojaMap != null)
 			kambojaMap.behindRender(sb, camera);
 		drawBackgroundTiles(sb);
-		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		beforeBlood.end();
-		
-//	
-//			Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE0);
-//			shaderBuffer.getColorBufferTexture().bind(0);
-//		    shader.setUniformi("u_texture", 0); //passing first texture!!!
-//
-//		    Gdx.graphics.getGL20().glActiveTexture(GL20.GL_TEXTURE1);
-//			binocularMask.bind(1);
-//		    shader.setUniformi("displacement_map", 1); //passing second texture!!!
-//		    
-//		    
-//			shader.setUniformf("intensity", 0.1f);
-//			shader.setUniformf("time", timer);
-//			shader.setUniformf("x_t", 0.1f);
-//			shader.setUniformf("y_t", 0);
-		
-		
-		
+
 		drawPersistentParticles(sb);
-		
 		drawBlocks(sb);
 		drawItems(sb);
 		drawParticles(sb);
+		
+		
 		drawPlayersAndLight(sb);
+		
+		
 		if(kambojaMap != null)
 		kambojaMap.render(sb, camera);
 		drawCeilingTiles(sb);
@@ -799,9 +783,6 @@ public class GameState extends State{
 		
 		
 		
-		
-
-
 	}
 
 	public void drawBackgroundTiles(SpriteBatch sb){
@@ -1077,7 +1058,6 @@ public class GameState extends State{
 	//Update
 	
 	public void update(float delta) {
-		
 		GameMusic.fadeOut(GameMusic.MAIN_MENU);
 				
 		if(islandBackground != null){
@@ -1311,9 +1291,6 @@ public class GameState extends State{
 		if(!isPause())
 		world.step(1/60f, 6, 2);
 		
-		
-		
-		
 		float minx = getPlayers().get(0).getBody().getWorldCenter().x;
 		float miny = getPlayers().get(0).getBody().getWorldCenter().y;
 		float maxx = getPlayers().get(0).getBody().getWorldCenter().x;
@@ -1344,6 +1321,7 @@ public class GameState extends State{
 		getCamera().position.y += (med.y - getCamera().position.y)/10.0f;
 		
 		getCamera().update();
+		
 		
 	}
 

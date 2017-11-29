@@ -42,6 +42,7 @@ import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.Player;
@@ -1114,22 +1115,22 @@ public class PlayerSelectState extends State{
 		
 		
 		for(int i = 0; i < 4; i ++) {
+			
+			if(playerReady[i]) {
+				okAlpha[i] += (1 - okAlpha[i])/10.0f;
+				okScale[i] += (1 - okScale[i])/10.0f;
+				okAngle[i] += (0 - okAngle[i])/10.0f;
+				gear_angle[i] += (180 - gear_angle[i])/10.0f;
+			}
+			else {
+				okAlpha[i] += (0 - okAlpha[i])/10.0f;
+				okScale[i] += (2 - okScale[i])/10.0f;
+				okAngle[i] += (30 - okAngle[i])/10.0f;
+				gear_angle[i] += (0 - gear_angle[i])/10.0f;
+			}
+			
 			if(KambojaMain.getControllers().size()-1 >= i){
 				if(KambojaMain.getControllers().get(i) != null) {
-					
-					
-					if(playerReady[i]) {
-						okAlpha[i] += (1 - okAlpha[i])/10.0f;
-						okScale[i] += (1 - okScale[i])/10.0f;
-						okAngle[i] += (0 - okAngle[i])/10.0f;
-						gear_angle[i] += (180 - gear_angle[i])/10.0f;
-					}
-					else {
-						okAlpha[i] += (0 - okAlpha[i])/10.0f;
-						okScale[i] += (2 - okScale[i])/10.0f;
-						okAngle[i] += (30 - okAngle[i])/10.0f;
-						gear_angle[i] += (0 - gear_angle[i])/10.0f;
-					}
 					
 					selection_bound_tween[i].setRect(
 							selection_bound_tween[i].getX() + (selection_bounds[i][selection[i]].getX() - selection_bound_tween[i].getX())/10f,
@@ -1583,6 +1584,39 @@ public class PlayerSelectState extends State{
 	}
 	
 	public boolean keyDown(int keycode) {
+		
+		if(keycode == Keys.B) {
+			int put_id = Util.getFirstAvailableID();
+			if(put_id != -1) {
+				BotController bot = new BotController(firstPlayerAvailable());
+				KambojaMain.getControllers().remove(put_id);
+				KambojaMain.getControllers().add(put_id, bot);
+				
+				positionPlayerOffset[KambojaMain.getControllers().size() - 1] = bot.getPlayer();
+				positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+				playerReady[put_id] = true;
+			}
+			else {
+				if(KambojaMain.getControllers().size() < 4) {
+					BotController bot = new BotController(firstPlayerAvailable());
+					KambojaMain.getControllers().add(bot);
+					
+					positionPlayerOffset[KambojaMain.getControllers().size() - 1] = bot.getPlayer();
+					positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+					playerReady[KambojaMain.getControllers().size() - 1] = true;
+				}
+			}
+			
+		}
+		if(keycode == Keys.N) {
+			for(int i = KambojaMain.getControllers().size() - 1; i >= 0; i --) {
+				if(KambojaMain.getControllers().get(i) instanceof BotController) {
+					playerReady[i] = false;
+					KambojaMain.getControllers().remove(i);
+					break;
+				}
+			}
+		}
 		
 		int id = Util.getControllerID(getKeyboardController());
 		
