@@ -24,7 +24,7 @@
 		<link>
 			<name>assets</name>
 			<type>2</type>
-			<location>C:/Users/Guilherme/Documents/kamboja/kamboja/core/assets</location>
+			<locationURI>PARENT-1-PROJECT_LOC/core/assets</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
