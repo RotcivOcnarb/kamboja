@@ -46,17 +46,7 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new OptionsState(this));
 		
 		Controllers.clearListeners();
-		Controllers.addListener(this);
-		int cont = 0;
-		for(int i = Controllers.getControllers().size - 1; i >= 0 ; i --) {
-			if(Controllers.getControllers().get(i).getName().contains("XBOX 360")) {
-				if(cont < 2) {
-					Controllers.getControllers().removeIndex(i);
-					cont++;
-				}
-				
-			}
-		}		
+		Controllers.addListener(this);	
 		Gdx.input.setInputProcessor(this);
 	}
 
