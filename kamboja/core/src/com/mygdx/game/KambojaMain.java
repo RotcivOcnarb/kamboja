@@ -12,7 +12,6 @@ import java.util.HashMap;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.swing.text.Utilities;
 
 import org.apache.commons.codec.binary.Base64;
 

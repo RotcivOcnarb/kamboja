@@ -987,7 +987,7 @@ public class MapSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == XBox.AXIS_LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -1012,7 +1012,7 @@ public class MapSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == GenericController.LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -1060,6 +1060,7 @@ public class MapSelectState extends State{
 		switch(selection[id]) {
 		case 16:
 			outro = true;
+			intro = false;
 			goingBack = true;
 			break;
 		case 17:
@@ -1068,6 +1069,7 @@ public class MapSelectState extends State{
 			KambojaMain.setMapName(mapNames.get(selected_map));
 			
 			outro = true;
+			intro = false;
 			break;
 		case 18:
 			KambojaMain.setGameTime(KambojaMain.getGameTime() + 60);

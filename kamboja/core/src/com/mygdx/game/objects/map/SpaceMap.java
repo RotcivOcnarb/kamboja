@@ -2,7 +2,6 @@ package com.mygdx.game.objects.map;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -38,13 +37,13 @@ public class SpaceMap extends KambojaMap{
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
 		sb.setColor(1, 1, 1, 1);
-		sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		sb.draw(background, 0, 0, 1920, 1080);
 
 		for(int i = 1; i <= 5; i ++) {
 			sb.draw(stars,
 					0, 0,
-					(int)Gdx.graphics.getWidth(),
-					(int)Gdx.graphics.getHeight(), 
+					(int)1920,
+					(int)1080, 
 					(int)(camera.position.x * GameState.UNIT_SCALE / (i*2f)),
 					(int)(-camera.position.y * GameState.UNIT_SCALE / (i*2f)),
 					(int)stars.getWidth(),

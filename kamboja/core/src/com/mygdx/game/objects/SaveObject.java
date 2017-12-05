@@ -1,9 +1,5 @@
 package com.mygdx.game.objects;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;

@@ -1,41 +1,22 @@
 package com.mygdx.game.states;
 
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
-import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
-import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.GameMusic;
-import com.mygdx.game.objects.Util;
 
 public class OptionsState extends GenericInterface{
 	
@@ -353,7 +334,7 @@ public class OptionsState extends GenericInterface{
 					}
 					val_x = value;
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == XBox.AXIS_LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -379,7 +360,7 @@ public class OptionsState extends GenericInterface{
 					}
 					val_x = value;
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == GenericController.LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;

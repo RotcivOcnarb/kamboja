@@ -566,9 +566,7 @@ public class PlayerSelectState extends State{
 
 	@Override
 	public void render(SpriteBatch sb) {	
-		
-		float factor = 1080 / 1080f;
-		
+				
 		for(int i = 0; i < 4; i ++) {
 			
 			if(KambojaMain.getControllers().size()-1 >= i){
@@ -1509,7 +1507,7 @@ public class PlayerSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == XBox.AXIS_LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;
@@ -1550,7 +1548,7 @@ public class PlayerSelectState extends State{
 						xMoved = false;
 					}
 				}
-				if(axisCode == Gamecube.MAIN_Y) {
+				if(axisCode == GenericController.LEFT_Y) {
 					if(Math.abs(value) > 0.5f) {
 						if(!yMoved) {
 							yMoved = true;

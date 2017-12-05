@@ -1,6 +1,5 @@
 package com.mygdx.game.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.math.Matrix4;
 import com.mygdx.game.KambojaMain;

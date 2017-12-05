@@ -64,15 +64,14 @@ public class Bazooka extends Weapon{
 		globalTimer += delta;
 		
 		if(analog > 0.7){
-			if(shootTimer > 1.5f){
+			if(shootTimer > 1.2f){
 				float radius = 2;
-				
 				knockback(0.7f);
 				screenshake(0.4f);
 				
 				if(GameState.SFX)
 				torpedo[(int)(Math.random()*2f)].play(0.5f * GameState.VOLUME);
-				
+								
 				shootTimer = 0;
 				BodyDef def = new BodyDef();
 				def.bullet = true;
@@ -85,6 +84,7 @@ public class Bazooka extends Weapon{
 				float vel =  1;
 				Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel);
 				def.linearVelocity.set(direction);
+				
 				if(!Float.isNaN(def.position.x) && !Float.isNaN(def.position.y)){
 				Body bul = world.createBody(def);
 				

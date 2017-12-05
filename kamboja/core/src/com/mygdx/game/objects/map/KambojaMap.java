@@ -2,7 +2,6 @@ package com.mygdx.game.objects.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.mygdx.game.states.GameState;
 
 public abstract class KambojaMap {

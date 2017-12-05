@@ -32,7 +32,7 @@ public class Pathfinding implements Runnable{
 		System.out.println("Thread start");
 		while(!end) {
 			if(map != null) {
-				getPathBetween();
+				path = getPathBetween();
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class Pathfinding implements Runnable{
 		return null;
 	}
 	
-	public void getPathBetween(){
+	public ArrayList<Vector2> getPathBetween(){
 		ArrayList<Vector2> path_aux = new ArrayList<Vector2>();
 		
 		ArrayList<Node> all = new ArrayList<Pathfinding.Node>();
@@ -141,8 +141,7 @@ public class Pathfinding implements Runnable{
 				if(found != null) break;
 			}
 			if(open.size() == 0) {
-				path = path_aux;
-				return;
+				break;
 			}
 			//Depois de colocar os pontos em volta à lista aberta, checa qual dos pontos da aberta tem a soma menor
 			Node smallest = open.get(0);
@@ -162,7 +161,7 @@ public class Pathfinding implements Runnable{
 			path_aux.add(new Vector2(found.getX(), found.getY()));
 			found = found.getParent();
 		}
-		path = path_aux;
+		return path_aux;
 	}
 	
 	public int getSx() {

@@ -3,15 +3,11 @@ package com.mygdx.game.objects;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.QueryCallback;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
-import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.weapon.Flamethrower;
 import com.mygdx.game.objects.weapon.Shotgun;
@@ -20,9 +16,7 @@ import com.mygdx.game.states.GameState;
 public class BetterBot extends Player{
 	
 	ArrayList<Vector2> path;
-		
-	int bitmap[][];
-	
+
 	Vector2 target;
 
 	Pathfinding pf;
@@ -44,7 +38,6 @@ public class BetterBot extends Player{
 		super(body, id, state);
 		path = new ArrayList<Vector2>();
 				
-		bitmap = new int[getState().getTiledMap().getProperties().get("width", Integer.class)][getState().getTiledMap().getProperties().get("height", Integer.class)];
 
 		target = new Vector2();
 	
@@ -97,6 +90,7 @@ public class BetterBot extends Player{
 	}
 	
 	public void update(float delta) {
+		System.out.println("\tframe start");
 		long startTime = System.nanoTime();
 		super.update(delta);
 		
@@ -106,6 +100,11 @@ public class BetterBot extends Player{
 				target = p.getPosition();
 			}
 		}
+		
+		int elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		float percent = (elapsed / (1000/60f))*100;
+		System.out.println("target detected in: " + percent + "% of total frame time");
+		startTime = System.nanoTime();
 
 		if(target != null && !isDead()) {
 		Vector2 aimingTarget = target.cpy().sub(getPosition().cpy()).nor();
@@ -114,15 +113,24 @@ public class BetterBot extends Player{
 		
 		getState().getWorld().rayCast(raycast, getPosition().cpy(), target.cpy());
 		
+		elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		percent = (elapsed / (1000/60f))*100;
+		System.out.println("raycasted in: " + percent + "% of total frame time");
+		startTime = System.nanoTime();
+		
 		}
 		
 		pf.setSx((int)(getPosition().x / (32 / GameState.UNIT_SCALE)));
 		pf.setSy((int)(getPosition().y / (32 / GameState.UNIT_SCALE)));
 		pf.setEx((int)(target.x / (32 / GameState.UNIT_SCALE)));
 		pf.setEy((int)(target.y / (32 / GameState.UNIT_SCALE)));
-		pf.setMap(bitmap);
-		
+		pf.setMap(getState().getBitmap());
 		path = pf.getPath();
+		
+		elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		percent = (elapsed / (1000/60f))*100;
+		System.out.println("path attributting in: " + percent + "% of total frame time");
+		startTime = System.nanoTime();
 		
 		if(path != null) {
 			for(Vector2 p : path) {
@@ -133,6 +141,11 @@ public class BetterBot extends Player{
 			
 			if(!path.isEmpty())
 				path.remove(0);
+			
+			elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+			percent = (elapsed / (1000/60f))*100;
+			System.out.println("path adjusted in: " + percent + "% of total frame time");
+			startTime = System.nanoTime();
 		}
 		
 		if(path.size() > 0 && !isDead()) {
@@ -143,6 +156,11 @@ public class BetterBot extends Player{
 				if(!canHit)
 				body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
 			}
+			
+			elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+			percent = (elapsed / (1000/60f))*100;
+			System.out.println("force applied in: " + percent + "% of total frame time");
+			startTime = System.nanoTime();
 		}
 		
 		if(!isDead()) {
@@ -161,36 +179,9 @@ public class BetterBot extends Player{
 			}
 		}
 		
-		for(int i = 0; i < bitmap.length; i ++ ) {
-			for(int j = 0; j < bitmap[0].length; j ++ ) {
-				bitmap[i][j] = 0;
-			}
-		}
-		for(int i = 0; i < bitmap.length; i ++ ) {
-			for(int j = 0; j < bitmap[0].length; j ++ ) {
-				final int x = i;
-				final int y = j;
-				body.getWorld().QueryAABB(
-						new QueryCallback() {
-					public boolean reportFixture(Fixture fixture) {
-						if(fixture.getBody().getUserData() instanceof Block) {
-							bitmap[x][y] = 1;
-							return false;
-						}
-						return true;
-					}
-				},	
-				(16 + i * 32 - 1) / GameState.UNIT_SCALE , (16 + j * 32 - 1) / GameState.UNIT_SCALE,
-				(16 + i * 32 + 1) / GameState.UNIT_SCALE, (16 + j * 32 + 1) / GameState.UNIT_SCALE);
-				
-			}
-		}
-		
 
-		int elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		float percent = (elapsed / (1000/60f))*100;
-		System.out.println("rendered player in: " + percent + "% of total frame time");
-		startTime = System.nanoTime();
+
+		
 	}
 
 }

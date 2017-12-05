@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.shift.Barrier;
@@ -17,6 +18,7 @@ public class BazookaBullet extends Bullet{
 	
 	ParticleEffect smoke;
 	static Sound explosion;
+	Vector2 direction;
 	static{
 		explosion = Gdx.audio.newSound(Gdx.files.internal("audio/weapon/explosion.ogg"));
 	}
@@ -29,6 +31,8 @@ public class BazookaBullet extends Bullet{
 		smoke.load(Gdx.files.internal("particles/smoke.par"), Gdx.files.internal("particles"));
 		smoke.scaleEffect(1f/GameState.UNIT_SCALE / 2f);
 		smoke.start();
+		
+		direction = body.getLinearVelocity().cpy();
 
 	}
 	
@@ -48,7 +52,6 @@ public class BazookaBullet extends Bullet{
 		explosion.play(0.5f * GameState.VOLUME);
 		
 		player.getState().showExplosion(body.getPosition());
-		
 		expShake = 1;
 		
 		float radius = 60 / GameState.UNIT_SCALE;
@@ -82,19 +85,36 @@ public class BazookaBullet extends Bullet{
 			}
 
 		}
-		
-		//lista de blocos
-		
-		//dar dano aos blocos
 	}
 	
 	public boolean render(SpriteBatch sb){
 		
-		body.applyForceToCenter(body.getLinearVelocity().cpy().nor().scl(0.2f), true);
+		//body.applyForceToCenter(body.getLinearVelocity().cpy().nor().scl(0.2f), true);
 		if(!disposed)
 		trail.renderTrail(sb, !destroyed);
 		
 		globalTime += Gdx.graphics.getDeltaTime();
+		
+		Player closest = null;
+		for(Player p : getPlayer().getState().getPlayers()) {
+			if(p != getPlayer()) {
+				if(!p.isDead()) {
+					if(closest == null) closest = p;
+					else if(body.getWorldCenter().cpy().sub(p.getPosition().cpy()).len() < closest.getPosition().cpy().sub(body.getPosition().cpy()).len()) {
+						closest = p;
+					}
+				}
+			}
+		}
+		
+		
+		
+		if(closest != null) {
+			Vector2 target = closest.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(10f);
+			direction.add(target.cpy().sub(direction.cpy()).scl(1/50f));
+		}
+		
+		body.setLinearVelocity(direction);
 		
 		Texture tex = bulletAnimation.getKeyFrame(globalTime).getTexture();
 		

@@ -74,9 +74,11 @@ public class MyContactListener implements ContactListener{
 			TurretObject to = (TurretObject) contact.getFixtureA().getUserData();
 			
 			if(!bullet.player.equals(to.turret.player)){
+				
 				if(bullet instanceof BazookaBullet){
 					((BazookaBullet)bullet).explosionDamage();
 				}
+				
 				to.takeDamage(bullet.getDamage());
 				bullet.remove();
 				GameState.removeBody(contact.getFixtureB().getBody());
@@ -177,26 +179,27 @@ public class MyContactListener implements ContactListener{
 		
 		//bala atinge inimigo
 		if(contact.getFixtureA().getUserData() instanceof Player && contact.getFixtureB().getUserData() instanceof Bullet){
+			System.out.println("bazooka -> player A");
 			Player player = (Player) contact.getFixtureA().getUserData();
 			Bullet b = (Bullet) contact.getFixtureB().getUserData();
 			
-			
-			
 			if(b.getID() != player.getId()){
 				if(!player.isDead()){
+					System.out.println("\ttaking damage");
 					player.takeDamage(b.getDamage(), b.getPlayer(), true);
+					
+					if(b instanceof BazookaBullet){
+						((BazookaBullet)b).explosionDamage();
+					}
+					b.remove();
+					GameState.removeBody(contact.getFixtureB().getBody());
 				}
 				else{
+					System.out.println("\tdisable contact");
 					contact.setEnabled(false);
 					return;
 				}
 				
-				if(b instanceof BazookaBullet){
-					((BazookaBullet)b).explosionDamage();
-				}
-				
-				b.remove();
-				GameState.removeBody(contact.getFixtureB().getBody());
 				
 			}
 			
@@ -208,20 +211,18 @@ public class MyContactListener implements ContactListener{
 			if(b.getID() != player.getId()){
 				if(!player.isDead()){
 					player.takeDamage(b.getDamage(), b.getPlayer(), true);
+					
+					if(b instanceof BazookaBullet){
+						((BazookaBullet)b).explosionDamage();
+					}
+
+					b.remove();
+					GameState.removeBody(contact.getFixtureA().getBody());
 				}
 				else{
 					contact.setEnabled(false);
 					return;
 				}
-				
-
-				if(b instanceof BazookaBullet){
-					((BazookaBullet)b).explosionDamage();
-				}
-				
-				
-				b.remove();
-				GameState.removeBody(contact.getFixtureA().getBody());
 				
 			}
 		}

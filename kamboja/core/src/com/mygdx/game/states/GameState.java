@@ -40,6 +40,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.QueryCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.KambojaMain;
@@ -84,6 +85,8 @@ public class GameState extends State{
 	private static int mapWidth;
 	private static int mapHeight;
 	private Rectangle2D bounds;
+	
+	int bitmap[][];
 	
 	private RayHandler handler;
 	private BitmapFont font;
@@ -231,6 +234,7 @@ public class GameState extends State{
 	public void create() {
 		
 		//shader stuff
+		
 
 		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
@@ -306,6 +310,8 @@ public class GameState extends State{
 		
 		System.out.println("Loading map (" + KambojaMain.getMapName() + ")");
 		setTiledMap(new TmxMapLoader().load(KambojaMain.getMapName()));
+		
+		bitmap = new int[getTiledMap().getProperties().get("width", Integer.class)][getTiledMap().getProperties().get("height", Integer.class)];
 		
 		if(KambojaMain.getMapName().endsWith("island.tmx")){
 			islandBackground = new IslandBackground();
@@ -769,11 +775,7 @@ public class GameState extends State{
 		drawBlocks(sb);
 		drawItems(sb);
 		drawParticles(sb);
-		
-		
 		drawPlayersAndLight(sb);
-		
-		
 		if(kambojaMap != null)
 		kambojaMap.render(sb, camera);
 		drawCeilingTiles(sb);
@@ -1062,6 +1064,31 @@ public class GameState extends State{
 				
 		if(islandBackground != null){
 			islandBackground.update(delta);
+		}
+		
+		for(int i = 0; i < bitmap.length; i ++ ) {
+			for(int j = 0; j < bitmap[0].length; j ++ ) {
+				bitmap[i][j] = 0;
+			}
+		}
+		for(int i = 0; i < bitmap.length; i ++ ) {
+			for(int j = 0; j < bitmap[0].length; j ++ ) {
+				final int x = i;
+				final int y = j;
+				world.QueryAABB(
+						new QueryCallback() {
+					public boolean reportFixture(Fixture fixture) {
+						if(fixture.getBody().getUserData() instanceof Block) {
+							bitmap[x][y] = 1;
+							return false;
+						}
+						return true;
+					}
+				},	
+				(16 + i * 32 - 1) / GameState.UNIT_SCALE , (16 + j * 32 - 1) / GameState.UNIT_SCALE,
+				(16 + i * 32 + 1) / GameState.UNIT_SCALE, (16 + j * 32 + 1) / GameState.UNIT_SCALE);
+				
+			}
 		}
 		
 		if(kambojaMap != null)
@@ -1555,6 +1582,10 @@ public class GameState extends State{
 
 	public World getWorld() {
 		return world;
+	}
+
+	public int[][] getBitmap() {
+		return bitmap;
 	}
 
 	
