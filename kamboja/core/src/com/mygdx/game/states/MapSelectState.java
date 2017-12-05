@@ -946,17 +946,14 @@ public class MapSelectState extends State{
 	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
 	int id = Util.getControllerID(controller);
-		
-		
+
 		if(id != -1){
 			if(controller.getName().equals(Gamecube.getID())){
 				if(axisCode == Gamecube.MAIN_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {
 							xMoved = true;
-							
 							changeSelectionX(id, value);
-							
 						}
 					}
 					else {

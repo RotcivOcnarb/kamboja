@@ -320,6 +320,7 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
@@ -345,6 +346,7 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
 			else {
 				if(axisCode == GenericController.LEFT_X) {
@@ -371,9 +373,8 @@ public class OptionsState extends GenericInterface{
 						yMoved = false;
 					}
 				}
+				return false;
 			}
-		
-		return false;
 	}
 
 	public void doSelection() {

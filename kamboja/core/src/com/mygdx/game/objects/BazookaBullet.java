@@ -5,7 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.shift.Barrier;
@@ -18,7 +17,6 @@ public class BazookaBullet extends Bullet{
 	
 	ParticleEffect smoke;
 	static Sound explosion;
-	Vector2 direction;
 	static{
 		explosion = Gdx.audio.newSound(Gdx.files.internal("audio/weapon/explosion.ogg"));
 	}
@@ -31,8 +29,6 @@ public class BazookaBullet extends Bullet{
 		smoke.load(Gdx.files.internal("particles/smoke.par"), Gdx.files.internal("particles"));
 		smoke.scaleEffect(1f/GameState.UNIT_SCALE / 2f);
 		smoke.start();
-		
-		direction = body.getLinearVelocity().cpy();
 
 	}
 	
@@ -52,6 +48,7 @@ public class BazookaBullet extends Bullet{
 		explosion.play(0.5f * GameState.VOLUME);
 		
 		player.getState().showExplosion(body.getPosition());
+		
 		expShake = 1;
 		
 		float radius = 60 / GameState.UNIT_SCALE;
@@ -85,6 +82,10 @@ public class BazookaBullet extends Bullet{
 			}
 
 		}
+		
+		//lista de blocos
+		
+		//dar dano aos blocos
 	}
 	
 	public boolean render(SpriteBatch sb){
@@ -95,28 +96,25 @@ public class BazookaBullet extends Bullet{
 		
 		globalTime += Gdx.graphics.getDeltaTime();
 		
-		Player closest = null;
-		for(Player p : getPlayer().getState().getPlayers()) {
-			if(p != getPlayer()) {
-				if(!p.isDead()) {
-					if(closest == null) closest = p;
-					else if(body.getWorldCenter().cpy().sub(p.getPosition().cpy()).len() < closest.getPosition().cpy().sub(body.getPosition().cpy()).len()) {
-						closest = p;
-					}
+		Texture tex = bulletAnimation.getKeyFrame(globalTime).getTexture();
+		
+		Player closestP = null;
+		float closestD = 1000;
+		
+		for(int i = getPlayer().getState().getPlayers().size() - 1; i >= 0; i --) {
+			if(!getPlayer().getState().getPlayers().get(i).equals(getPlayer())) {
+				float dist = getPlayer().getState().getPlayers().get(i).getPosition().cpy().sub(body.getWorldCenter()).len();
+				if(dist < closestD) {
+					closestD = dist;
+					closestP = getPlayer().getState().getPlayers().get(i);
 				}
 			}
 		}
 		
-		
-		
-		if(closest != null) {
-			Vector2 target = closest.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(10f);
-			direction.add(target.cpy().sub(direction.cpy()).scl(1/50f));
+		if(closestP != null) {
+			body.setLinearVelocity(body.getLinearVelocity().add(closestP.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(.1f)));
 		}
-		
-		body.setLinearVelocity(direction);
-		
-		Texture tex = bulletAnimation.getKeyFrame(globalTime).getTexture();
+		//body.applyForceToCenter(closestP.getPosition().cpy().sub(body.getWorldCenter()).nor().scl(1f), true);
 		
 		expShake -= Gdx.graphics.getDeltaTime();
 		if(expShake <= 0) expShake = 0;
