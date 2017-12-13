@@ -5,7 +5,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.states.GameState;
 
 public class Bullet {
@@ -47,8 +53,27 @@ public class Bullet {
 		disposed = true;
 	}
 	
-	public Bullet(Body body, int id, float damage, float radius, Player player){
-		this.body = body;
+	public Bullet(World world, Vector2 position, Vector2 direction, int id, float damage, float radius, Player player){
+		
+		BodyDef def = new BodyDef();
+		def.bullet = true;
+		def.type = BodyType.DynamicBody;
+		def.linearDamping = 0;
+		def.position.set(position);
+		def.linearVelocity.set(direction);
+		
+		body = world.createBody(def);
+		
+		CircleShape shape = new CircleShape();
+		shape.setRadius(radius/GameState.UNIT_SCALE);
+		
+		Fixture f = body.createFixture(shape, 1);
+		f.setSensor(true);
+		
+		body.setUserData(this);
+		f.setUserData(this);
+		
+		
 		this.id = id;
 		this.radius = radius;
 		this.damage = damage;

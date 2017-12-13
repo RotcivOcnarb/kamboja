@@ -1,16 +1,19 @@
 package com.mygdx.game.states;
 
+import java.io.File;
 import java.util.Comparator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -34,6 +37,8 @@ public class PostGameState extends GenericInterface{
 	Texture[] player_frame = new Texture[4];
 	Texture crown, crown_light;
 	Texture kill_icon, death_icon;
+	Texture unlockedText;
+	Texture unlockedImage;
 	
 	Texture capsule, capsule_light, progress_case, progress_bar;
 		
@@ -48,13 +53,89 @@ public class PostGameState extends GenericInterface{
 	BitmapFont oliverFrag, oliverScore;
 	ShaderProgram waveShader;
 	Texture[] inGameWep;
+	GlyphLayout layout;
 
+	boolean increasingEXP = true;
+	int unlockable_frame_selection = -1;
+	Unlockable nextUnlockable;
+	float textTween;
+	float imageTween;
+	
+	enum Unlockable{
+		Island("Island", "Map", "maps/thumb_Disland.png"),
+		Iceland("Iceland", "Map", "maps/thumb_Eiceland.png"),
+		Volcan("Volcan", "Map", "maps/thumb_Fvolcan.png"),
+		Space("Space", "Map", "maps/thumb_Gspace.png"),
+		MP5("MP5", "Weapon", "Weapons/Icon/Mp5.png"),
+		Shotgun("Shotgun", "Weapon", "Weapons/Icon/shotgun.png"),
+		Flamethrower("Flamethrower", "Weapon", "Weapons/Icon/Flamethrower.png"),
+		Minigun("Minigun", "Weapon", "Weapons/Icon/minigun.png"),
+		Bazooka("Bazooka", "Weapon", "Weapons/Icon/Bazook.png"),
+		Laser("Laser", "Weapon", "Weapons/Icon/Laser.png");
+		
+		public String nome;
+		public String tipo;
+		public Texture imagem;
+		
+		private Unlockable(String nome, String tipo, String imagem) {
+			this.nome = nome;
+			this.tipo = tipo;
+			
+			if(tipo.equals("Map")) {
+				this.imagem = new Texture(new FileHandle(new File(imagem)));
+			}
+			else {
+				this.imagem = KambojaMain.getTexture(imagem);
+			}
+
+		}
+
+	}
+	
+	public void unlock() {
+		switch (nextUnlockable){
+		case Island:
+			KambojaMain.mapUnlocked[3] = true;
+			break;
+		case Iceland:
+			KambojaMain.mapUnlocked[4] = true;
+			break;
+		case Volcan:
+			KambojaMain.mapUnlocked[5] = true;
+			break;
+		case Space:
+			KambojaMain.mapUnlocked[6] = true;
+			break;
+		case MP5:
+			KambojaMain.weaponUnlocked[4] = true;
+			break;
+		case Shotgun:
+			KambojaMain.weaponUnlocked[3] = true;
+			break;
+		case Flamethrower:
+			KambojaMain.weaponUnlocked[5] = true;
+			break;
+		case Minigun:
+			KambojaMain.weaponUnlocked[2] = true;
+			break;
+		case Bazooka:
+			KambojaMain.weaponUnlocked[6] = true;
+			break;
+		case Laser:
+			KambojaMain.weaponUnlocked[7] = true;
+			break;
+		}
+	}
+	
 	public PostGameState(Manager manager) {
 		super(manager);
 		
 		background = KambojaMain.getTexture("menu/postgame/fundo.jpg");
 		
 		oliver = KambojaMain.getInstance().getAssets().get("fonts/olivers barney.ttf", BitmapFont.class);
+		
+		unlockedText = KambojaMain.getTexture("menu/map_select/map_name.png");
+		unlockedImage = KambojaMain.getTexture("menu/map_select/frame_map.png");
 		
 		FreeTypeFontGenerator ftfg;
 		FreeTypeFontParameter param;
@@ -110,12 +191,43 @@ public class PostGameState extends GenericInterface{
 		crown = KambojaMain.getTexture("menu/postgame/coroa.png");
 		crown_light = KambojaMain.getTexture("menu/postgame/crown_light.png");
 
+		nextUnlockable = getNextUnlockable();
+		
+	}
+	
+	public Unlockable getNextUnlockable() {
+
+		switch(KambojaMain.level) {
+		case 1:
+			return Unlockable.MP5;
+		case 2:
+			return Unlockable.Island;
+		case 3:
+			return Unlockable.Shotgun;
+		case 4:
+			return Unlockable.Iceland;
+		case 5:
+			return Unlockable.Flamethrower;
+		case 6:
+			return Unlockable.Volcan;
+		case 7:
+			return Unlockable.Minigun;
+		case 8:
+			return Unlockable.Space;
+		case 9:
+			return Unlockable.Bazooka;
+		case 10:
+			return Unlockable.Laser;
+		default:
+				return null;
+		}
+		
 	}
 	
 	public void create() {
 		super.create();
 		
-	
+		layout = new GlyphLayout();
 
 		for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
 			float margin = (1920 - 4*main_frame[i].getWidth())/5f;
@@ -254,6 +366,41 @@ public class PostGameState extends GenericInterface{
 		sb.draw(capsule, 50, 50);
 		oliverFrag.draw(sb, "LVL " + KambojaMain.level, 50, 180, capsule.getWidth(), 1, false);
 		sb.draw(capsule_light, 50, 50);
+				
+		sb.setColor(1, 1, 1, textTween);
+		sb.draw(unlockedText,
+				(1920 - unlockedText.getWidth()*textTween*2)/2f,
+				(1080 - unlockedText.getHeight()*textTween*2)/2f,
+				unlockedText.getWidth()*textTween*2,
+				unlockedText.getHeight()*textTween*2
+				);		
+		
+		oliverFrag.setColor(1, 1, 1, textTween);
+		oliverFrag.draw(sb, "Unlocked new " + nextUnlockable.tipo + "!", 0,
+				(1080 - unlockedText.getHeight()*textTween*2)/2f + 150,
+				1920, 1, false);
+		
+		
+		sb.setColor(1, 1, 1, imageTween);
+		sb.draw(unlockedImage,
+				(1920 - unlockedImage.getWidth()*imageTween)/2f,
+				(1080 - unlockedImage.getHeight()*imageTween)/2f,
+				unlockedImage.getWidth()*imageTween,
+				unlockedImage.getHeight()*imageTween
+				);
+		
+		sb.draw(nextUnlockable.imagem,
+				(1920 - nextUnlockable.imagem.getWidth()*imageTween)/2f,
+				(1080 - nextUnlockable.imagem.getHeight()*imageTween)/2f,
+				nextUnlockable.imagem.getWidth()*imageTween,
+				nextUnlockable.imagem.getHeight()*imageTween);
+		
+		oliverFrag.setColor(1, 1, 1, imageTween);
+		oliverFrag.draw(sb, nextUnlockable.nome, 0, (1080 - unlockedImage.getHeight()*imageTween)/2f + 150,
+				1920, 1, false);
+		
+		oliverFrag.setColor(1, 1, 1, 1);
+		sb.setColor(1, 1, 1, 1);
 
 		//TODO:
 		/*
@@ -285,22 +432,40 @@ public class PostGameState extends GenericInterface{
 		
 		if(globalTimer > 2) {
 			ended = true;
-			for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
-				if(KambojaMain.getPostGamePlayers().get(i).getScore() > 10){
-				KambojaMain.experience += 10;
-				KambojaMain.getPostGamePlayers().get(i).reduceScore(10);
-				ended = false;
+			if(increasingEXP) {
+				for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
+					if(KambojaMain.getPostGamePlayers().get(i).getScore() > 10){
+					KambojaMain.experience += 40;
+					KambojaMain.getPostGamePlayers().get(i).reduceScore(10);
+					ended = false;
+					}
+					else if(KambojaMain.getPostGamePlayers().get(i).getScore() > 0){
+					KambojaMain.experience += KambojaMain.getPostGamePlayers().get(i).getScore();
+					KambojaMain.getPostGamePlayers().get(i).reduceScore(KambojaMain.getPostGamePlayers().get(i).getScore());
+					ended = false;
+					}
 				}
-				else if(KambojaMain.getPostGamePlayers().get(i).getScore() > 0){
-				KambojaMain.experience += KambojaMain.getPostGamePlayers().get(i).getScore();
-				KambojaMain.getPostGamePlayers().get(i).reduceScore(KambojaMain.getPostGamePlayers().get(i).getScore());
-				ended = false;
+				if(KambojaMain.experience > KambojaMain.maxExperience) {
+					KambojaMain.experience -= KambojaMain.maxExperience;
+					KambojaMain.level ++;
+					increasingEXP = false;
+					unlockable_frame_selection = 0;
 				}
 			}
-			if(KambojaMain.experience > KambojaMain.maxExperience) {
-				KambojaMain.experience -= KambojaMain.maxExperience;
-				KambojaMain.level ++;
-			}
+		}
+		
+		if(unlockable_frame_selection == 0) {
+			textTween += (1 - textTween)/10.0f;
+		}
+		else {
+			textTween += (0 - textTween)/10.0f;
+		}
+		
+		if(unlockable_frame_selection == 1) {
+			imageTween += (1 - imageTween)/10.0f;
+		}
+		else {
+			imageTween += (0 - imageTween)/10.0f;
 		}
 	}
 
@@ -318,12 +483,78 @@ public class PostGameState extends GenericInterface{
 	public void disconnected(Controller controller) {
 		
 	}
+	
+	@Override
+	public boolean keyDown(int keycode) {
+		
+		if(unlockable_frame_selection == 0) {
+			unlockable_frame_selection = 1;
+			return false;
+		}
+		
+		if(unlockable_frame_selection == 1) {
+			unlockable_frame_selection = -1;
+			unlock();
+			nextUnlockable = getNextUnlockable();
+			increasingEXP = true;
+			return false;
+		}
+		
+		if(ended) {
+			if(unlockable_frame_selection == -1) {
+				intro = false;
+				outro = true;
+			}
+		}
+		else {
+			while(!ended) {
+				ended = true;
+				for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
+					if(KambojaMain.getPostGamePlayers().get(i).getScore() > 10){
+					KambojaMain.experience += 40;
+					KambojaMain.getPostGamePlayers().get(i).reduceScore(10);
+					ended = false;
+					}
+					else if(KambojaMain.getPostGamePlayers().get(i).getScore() > 0){
+					KambojaMain.experience += KambojaMain.getPostGamePlayers().get(i).getScore();
+					KambojaMain.getPostGamePlayers().get(i).reduceScore(KambojaMain.getPostGamePlayers().get(i).getScore());
+					ended = false;
+					}
+				}
+				if(KambojaMain.experience > KambojaMain.maxExperience) {
+					KambojaMain.experience -= KambojaMain.maxExperience;
+					KambojaMain.level ++;
+					unlockable_frame_selection = 0;
+					ended = false;
+					break;
+					
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	public boolean buttonDown(Controller controller, int buttonCode) {
 		
+		if(unlockable_frame_selection == 0) {
+			unlockable_frame_selection = 1;
+			return false;
+		}
+		
+		if(unlockable_frame_selection == 1) {
+			unlockable_frame_selection = -1;
+			unlock();
+			nextUnlockable = getNextUnlockable();
+			increasingEXP = true;
+			return false;
+		}
+		
 		if(ended) {
-			intro = false;
-			outro = true;
+			if(unlockable_frame_selection == -1) {
+				intro = false;
+				outro = true;
+			}
 		}
 		else {
 			while(!ended) {
@@ -343,6 +574,10 @@ public class PostGameState extends GenericInterface{
 				if(KambojaMain.experience > KambojaMain.maxExperience) {
 					KambojaMain.experience -= KambojaMain.maxExperience;
 					KambojaMain.level ++;
+					unlockable_frame_selection = 0;
+					ended = false;
+					break;
+					
 				}
 			}
 		}

@@ -11,6 +11,11 @@ public class BotController extends PlayerController{
 		super(0, null, player, "");
 		
 		weapon = (int)(Math.random() * KambojaMain.getWeaponSize());
+		
+		while(!KambojaMain.weaponUnlocked[weapon]) {
+			weapon = (int)(Math.random() * KambojaMain.getWeaponSize());
+		}
+		
 		name = names[(int)(Math.random() * names.length)];
 	}
 

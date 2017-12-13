@@ -182,31 +182,13 @@ public class TurretObject {
 				float radius = 4;
 				
 				shootTimer = 0;
-				BodyDef def = new BodyDef();
-				def.bullet = true;
-				def.type = BodyType.DynamicBody;
-				def.linearDamping = 0;
-				def.position.set(
+				Vector2 position = new Vector2(
 						body.getWorldCenter().x + (float)Math.cos(Math.toRadians(-body.getAngle())) * (20 / GameState.UNIT_SCALE),
 						body.getWorldCenter().y + (float)Math.sin(Math.toRadians(-body.getAngle())) * (20 / GameState.UNIT_SCALE));
 				Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(body.getAngle() + 90)) * 30, (float)Math.cos(Math.toRadians(body.getAngle() + 90)) * 30);
-				def.linearVelocity.set(direction);
 				
-				Body bul = body.getWorld().createBody(def);
-				
-				CircleShape shape = new CircleShape();
-				shape.setRadius(radius/GameState.UNIT_SCALE);
-				
-				Fixture f = bul.createFixture(shape, 1);
-				f.setSensor(true);
-				
-				shape.dispose();
-				
-				Bullet bullet = new Bullet(bul, turret.player.getId(), Turret.DAMAGE * turret.player.getAtk(), radius, turret.player);
-				
-				f.setUserData(bullet);
-				bul.setUserData(bullet);
-				
+				Bullet bullet = new Bullet(body.getWorld(), position, direction, turret.player.getId(), Turret.DAMAGE * turret.player.getAtk(), radius, turret.player);
+
 				turret.player.getState().addBullet(bullet);
 			}
 		

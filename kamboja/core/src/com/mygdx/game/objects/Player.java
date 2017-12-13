@@ -226,7 +226,7 @@ public class Player implements Steerable<Vector2>{
 		
 		ghosts = new ArrayList<Ghost>();
 		
-
+		
 				
 		fire = new ParticleEffect();
 		fire.load(Gdx.files.internal("particles/firebuff.par"), Gdx.files.internal("particles"));
@@ -677,6 +677,8 @@ public class Player implements Steerable<Vector2>{
 		setDead(false);
 		setFallingTimer(1);
 		setFalling(false);
+		axisVel.set(0, 0);
+		weapon.analog = 0;
 		inputBlocked = false;
 		throwBlood = false;		
 		imunity = 1;

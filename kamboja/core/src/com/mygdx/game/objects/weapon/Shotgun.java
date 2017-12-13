@@ -5,11 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.objects.Bullet;
 import com.mygdx.game.objects.Player;
@@ -56,6 +51,8 @@ public class Shotgun extends Weapon{
 	public void update(float delta) {
 		shootTimer += delta;
 		
+		player.setSprintCooldown(9);
+		
 		if(analog > 0.7){
 			if(shootTimer > 1f){
 				if(GameState.SFX)
@@ -73,11 +70,7 @@ public class Shotgun extends Weapon{
 					
 					
 					shootTimer = 0;
-					BodyDef def = new BodyDef();
-					def.bullet = true;
-					def.type = BodyType.DynamicBody;
-					def.linearDamping = 20f;
-					def.position.set(
+					Vector2 position = new Vector2(
 							getPlayer().getBody().getWorldCenter().x + (float)Math.cos(Math.toRadians(-getPlayer().getAngle())) * (5 / GameState.UNIT_SCALE),
 							getPlayer().getBody().getWorldCenter().y + (float)Math.sin(Math.toRadians(-getPlayer().getAngle())) * (5 / GameState.UNIT_SCALE));
 					
@@ -85,26 +78,12 @@ public class Shotgun extends Weapon{
 					float opening = (float) (10 + Math.random() * 3);
 					float rnd = (float) (Math.random() - 0.5f);
 					Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + i*opening + rnd*PRECISION + rnd*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + i*opening + rnd*PRECISION + rnd*botPrecision)) * vel);
-					def.linearVelocity.set(direction);
-					if(!Float.isNaN(def.position.x) && !Float.isNaN(def.position.y)){
-					Body bul = world.createBody(def);
 					
-					CircleShape shape = new CircleShape();
-					shape.setRadius(radius/GameState.UNIT_SCALE);
-					
-					Fixture f = bul.createFixture(shape, 1);
-					f.setSensor(true);
-					
-					shape.dispose();
-					
-					Bullet bullet = new Bullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+
+					Bullet bullet = new Bullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 					bullet.setTexture(this.bullet);
-					
-					f.setUserData(bullet);
-					bul.setUserData(bullet);
-					
+
 					player.getState().addBullet(bullet);
-					}
 				}
 			}
 		}

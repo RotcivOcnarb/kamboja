@@ -1050,6 +1050,16 @@ public class PlayerSelectState extends State{
 			back_angle += delta*100;
 		}
 		
+		for(int i = 0; i < 4; i ++) {
+			if(i < KambojaMain.getControllers().size()) {
+				if(KambojaMain.getControllers().get(i) != null) {
+					if(KambojaMain.getControllers().get(i) instanceof BotController) {
+						playerReady[i] = true;
+					}
+				}
+			}
+		}
+		
 		if(allReady) {
 			if(!hasFallen) {
 				pressStartBody.setTransform(new Vector2(1920/2f / 100f,  1080*2 / 100f), 0);

@@ -5,12 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.objects.Bullet;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.states.GameState;
@@ -70,42 +65,23 @@ public class Mp5 extends Weapon{
 
 				
 				shootTimer = 0;
-				BodyDef def = new BodyDef();
-				def.bullet = true;
-				def.type = BodyType.DynamicBody;
-				def.linearDamping = 0;
-				def.position.set(
+				Vector2 position = new Vector2(
 						getPlayer().getBody().getWorldCenter().x + (float)Math.cos(Math.toRadians(-getPlayer().getAngle())) * (5 / GameState.UNIT_SCALE),
 						getPlayer().getBody().getWorldCenter().y + (float)Math.sin(Math.toRadians(-getPlayer().getAngle())) * (5 / GameState.UNIT_SCALE));
 				float rnd = (float) Math.random() - 0.5f;
 				float vel = 30;
 				Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel);
-				def.linearVelocity.set(direction);
-				if(!Float.isNaN(def.position.x) && !Float.isNaN(def.position.y)){
-					Body bul = world.createBody(def);
+
+				Bullet bullet = new Bullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+
+				player.getState().addBullet(bullet);
 					
-					CircleShape shape = new CircleShape();
-					shape.setRadius(radius/GameState.UNIT_SCALE);
-					
-					Fixture f = bul.createFixture(shape, 1);
-					f.setSensor(true);
-					shape.dispose();
-					Bullet bullet = new Bullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
-					
-					f.setUserData(bullet);
-					bul.setUserData(bullet);
-					
-					player.getState().addBullet(bullet);
-					
-					bulletCount ++;
-					if(bulletCount > 40){
-						bulletCount = 0;
-						reload = -1f;
-					}
+				bulletCount ++;
+				if(bulletCount > 40){
+					bulletCount = 0;
+					reload = -1f;
 				}
-				else{
-					System.out.println(getPlayer().getBody().getWorldCenter() + ", " + getClass().getSimpleName());
-				}
+
 			}
 		}
 	}

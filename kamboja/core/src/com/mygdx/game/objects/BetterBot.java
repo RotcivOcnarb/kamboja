@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.mygdx.game.objects.map.BreakableBlock;
 import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.weapon.Flamethrower;
 import com.mygdx.game.objects.weapon.Shotgun;
@@ -72,7 +73,7 @@ public class BetterBot extends Player{
 					return -1;
 				}
 				else {
-					if(fixture.getBody().getUserData() instanceof UnbreakableBlock){
+					if(fixture.getBody().getUserData() instanceof UnbreakableBlock || fixture.getBody().getUserData() instanceof BreakableBlock){
 						canHit = false;
 						return 0;
 					}
@@ -94,9 +95,15 @@ public class BetterBot extends Player{
 		long startTime = System.nanoTime();
 		super.update(delta);
 		
+		target = null;
 		for(Player p : getState().getPlayers()) {
-			if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
-				if(p != this)
+			if(target == null) {
+				if(!p.isDead()) {
+					target = p.getPosition();
+				}
+			}
+			else if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
+				if(p != this && !p.isDead())
 				target = p.getPosition();
 			}
 		}
@@ -155,6 +162,9 @@ public class BetterBot extends Player{
 			else {
 				if(!canHit)
 				body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
+				else {
+					body.applyForceToCenter(angleAiming.cpy().rotate(90).scl(5, -5), true);
+				}
 			}
 			
 			elapsed = (int)((System.nanoTime() - startTime) / 1000000f);

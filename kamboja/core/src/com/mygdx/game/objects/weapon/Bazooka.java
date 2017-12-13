@@ -6,11 +6,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.objects.BazookaBullet;
 import com.mygdx.game.objects.Player;
@@ -73,40 +68,18 @@ public class Bazooka extends Weapon{
 				torpedo[(int)(Math.random()*2f)].play(0.5f * GameState.VOLUME);
 								
 				shootTimer = 0;
-				BodyDef def = new BodyDef();
-				def.bullet = true;
-				def.type = BodyType.DynamicBody;
-				def.linearDamping = 0;
-				def.position.set(
+				Vector2 position = new Vector2(
 						getPlayer().getBody().getWorldCenter().x + (float)Math.cos(Math.toRadians(-getPlayer().getAngle())) * (20 / GameState.UNIT_SCALE),
 						getPlayer().getBody().getWorldCenter().y + (float)Math.sin(Math.toRadians(-getPlayer().getAngle())) * (20 / GameState.UNIT_SCALE));
 				float rnd = (float) Math.random() - 0.5f;
 				float vel =  1;
 				Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel);
-				def.linearVelocity.set(direction);
 				
-				if(!Float.isNaN(def.position.x) && !Float.isNaN(def.position.y)){
-				Body bul = world.createBody(def);
-				
-				CircleShape shape = new CircleShape();
-				shape.setRadius(radius/GameState.UNIT_SCALE);
-				
-				Fixture f = bul.createFixture(shape, 1);
-				f.setSensor(true);
-				
-				shape.dispose();
-				
-				BazookaBullet bullet = new BazookaBullet(bul, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+				BazookaBullet bullet = new BazookaBullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
 				bullet.setTexture(bulletBazooka);
 				
-				f.setUserData(bullet);
-				bul.setUserData(bullet);
-				
 				player.getState().addBullet(bullet);
-				}
-				else{
-					System.out.println(getPlayer().getBody().getWorldCenter() + ", " + getClass().getSimpleName());
-				}
+
 			}
 		}
 	}
