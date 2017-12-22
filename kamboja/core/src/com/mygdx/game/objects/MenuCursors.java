@@ -65,7 +65,7 @@ public class MenuCursors {
 		for(PlayerController pc : KambojaMain.getControllers()){
 			if(pc instanceof KeyboardController){
 				cursorPosition[cont].x = Gdx.input.getX();
-				cursorPosition[cont].y = 1920 - Gdx.input.getY();
+				cursorPosition[cont].y = 1080 - Gdx.input.getY() - 20;
 			}
 			cont++;
 		}

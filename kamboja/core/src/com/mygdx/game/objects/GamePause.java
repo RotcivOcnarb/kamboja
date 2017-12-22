@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -33,6 +34,7 @@ public class GamePause {
 	
 	public float offset1, offset2;
 	FreeTypeFontGenerator ftfg;
+	GlyphLayout layout;
 	
 	public void dispose(){
 		ftfg.dispose();
@@ -54,6 +56,8 @@ public class GamePause {
 		param.shadowOffsetY = 3;
 		font = ftfg.generateFont(param);
 		
+		layout = new GlyphLayout();
+		
 		offset1 = -1000;
 		offset2 = 1000;
 		
@@ -68,7 +72,6 @@ public class GamePause {
 	}
 	
 	public void render(SpriteBatch sb){
-		//desenha os cursores
 		
 		offset1 += (-offset1)/20.0f;
 		offset2 += (-offset2)/20.0f;
@@ -85,6 +88,8 @@ public class GamePause {
 			font.draw(sb, "Exit", (float)exit.getX(), (float)exit.getY() + font.getLineHeight()/2);
 		}
 		else{
+			layout.setText(font, "Really want to exit?");
+			font.draw(sb, "Really want to exit?", (1920 - layout.width)/2f, 1920/2f);
 			font.draw(sb, "Yes", (float)yes.getX(), (float)yes.getY() + font.getLineHeight()/2);
 			font.draw(sb, "No", (float)no.getX(), (float)no.getY() + font.getLineHeight()/2);
 		}
