@@ -605,12 +605,11 @@ public class GameState extends State{
 			parser.load(world, layer2d);
 			System.out.println("Loaded " + parser.getBodies().size + " BOX2D objects!");
 		}
-		if(tiledMap.getProperties().get("music") != null)
-		musicName = tiledMap.getProperties().get("music").toString();
-		else
-			musicName = "the_league_of_mice";
+//		if(tiledMap.getProperties().get("music") != null)
+//		musicName = tiledMap.getProperties().get("music").toString();
+//		else
+//			musicName = "the_league_of_mice";
 		
-		GameMusic.loadMusic(musicName);
 	}
 	
 	public void setInSpace() {
@@ -1063,7 +1062,7 @@ public class GameState extends State{
 	//Update
 	
 	public void update(float delta) {
-		GameMusic.fadeOut(GameMusic.MAIN_MENU);
+		//GameMusic.fadeOut(GameMusic.MAIN_MENU);
 				
 		if(islandBackground != null){
 			islandBackground.update(delta);
@@ -1143,7 +1142,7 @@ public class GameState extends State{
 			if(opacity > 1){
 				opacity = 1;
 				manager.changeState(Manager.POST_GAME_STATE);
-				GameMusic.fadeOut(musicName);
+				//GameMusic.fadeOut(musicName);
 				return;
 			}
 		}
@@ -1193,7 +1192,7 @@ public class GameState extends State{
 			else
 			inputBlocked = true;
 			
-			GameMusic.loop(musicName, 1);
+			//GameMusic.loop(musicName, 1);
 		}
 		
 		for(int i = 0; i < getPlayers().size(); i ++){

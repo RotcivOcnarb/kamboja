@@ -258,9 +258,6 @@ public class PlayerSelectState extends State{
 		goingBack = false;
 		allReady = false;
 		back_angle = 0;
-		
-		GameMusic.loadMusic(GameMusic.MAIN_MENU);
-		GameMusic.loop(GameMusic.MAIN_MENU, 0);
 
 		chainBody.clear();
 

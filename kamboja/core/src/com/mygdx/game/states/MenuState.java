@@ -162,8 +162,8 @@ public class MenuState extends State{
 		eng_angle[4] = 0;
 		eng_angle[5] = 0;
 		
-		GameMusic.loadMusic(GameMusic.MAIN_MENU);
-		GameMusic.loop(GameMusic.MAIN_MENU, 0);
+		//GameMusic.loadMusic(GameMusic.MAIN_MENU);
+		//GameMusic.loop(GameMusic.MAIN_MENU, 0);
 
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		
@@ -174,7 +174,7 @@ public class MenuState extends State{
 	}
 
 	public void render(SpriteBatch sb) {
-		GameMusic.fadeIn(GameMusic.MAIN_MENU);
+		//GameMusic.fadeIn(GameMusic.MAIN_MENU);
 		
 		
 		

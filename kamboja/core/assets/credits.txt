@@ -5,8 +5,10 @@
 <space/>
 S<subtitle>Sprites and pixel arts</subtitle>
 <info>João Luis</info>
+<info>Fernando Leandro</info>
+<info>Victor "Rotciv" Branco</info>
 <space/>
-<subtitle>Interfaces</subtitle>
+<subtitle>Interface</subtitle>
 <info>Geovanna Votto</info>
 <space/>
 <subtitle>Level and Map designs</subtitle>
@@ -28,3 +30,6 @@ S<subtitle>Sprites and pixel arts</subtitle>
 <info>Guilherme Leocádio</info>
 <info>Celso Tito Godoy</info>
 <info>Rafael "Xicuinha" Sales</info>
+<info>Paulo Dias</info>
+<info>Victor "Blu Fox"</info>
+<info>Cláudio "Auso"</info>

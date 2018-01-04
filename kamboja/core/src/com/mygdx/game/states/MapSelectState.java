@@ -257,10 +257,7 @@ public class MapSelectState extends State{
 		back_speed = 0;
 		start_angle = 0;
 		start_speed = 0;
-		
-		GameMusic.loadMusic(GameMusic.MAIN_MENU);
-		GameMusic.loop(GameMusic.MAIN_MENU, 0);
-		
+
 		chainBody = new ArrayList<Body>();
 
 		world = new World(new Vector2(0, -9.81f), false);

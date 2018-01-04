@@ -56,9 +56,7 @@ public class PostGame extends State{
 		botTimer = 0;
 
 		sound_select = Gdx.audio.newSound(Gdx.files.internal("audio/select.ogg"));
-		
-		GameMusic.stopAll();
-		
+				
 		background = new Background();
 		
 		pos = -1000;
