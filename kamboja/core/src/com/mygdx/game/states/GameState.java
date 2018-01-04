@@ -110,7 +110,6 @@ public class GameState extends State{
 	private float opacity = 1;
 	private float endTimer;
 	private boolean end;
-	private String musicName;
 	
 	private float menuPos = 0;
 	private float targetMenuPos = 0;
@@ -609,8 +608,11 @@ public class GameState extends State{
 //		musicName = tiledMap.getProperties().get("music").toString();
 //		else
 //			musicName = "the_league_of_mice";
+
+		GameMusic.playSong(tiledMap.getProperties().get("SongName").toString());
 		
 	}
+
 	
 	public void setInSpace() {
 		bloodEffect.setMinLinDamp(0);

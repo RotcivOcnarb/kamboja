@@ -27,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
 
@@ -192,7 +193,8 @@ public class PostGameState extends GenericInterface{
 		crown_light = KambojaMain.getTexture("menu/postgame/crown_light.png");
 
 		nextUnlockable = getNextUnlockable();
-		
+		GameMusic.playMenuSong();
+
 	}
 	
 	public Unlockable getNextUnlockable() {

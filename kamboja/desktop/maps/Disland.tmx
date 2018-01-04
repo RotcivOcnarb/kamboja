@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="56" height="47" tilewidth="32" tileheight="32" nextobjectid="5">
+ <properties>
+  <property name="SongName" value="ilha flutuante"/>
+ </properties>
  <tileset firstgid="1" source="Tiles.tsx"/>
  <tileset firstgid="1025" source="Tiles.tsx"/>
  <layer name="floor" width="56" height="47">

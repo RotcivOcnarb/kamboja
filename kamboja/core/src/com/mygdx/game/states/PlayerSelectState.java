@@ -237,10 +237,11 @@ public class PlayerSelectState extends State{
 				playerBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 280, false);
 				weaponBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
 				keyboardBuffer[i] = new FrameBuffer(Format.RGBA8888, 181, 151, false);
-				
 			}
 			
 			back_tex = KambojaMain.getTexture("menu/player_select/back_btn.png");
+			
+			GameMusic.playMenuSong();
 	}
 
 	@Override

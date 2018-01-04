@@ -10,6 +10,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.states.CreditsState;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.HelpState;
@@ -69,6 +70,8 @@ public class Manager implements ControllerListener, InputProcessor{
 	}
 	
 	public void update(float delta){
+		GameMusic.update();
+		
 		if(!disposed)
 		states.get(currentState).update(delta);
 	}

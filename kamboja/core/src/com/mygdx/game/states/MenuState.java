@@ -133,6 +133,8 @@ public class MenuState extends State{
 			System.out.println(shader.getLog());
 		}
 		
+		GameMusic.startMenu();
+		
 	}
 
 	public void create() {
