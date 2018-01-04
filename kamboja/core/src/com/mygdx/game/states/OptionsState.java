@@ -162,9 +162,7 @@ public class OptionsState extends GenericInterface{
 		left_debug_scale += (1- left_debug_scale)/10.0f;
 		right_debug_scale += (1- right_debug_scale)/10.0f;
 		
-		
-		
-		
+				
 	}
 
 	public void connected(Controller controller) {

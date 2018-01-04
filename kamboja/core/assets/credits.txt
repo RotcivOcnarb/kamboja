@@ -23,8 +23,14 @@ S<subtitle>Sprites and pixel arts</subtitle>
 <info>https://freesound.org</info>
 <space/>
 <subtitle>Musics from</subtitle>
-<info>NÃO SEI AINDA EU NÃO</info>
-<info>COLOQUEI AS MUSICA AAAA</info>
+<info>Reusenoise (DNB Mix), by spinningmerkaba</info>
+<info>I dunno, by grapes</info>
+<info>Newsroom, by Riot</info>
+<info>Granite, by Riot</info>
+<info>Silver, by Riot</info>
+<info>Sunday, by Otis McDonald</info>
+<info>Again, Once Again, by fluffy</info>
+<info>Haus Guest, by Gunnar Olsen</info>
 <space/>
 <subtitle>Special thanks:</subtitle>
 <info>Guilherme Leocádio</info>

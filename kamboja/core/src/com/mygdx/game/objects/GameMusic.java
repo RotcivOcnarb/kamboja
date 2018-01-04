@@ -12,7 +12,9 @@ public class GameMusic{
 	
 	 static HashMap<String, Music> inGameMusics;
 	 
-	 public static float MUSIC_VOLUME = 0;
+	 public static float MUSIC_VOLUME = 1;
+	 
+	 static float volume = 1;
 	 
 	 public static final String MAIN_MENU = "main_menu";
 	 
@@ -24,6 +26,7 @@ public class GameMusic{
 		
 		inGameMusics.put(MAIN_MENU, Gdx.audio.newMusic(Gdx.files.internal("music/menu inicial.ogg")));
 		inGameMusics.get(MAIN_MENU).setLooping(true);
+		inGameMusics.get(MAIN_MENU).setVolume(0);
 		
 		inGameMusics.put("garden", Gdx.audio.newMusic(Gdx.files.internal("music/garden.ogg")));
 		inGameMusics.get("garden").setLooping(true);
@@ -43,7 +46,7 @@ public class GameMusic{
 		if(!started) {
 			currentMusic = MAIN_MENU;
 			nextMusic = MAIN_MENU;
-			MUSIC_VOLUME = 0;
+			volume = 0;
 			fadeIn = true;
 			inGameMusics.get(MAIN_MENU).play();
 			started = true;
@@ -71,11 +74,12 @@ public class GameMusic{
 	
 	public static void update() {
 		
+		inGameMusics.get(currentMusic).setVolume(volume * MUSIC_VOLUME * GameState.VOLUME);
+		
 			if(fadeOut) {
-				inGameMusics.get(currentMusic).setVolume(MUSIC_VOLUME * GameState.VOLUME);
-				MUSIC_VOLUME -= 0.01f;
-				if(MUSIC_VOLUME < 0) {
-					MUSIC_VOLUME = 0;
+				volume -= 0.01f;
+				if(volume < 0) {
+					volume = 0;
 					inGameMusics.get(currentMusic).stop();
 					currentMusic = nextMusic;
 					inGameMusics.get(currentMusic).play();
@@ -84,10 +88,9 @@ public class GameMusic{
 				}
 			}
 			if(fadeIn) {
-				inGameMusics.get(currentMusic).setVolume(MUSIC_VOLUME * GameState.VOLUME);
-				MUSIC_VOLUME += 0.01f;
-				if(MUSIC_VOLUME > 1) {
-					MUSIC_VOLUME = 1;
+				volume += 0.01f;
+				if(volume > 1) {
+					volume = 1;
 					fadeIn = false;
 				}
 			}
