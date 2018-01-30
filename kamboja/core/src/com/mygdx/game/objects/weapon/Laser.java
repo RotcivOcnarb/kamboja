@@ -286,8 +286,10 @@ public class Laser extends Weapon{
 											)
 							);
 					closestFraction = 1;
+					if(p1.cpy().sub(p2.cpy()).len2() > 0) {
+						world.rayCast(callback, p1.cpy(), p2.cpy());
 					
-					world.rayCast(callback, p1.cpy(), p2.cpy());
+					
 					if(closestFixture != null){
 						if(closestFixture.getUserData() instanceof Player){
 							Player pl = (Player) closestFixture.getUserData();
@@ -317,6 +319,7 @@ public class Laser extends Weapon{
 					for(int i = 0; i < (distance/step) + 1; i ++){
 						points.add(startPoint.cpy());
 						startPoint.add(direction.cpy().scl(step));
+					}
 					}
 				}
 				else{

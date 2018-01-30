@@ -91,53 +91,64 @@ public class BetterBot extends Player{
 	}
 	
 	public void update(float delta) {
-		System.out.println("\tframe start");
-		long startTime = System.nanoTime();
+		//System.out.println("\tframe start");
+		//long startTime = System.nanoTime();
 		super.update(delta);
 		
 		target = null;
-		for(Player p : getState().getPlayers()) {
-			if(target == null) {
-				if(!p.isDead()) {
-					target = p.getPosition();
+		
+			for(Player p : getState().getPlayers()) {
+				if(p != this) {
+					if(target == null) {
+						if(!p.isDead()) {
+							target = p.getPosition();
+						}
+					}
+					else if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
+						if(!p.isDead())
+						target = p.getPosition();
+					}
 				}
 			}
-			else if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
-				if(p != this && !p.isDead())
-				target = p.getPosition();
-			}
-		}
 		
-		int elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		float percent = (elapsed / (1000/60f))*100;
-		System.out.println("target detected in: " + percent + "% of total frame time");
-		startTime = System.nanoTime();
+		
+		//int elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		//float percent = (elapsed / (1000/60f))*100;
+		//System.out.println("target detected in: " + percent + "% of total frame time");
+		//startTime = System.nanoTime();
 
 		if(target != null && !isDead()) {
 		Vector2 aimingTarget = target.cpy().sub(getPosition().cpy()).nor();
 		angleAiming.add(aimingTarget.cpy().sub(angleAiming.cpy()).scl(difficulty));
 		setAngle(angleAiming.cpy().scl(1, -1));
 		
-		getState().getWorld().rayCast(raycast, getPosition().cpy(), target.cpy());
-		
-		elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		percent = (elapsed / (1000/60f))*100;
-		System.out.println("raycasted in: " + percent + "% of total frame time");
-		startTime = System.nanoTime();
-		
+		if(target.cpy().sub(getPosition().cpy()).len2() > 0) {
+			getState().getWorld().rayCast(raycast, getPosition().cpy(), target.cpy());
+		}
+		else {
+			System.out.println("Ha! This should have given an error (i think)");
 		}
 		
-		pf.setSx((int)(getPosition().x / (32 / GameState.UNIT_SCALE)));
-		pf.setSy((int)(getPosition().y / (32 / GameState.UNIT_SCALE)));
-		pf.setEx((int)(target.x / (32 / GameState.UNIT_SCALE)));
-		pf.setEy((int)(target.y / (32 / GameState.UNIT_SCALE)));
-		pf.setMap(getState().getBitmap());
-		path = pf.getPath();
+		//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		//percent = (elapsed / (1000/60f))*100;
+		//System.out.println("raycasted in: " + percent + "% of total frame time");
+		//startTime = System.nanoTime();
 		
-		elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		percent = (elapsed / (1000/60f))*100;
-		System.out.println("path attributting in: " + percent + "% of total frame time");
-		startTime = System.nanoTime();
+		
+		
+			pf.setSx((int)(getPosition().x / (32 / GameState.UNIT_SCALE)));
+			pf.setSy((int)(getPosition().y / (32 / GameState.UNIT_SCALE)));
+			pf.setEx((int)(target.x / (32 / GameState.UNIT_SCALE)));
+			pf.setEy((int)(target.y / (32 / GameState.UNIT_SCALE)));
+			pf.setMap(getState().getBitmap());
+			path = pf.getPath();
+		
+		//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+		//percent = (elapsed / (1000/60f))*100;
+		//System.out.println("path attributting in: " + percent + "% of total frame time");
+		//startTime = System.nanoTime();
+		
+		}
 		
 		if(path != null) {
 			for(Vector2 p : path) {
@@ -149,10 +160,10 @@ public class BetterBot extends Player{
 			if(!path.isEmpty())
 				path.remove(0);
 			
-			elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-			percent = (elapsed / (1000/60f))*100;
-			System.out.println("path adjusted in: " + percent + "% of total frame time");
-			startTime = System.nanoTime();
+			//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+			//percent = (elapsed / (1000/60f))*100;
+			//System.out.println("path adjusted in: " + percent + "% of total frame time");
+			//startTime = System.nanoTime();
 		}
 		
 		if(path.size() > 0 && !isDead()) {
@@ -167,10 +178,10 @@ public class BetterBot extends Player{
 				}
 			}
 			
-			elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-			percent = (elapsed / (1000/60f))*100;
-			System.out.println("force applied in: " + percent + "% of total frame time");
-			startTime = System.nanoTime();
+			//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
+			//percent = (elapsed / (1000/60f))*100;
+			//System.out.println("force applied in: " + percent + "% of total frame time");
+			//startTime = System.nanoTime();
 		}
 		
 		if(!isDead()) {

@@ -67,8 +67,8 @@ public class KambojaMain extends ApplicationAdapter {
 	private static int playersize = 5;
 	private static boolean items = true; 
 	public static final double SENSITIVITY = 1.5f;
-	public static boolean[] mapUnlocked = new boolean[]{true, true, true, true, true, true, true, true};
-	public static boolean[] weaponUnlocked = new boolean[] {true, true, true, true, true, true, true, true};
+	public static boolean[] mapUnlocked = new boolean[]{true, true, true, false, false, false, false, true};
+	public static boolean[] weaponUnlocked = new boolean[] {true, true, false, false, false, false, false, false};
 	public static int level = 1;
 	public static int experience = 0;
 	public static int maxExperience = 10000;
@@ -215,7 +215,7 @@ public class KambojaMain extends ApplicationAdapter {
         return null;
     }
 
-    public static String decrypt(String key, String initVector, String encrypted) {
+    public static String decrypt(String key, String initVector, String encrypted) throws RuntimeException{
         try {
             IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
             SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
@@ -227,10 +227,12 @@ public class KambojaMain extends ApplicationAdapter {
 
             return new String(original);
         } catch (Exception ex) {
-            ex.printStackTrace();
+           throw new RuntimeException();
         }
-
-        return null;
+    }
+    
+    public static String clampLength(String str, int size) {
+    	return str.substring(0, size);
     }
     
     public static void loadGame() {
@@ -241,7 +243,7 @@ public class KambojaMain extends ApplicationAdapter {
 			encrypted = fw.readLine();
 			fw.close();
 			
-	    	String save = decrypt("" + steamUser.getSteamID().getAccountID() + steamUser.getSteamID().getAccountID(), "RandomInitVector", encrypted);
+	    	String save = decrypt(clampLength("" + steamUser.getSteamID() + steamUser.getSteamID(), 16), "RandomInitVector", encrypted);
 
 	    	System.out.println(save);
 	    	
@@ -268,7 +270,18 @@ public class KambojaMain extends ApplicationAdapter {
     	catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
+    	catch(RuntimeException e) {
+    		File file = new File("SavesDir/save.sav");
+    		if(file.exists()) {
+    			System.out.println("Save corrupted, deleting and creating new one");
+    			file.delete();
+    			try {
+					file.createNewFile();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+    		}
+    	}
     	
     }
     
@@ -281,7 +294,7 @@ public class KambojaMain extends ApplicationAdapter {
 		
 		Json json = new Json();
 
-		String encrypted = encrypt("" + steamUser.getSteamID().getAccountID() + steamUser.getSteamID().getAccountID(), "RandomInitVector", json.toJson(so));
+		String encrypted = encrypt(clampLength("" + steamUser.getSteamID() + steamUser.getSteamID(), 16), "RandomInitVector", json.toJson(so));
 		//System.out.println(encrypted);
 		
 		try {

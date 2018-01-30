@@ -394,8 +394,8 @@ public class PostGameState extends GenericInterface{
 		sb.draw(nextUnlockable.imagem,
 				(1920 - nextUnlockable.imagem.getWidth()*imageTween)/2f,
 				(1080 - nextUnlockable.imagem.getHeight()*imageTween)/2f,
-				nextUnlockable.imagem.getWidth()*imageTween,
-				nextUnlockable.imagem.getHeight()*imageTween);
+				200*imageTween,
+				200*imageTween);
 		
 		oliverFrag.setColor(1, 1, 1, imageTween);
 		oliverFrag.draw(sb, nextUnlockable.nome, 0, (1080 - unlockedImage.getHeight()*imageTween)/2f + 150,
