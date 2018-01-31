@@ -1060,7 +1060,7 @@ public class GameState extends State{
 			gamepause.render(sb);
 		}
 	}
-	
+
 	//Update
 	
 	public void update(float delta) {
@@ -1251,9 +1251,17 @@ public class GameState extends State{
 			if(itemTimer <= 0){
 				if(KambojaMain.hasItems()){
 					itemTimer = (float) (Math.random() * 10 + 10);
+					int bx = (int) (Math.random() * bitmap.length);
+					int by = (int) (Math.random() * bitmap[0].length);
+					
+					while(bitmap[bx][by] == 1) {
+						bx = (int) (Math.random() * bitmap.length);
+						by = (int) (Math.random() * bitmap[0].length);
+					}
+					
+					
 					addItem(new Vector2(
-							(float)(Math.random() * mapWidth * 16) / UNIT_SCALE,
-							(float)(Math.random() * mapHeight * 16) / UNIT_SCALE
+							(16 + bx * 32) / GameState.UNIT_SCALE , (16 + by * 32) / GameState.UNIT_SCALE
 							), (int)(Math.random() * (BETA_ITEMS ? 6 : 4)));
 				}
 			}
@@ -1322,17 +1330,19 @@ public class GameState extends State{
 		if(!isPause())
 		world.step(1/60f, 6, 2);
 		
-		float minx = getPlayers().get(0).getBody().getWorldCenter().x;
-		float miny = getPlayers().get(0).getBody().getWorldCenter().y;
-		float maxx = getPlayers().get(0).getBody().getWorldCenter().x;
-		float maxy = getPlayers().get(0).getBody().getWorldCenter().y;
+		float minx = 10000000;
+		float miny = 10000000;
+		float maxx = -10000;
+		float maxy = -1000;
 		
 		for(Player p : getPlayers()){
-			minx = Math.min(p.getBody().getWorldCenter().x, minx);
-			miny = Math.min(p.getBody().getWorldCenter().y, miny);
-			
-			maxx = Math.max(p.getBody().getWorldCenter().x, maxx);
-			maxy = Math.max(p.getBody().getWorldCenter().y, maxy);
+			if(!p.isDead()) {
+				minx = Math.min(p.getBody().getWorldCenter().x, minx);
+				miny = Math.min(p.getBody().getWorldCenter().y, miny);
+				
+				maxx = Math.max(p.getBody().getWorldCenter().x, maxx);
+				maxy = Math.max(p.getBody().getWorldCenter().y, maxy);
+			}
 		}
 		
 		minx -= 64 / UNIT_SCALE;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="49" height="29" tilewidth="32" tileheight="32" nextobjectid="9">
+<map version="1.0" tiledversion="1.1.0" orientation="orthogonal" renderorder="right-down" width="49" height="29" tilewidth="32" tileheight="32" infinite="0" nextobjectid="10">
  <properties>
   <property name="SongName" value="garden"/>
  </properties>
@@ -175,6 +175,12 @@
     <property name="angle" type="float" value="0"/>
    </properties>
    <ellipse/>
+  </object>
+  <object id="9" type="object" x="446" y="320">
+   <properties>
+    <property name="angle" type="float" value="0"/>
+   </properties>
+   <polygon points="0,0 -3,247 -62,256 -69,543 251,537 258,480 416,479 422,538 709,542 704,256 638,254 640,-3 831,-2 829,-128 1028,-134 1024,-330 1138,-334 1132,620 -478,616 -458,-342 -378,-330 -384,-132 -200,-132 -190,2"/>
   </object>
  </objectgroup>
  <objectgroup name="Player">

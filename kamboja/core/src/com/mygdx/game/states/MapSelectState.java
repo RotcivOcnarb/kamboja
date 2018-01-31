@@ -577,7 +577,7 @@ public class MapSelectState extends State{
 						174
 						);
 				
-				if(KambojaMain.mapUnlocked[i]  || i == KambojaMain.mapUnlocked.length-1)
+				if(KambojaMain.mapUnlocked[i]  || i == KambojaMain.randomIndex)
 				sb.setColor(1, 1, 1, 0.3f);
 				else
 				sb.setColor(0.3f, 0.3f, 0.3f, 1f);
@@ -1096,11 +1096,10 @@ public class MapSelectState extends State{
 			KambojaMain.setItems(!KambojaMain.hasItems());
 			break;
 		default:			
-			if(KambojaMain.mapUnlocked[selection[id]] || selection[id] == KambojaMain.mapUnlocked.length-1) {
+			if(KambojaMain.mapUnlocked[selection[id]] || selection[id] == KambojaMain.randomIndex) {
 				selected_map = selection[id];
 				KambojaMain.setMapName(mapNames.get(selected_map));
-				if(selected_map == mapNames.size() - 1){
-					
+				if(selected_map == KambojaMain.randomIndex){
 					int randomMap = (int)(Math.random() * (KambojaMain.mapUnlocked.length - 1));
 					
 					while(!KambojaMain.mapUnlocked[randomMap]) {
@@ -1108,7 +1107,9 @@ public class MapSelectState extends State{
 					}
 					
 					KambojaMain.setMapName(mapNames.get(randomMap));
-					
+				}
+				else {
+					System.out.println("Not random index, index selected: " + selected_map);
 				}
 				
 			}

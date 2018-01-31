@@ -54,11 +54,15 @@ public class Bullet {
 	}
 	
 	public Bullet(World world, Vector2 position, Vector2 direction, int id, float damage, float radius, Player player){
+		this(world, position, direction, id, damage, radius, player, 0);
+	}
+	
+	public Bullet(World world, Vector2 position, Vector2 direction, int id, float damage, float radius, Player player, float linearDamping){
 		
 		BodyDef def = new BodyDef();
 		def.bullet = true;
 		def.type = BodyType.DynamicBody;
-		def.linearDamping = 0;
+		def.linearDamping = linearDamping;
 		def.position.set(position);
 		def.linearVelocity.set(direction);
 		

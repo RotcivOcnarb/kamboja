@@ -1472,7 +1472,7 @@ public class PlayerSelectState extends State{
 							}
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						xMoved = false;
 					}
 				}
@@ -1488,7 +1488,7 @@ public class PlayerSelectState extends State{
 							}
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						yMoved = false;
 					}
 				}
@@ -1512,7 +1512,7 @@ public class PlayerSelectState extends State{
 							}
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						xMoved = false;
 					}
 				}
@@ -1529,7 +1529,7 @@ public class PlayerSelectState extends State{
 							}
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						yMoved = false;
 					}
 				}
@@ -1554,7 +1554,7 @@ public class PlayerSelectState extends State{
 							
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						xMoved = false;
 					}
 				}
@@ -1571,7 +1571,7 @@ public class PlayerSelectState extends State{
 							}
 						}
 					}
-					else {
+					else if(Math.abs(value) < 0.3f){
 						yMoved = false;
 					}
 				}
@@ -1602,7 +1602,7 @@ public class PlayerSelectState extends State{
 				KambojaMain.getControllers().add(put_id, bot);
 				
 				positionPlayerOffset[KambojaMain.getControllers().size() - 1] = bot.getPlayer();
-				positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+				positionWeaponOffset[KambojaMain.getControllers().size() - 1] = bot.getWeapon();
 				playerReady[put_id] = true;
 			}
 			else {
@@ -1611,7 +1611,7 @@ public class PlayerSelectState extends State{
 					KambojaMain.getControllers().add(bot);
 					
 					positionPlayerOffset[KambojaMain.getControllers().size() - 1] = bot.getPlayer();
-					positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+					positionWeaponOffset[KambojaMain.getControllers().size() - 1] = bot.getWeapon();
 					playerReady[KambojaMain.getControllers().size() - 1] = true;
 				}
 			}

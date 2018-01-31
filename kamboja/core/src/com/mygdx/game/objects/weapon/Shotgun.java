@@ -51,7 +51,7 @@ public class Shotgun extends Weapon{
 	public void update(float delta) {
 		shootTimer += delta;
 		
-		player.setSprintCooldown(9);
+		//player.setSprintCooldown(9);
 		
 		if(analog > 0.7){
 			if(shootTimer > 1f){
@@ -80,7 +80,7 @@ public class Shotgun extends Weapon{
 					Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + i*opening + rnd*PRECISION + rnd*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + i*opening + rnd*PRECISION + rnd*botPrecision)) * vel);
 					
 
-					Bullet bullet = new Bullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+					Bullet bullet = new Bullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer(), 20);
 					bullet.setTexture(this.bullet);
 
 					player.getState().addBullet(bullet);

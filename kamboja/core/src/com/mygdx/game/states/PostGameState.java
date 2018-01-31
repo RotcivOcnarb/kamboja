@@ -388,14 +388,17 @@ public class PostGameState extends GenericInterface{
 				(1920 - unlockedImage.getWidth()*imageTween)/2f,
 				(1080 - unlockedImage.getHeight()*imageTween)/2f,
 				unlockedImage.getWidth()*imageTween,
-				unlockedImage.getHeight()*imageTween
+				unlockedImage.getWidth()*imageTween
 				);
 		
+		float imageWidth = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getWidth();
+		float imageHeight = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getHeight();
+		
 		sb.draw(nextUnlockable.imagem,
-				(1920 - nextUnlockable.imagem.getWidth()*imageTween)/2f,
-				(1080 - nextUnlockable.imagem.getHeight()*imageTween)/2f,
-				200*imageTween,
-				200*imageTween);
+				(1920 - imageWidth*imageTween)/2f,
+				(1080 - imageHeight*imageTween)/2f,
+				imageWidth*imageTween,
+				imageHeight*imageTween);
 		
 		oliverFrag.setColor(1, 1, 1, imageTween);
 		oliverFrag.draw(sb, nextUnlockable.nome, 0, (1080 - unlockedImage.getHeight()*imageTween)/2f + 150,
