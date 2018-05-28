@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.controllers.Gamecube;
@@ -29,6 +31,8 @@ public class GamePause {
 	BitmapFont font;
 	
 	Rectangle2D exit, resume, yes, no;
+	
+	ShapeRenderer sr;
 	
 	public boolean confirm = false;
 	
@@ -61,6 +65,8 @@ public class GamePause {
 		offset1 = -1000;
 		offset2 = 1000;
 		
+		sr = new ShapeRenderer();
+		
 		exit = new Rectangle2D.Float((1920 - 130)/2.0f + offset1, 300, 130, 50);
 		resume = new Rectangle2D.Float((1920 - 210)/2.0f + offset2, 400, 210, 50);
 		
@@ -73,6 +79,8 @@ public class GamePause {
 	
 	public void render(SpriteBatch sb){
 		
+		sb.setProjectionMatrix(Util.getNormalProjection());
+		
 		offset1 += (-offset1)/20.0f;
 		offset2 += (-offset2)/20.0f;
 		
@@ -84,14 +92,21 @@ public class GamePause {
 
 		sb.begin();
 		if(!confirm){
-			font.draw(sb, "Resume", (float)resume.getX(), (float)resume.getY() + font.getLineHeight()/2);
-			font.draw(sb, "Exit", (float)exit.getX(), (float)exit.getY() + font.getLineHeight()/2);
+			layout.setText(font, "Resume");
+			font.draw(sb, "Resume", (float)resume.getX() + 10, (float)resume.getY() + layout.height);
+			
+			layout.setText(font, "Exit");
+			font.draw(sb, "Exit", (float)exit.getX() + 10, (float)exit.getY() + layout.height);
 		}
 		else{
 			layout.setText(font, "Really want to exit?");
 			font.draw(sb, "Really want to exit?", (1920 - layout.width)/2f, 1920/2f);
-			font.draw(sb, "Yes", (float)yes.getX(), (float)yes.getY() + font.getLineHeight()/2);
-			font.draw(sb, "No", (float)no.getX(), (float)no.getY() + font.getLineHeight()/2);
+			
+			layout.setText(font, "Yes");
+			font.draw(sb, "Yes", (float)yes.getX() + 10, (float)yes.getY() + layout.height);
+			
+			layout.setText(font, "No");
+			font.draw(sb, "No", (float)no.getX() + 10, (float)no.getY() + layout.height);
 		}
 		sb.end();
 
@@ -139,24 +154,24 @@ public class GamePause {
 		}
 		
 		if(button == select){
-			Point2D p = new Point2D.Double(cursors.getPosition(id).x, cursors.getPosition(id).y);
+			Rectangle2D curs = new Rectangle2D.Double(cursors.getPosition(id).x - 16, cursors.getPosition(id).y - 16, 32, 32);
 			
 			if(!confirm){
-				if(exit.contains(p)){
+				if(exit.intersects(curs) || exit.contains(curs)){
 					confirm = true;
 					offset1 = -1000;
 					offset2 = 1000;
 				}
-				else if(resume.contains(p)){
+				else if(resume.intersects(curs) ||resume.contains(curs)){
 					state.pauseUnpause();
 				}
 			}
 			else{
-				if(yes.contains(p)){
+				if(yes.intersects(curs) || yes.contains(curs)){
 					state.manager.changeState(Manager.PLAYER_SELECT_STATE);
 					return;
 				}
-				else if(no.contains(p)){
+				else if(no.intersects(curs) || no.contains(curs)){
 					confirm = false;
 					offset1 = -1000;
 					offset2 = 1000;

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -73,6 +74,7 @@ public class KambojaMain extends ApplicationAdapter {
 	public static int level = 1;
 	public static int experience = 0;
 	public static int maxExperience = 10000;
+	public static boolean vaporAmount = false;
 	static SteamUser steamUser;
 	
 	AssetManager assets;
@@ -308,6 +310,18 @@ public class KambojaMain extends ApplicationAdapter {
     }
 	
 	public void create () {
+		
+		MultiPrintStream logTxt;
+		try {
+			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")));
+			System.setErr(logTxt);
+			//System.setOut(logTxt);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		
+		
 		GameMusic.initialize();
 		instance = this;
 		sr = new ShapeRenderer();
@@ -320,7 +334,7 @@ public class KambojaMain extends ApplicationAdapter {
 		try {
 			//SteamAPI.restartAppIfNecessary(747110);
 		    if (!SteamAPI.init()) {
-		    	System.out.println("Steam not connected");
+		    	System.err.println("Steam not connected");
 		       System.exit(1);
 		    }
 		} catch (SteamException e) {
@@ -402,7 +416,7 @@ public class KambojaMain extends ApplicationAdapter {
 			GameState.VOLUME = Float.parseFloat(configs.get("SFXVolume"));
 			GameMusic.MUSIC_VOLUME = Float.parseFloat(configs.get("MusicVolume"));
 			
-			
+			vaporAmount = Boolean.parseBoolean(configs.get("Vaporwave"));
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

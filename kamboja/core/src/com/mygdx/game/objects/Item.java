@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -28,6 +29,8 @@ public class Item implements Steerable<Vector2>{
 	
 	boolean canRemove = false;
 	
+	ParticleEffect showing;
+	
 	static Sound blow, fire, deffense, life, spawn[] = new Sound[4];
 	static{
 		blow = Gdx.audio.newSound(Gdx.files.internal("audio/blow.ogg"));
@@ -48,6 +51,10 @@ public class Item implements Steerable<Vector2>{
 	public Item(Body body, int id){
 		this.body = body;
 		this.id = id;
+		
+		showing = new ParticleEffect();
+		showing.load(Gdx.files.internal("particles/item.par"), Gdx.files.internal("particles"));
+		showing.scaleEffect(1f/GameState.UNIT_SCALE / 3f);
 		
 		if(GameState.SFX)
 		spawn[(int)(Math.random()*4)].play(GameState.VOLUME);
@@ -100,6 +107,19 @@ public class Item implements Steerable<Vector2>{
 	public boolean render(SpriteBatch sb){
 		
 		timer += Gdx.graphics.getDeltaTime();
+
+		if(!canRemove) {
+			if(showing.isComplete()){
+				showing.reset();
+			}
+		}
+		else {
+			showing.allowCompletion();
+		}
+		
+		showing.update(Gdx.graphics.getDeltaTime());
+		showing.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
+		
 		
 		sb.draw(texture,
 				body.getWorldCenter().x - (8 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
@@ -109,6 +129,8 @@ public class Item implements Steerable<Vector2>{
 				(16 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
 				(16 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
 				1, 1, 0, 0, 0, texture.getWidth(), texture.getHeight(), false, false);
+		
+		showing.draw(sb);
 		
 		return canRemove;
 	}

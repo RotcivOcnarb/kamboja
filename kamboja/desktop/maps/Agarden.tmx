@@ -173,12 +173,14 @@
   <object id="3" name="fonte" type="object" x="750.333" y="429.667" width="68.6667" height="68.6667">
    <properties>
     <property name="angle" type="float" value="0"/>
+    <property name="userData" value="Block"/>
    </properties>
    <ellipse/>
   </object>
   <object id="9" type="object" x="446" y="320">
    <properties>
     <property name="angle" type="float" value="0"/>
+    <property name="userData" value="Block"/>
    </properties>
    <polygon points="0,0 -3,247 -62,256 -69,543 251,537 258,480 416,479 422,538 709,542 704,256 638,254 640,-3 831,-2 829,-128 1028,-134 1024,-330 1138,-334 1132,620 -478,616 -458,-342 -378,-330 -384,-132 -200,-132 -190,2"/>
   </object>

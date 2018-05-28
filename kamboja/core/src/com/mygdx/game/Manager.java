@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -8,9 +9,15 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.GameMusic;
+import com.mygdx.game.objects.Util;
 import com.mygdx.game.states.CreditsState;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.HelpState;
@@ -35,6 +42,11 @@ public class Manager implements ControllerListener, InputProcessor{
 	public static final int POST_GAME_STATE = 6;
 	public static final int OPTIONS_STATE = 7;
 	
+	FrameBuffer geralBuffer;
+	ShaderProgram shader;
+	
+	float globalTimer;
+	
 	public Manager(){
 		states = new ArrayList<State>();
 		states.add(new GameState(this));
@@ -49,6 +61,11 @@ public class Manager implements ControllerListener, InputProcessor{
 		Controllers.clearListeners();
 		Controllers.addListener(this);	
 		Gdx.input.setInputProcessor(this);
+		
+		geralBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
+		
+		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
+				Gdx.files.internal("shaders/vaporwave.fs"));
 	}
 
 	public void reAddControllers(){
@@ -58,11 +75,42 @@ public class Manager implements ControllerListener, InputProcessor{
 	
 	public void create(){
 		states.get(currentState).create();
+		
+		
 	}
 	
 	public void render(SpriteBatch sb){
 		if(!disposed){
-		states.get(currentState).render(sb);
+			
+			if(KambojaMain.vaporAmount) {
+				FrameBufferStack.begin(geralBuffer);
+				states.get(currentState).render(sb);
+				FrameBufferStack.end();
+				
+				shader.begin();
+				
+				Calendar calendar = Calendar.getInstance();
+
+				shader.setUniformf("iTime", globalTimer);
+				shader.setUniformf("iDate", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+						calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.SECOND) + calendar.get(Calendar.MINUTE)*60 + calendar.get(Calendar.HOUR)*60*60);
+				shader.setUniformf("screenSize", 1920/3f, 1080/3f);
+				shader.setUniformf("amt", 0.7f);
+				
+				sb.setShader(shader);
+				sb.setProjectionMatrix(Util.getNormalProjection());
+				sb.begin();	
+					sb.draw(FrameBufferStack.getTexture(),
+							0, 0, 1920, 1080, 0, 0, 1920, 1080, false, true);
+				sb.end();
+				sb.setShader(null);
+				shader.end();
+			}
+			else {
+				states.get(currentState).render(sb);
+			}
+			
+			
 		}
 		else{
 			disposed = false;
@@ -71,7 +119,7 @@ public class Manager implements ControllerListener, InputProcessor{
 	
 	public void update(float delta){
 		GameMusic.update();
-		
+		globalTimer += delta;
 		if(!disposed)
 		states.get(currentState).update(delta);
 	}

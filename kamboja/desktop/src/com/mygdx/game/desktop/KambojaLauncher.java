@@ -5,6 +5,9 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -24,10 +27,20 @@ public class KambojaLauncher{
 	}
 
 	public KambojaLauncher() {
+		boolean debug = false;
+		PrintStream logTxt;
+		try {
+			logTxt = new PrintStream(new File ("log.txt"));
+			System.setErr(logTxt);
+			//System.setOut(logTxt);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
 		JPanel panel = new JPanel();
 		
 		JCheckBox chk_full = new JCheckBox("Fullscreen");
-		chk_full.setSelected(true);
+		chk_full.setSelected(!debug);
 		
 		JLabel lbl_res = new JLabel("Resolution: ");
 		JComboBox<ScreenSize> combo = new JComboBox<ScreenSize>();
@@ -51,6 +64,8 @@ public class KambojaLauncher{
 				
 			}
 		}
+		
+		if(debug) combo.setSelectedIndex(7);
 	
 		panel.setLayout(new FlowLayout());
 

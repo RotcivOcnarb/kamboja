@@ -54,7 +54,7 @@ public class MenuCursors {
 		//desenha os cursores
 		sb.setColor(1, 1, 1, 1);
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
-			sb.draw(cursors[i], cursorPosition[i].x, cursorPosition[i].y, 32, 32);
+			sb.draw(cursors[i], cursorPosition[i].x - 16, cursorPosition[i].y - 16, 32, 32);
 		}
 		
 		sb.end();

@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector2;
@@ -58,6 +59,7 @@ public class Player implements Steerable<Vector2>{
 	protected int maxStamina = 10;
 	protected float mana = 100;
 	protected float speed = 10;
+	protected String name;
 	
 	float staminaWrnScl = 2;
 	float staminaWrnAlpha = 0;
@@ -93,7 +95,8 @@ public class Player implements Steerable<Vector2>{
 	private static Texture[] players;
 	private TextureRegion player;
 	private Animation<TextureRegion> legsAnimation;
-	
+
+
 	private boolean dead = false;
 	private boolean throwBlood = false;
 	private boolean isFalling = false;
@@ -210,12 +213,13 @@ public class Player implements Steerable<Vector2>{
 		}
 	}
 	
-	public Player(Body body, int id, GameState state){
+	public Player(Body body, int id, GameState state, String name){
 		this.body = body;
 		this.setId(id);
 		this.setState(state);
 		body.setLinearDamping(30);
 		body.setFixedRotation(true);
+		this.name = name;
 		
 		stamina = 0;
 		
@@ -278,6 +282,9 @@ public class Player implements Steerable<Vector2>{
 		f.setUserData(new PlayerFall(this));
 		s.dispose();
 
+
+
+		
 		aim = new Texture("player/aim.png");
 		
 		if(KambojaMain.getControllers().get(id) instanceof KeyboardController){
@@ -616,36 +623,6 @@ public class Player implements Steerable<Vector2>{
 		}
 		
 		sb.setProjectionMatrix(Util.getNormalProjection());
-		
-		if(keyboard){
-			switch(getId()){
-			case 0:
-				sb.setColor(0, 0, 1, 1);
-				break;
-			case 1:
-				sb.setColor(1, 0, 0, 1);
-				break;
-			case 2:
-				sb.setColor(0, 1, 0, 1);
-				break;
-			case 3:
-				sb.setColor(1, 1, 0, 1);
-			}
-			sb.draw(aim,
-					Gdx.input.getX(),
-					1080 - Gdx.input.getY() - aim.getHeight()*3,
-					aim.getWidth()*3,
-					aim.getHeight()*3
-					);
-			
-			sb.setColor(1, 1, 1, 1);
-			
-			if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
-				if(getState().getTimer() > 5 && !(getState().isIntro() || getState().isOutro())){
-					getState().pauseUnpause();
-				}
-			}
-		}
 
 		switch(getId()){
 		case 0:
@@ -670,6 +647,44 @@ public class Player implements Steerable<Vector2>{
 		sb.end();
 		
 		
+	}
+	
+	public void renderAbove(SpriteBatch sb) {
+		sb.setProjectionMatrix(Util.getNormalProjection());
+		
+		if(keyboard){
+			sb.begin();
+			sb.setColor(1, 0, 0, 1);
+			sb.draw(aim,
+					Gdx.input.getX(),
+					1080 - Gdx.input.getY() - aim.getHeight()*3,
+					aim.getWidth()*3,
+					aim.getHeight()*3
+					);
+			
+			sb.setColor(1, 1, 1, 1);
+			sb.end();
+			
+			if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
+				if(getState().getTimer() > 5 && !(getState().isIntro() || getState().isOutro())){
+					getState().pauseUnpause();
+				}
+			}
+		}
+		
+		
+		if(!(this instanceof BetterBot) && !dead) {
+			sr.begin(ShapeType.Filled);
+			sr.setProjectionMatrix(state.getCamera().combined);
+			sr.setColor(Color.RED);
+			int distance = (int) (2000 * state.getCamera().zoom);
+			for(int i = 1; i < distance; i ++) {
+				Vector2 point = getPosition().cpy().add(angle.cpy().nor().scl(1, -1).scl(i / GameState.UNIT_SCALE * 15));
+				sr.circle(point.x, point.y, ((distance - i) / (float) distance)/2 * (3 / GameState.UNIT_SCALE) * 250 * state.getCamera().zoom, 15);
+				
+			}
+			sr.end();
+		}
 	}
 
 	public void revive(){
@@ -737,6 +752,44 @@ public class Player implements Steerable<Vector2>{
 			if(body.getLinearVelocity().len() > 3) {
 				body.setLinearVelocity(body.getLinearVelocity().cpy().nor().scl(3));
 			}
+		}
+		
+		if(!(this instanceof BetterBot) && !keyboard) {
+			
+			Player aiming = null;
+			
+			for(Player p : state.getPlayers()) {
+				if(p != this && !p.isDead()) {
+					
+					Vector2 line = p.getPosition().cpy().sub(getPosition().cpy());
+					Vector2 angle_inverted = angle.cpy().scl(1, -1);
+					
+					float a_b = (float) Math.acos(line.dot(angle_inverted) / (line.len() * angle_inverted.len()));
+					
+					if(Math.toDegrees(a_b) < 30) {
+						
+						if(aiming == null) {
+							aiming = p;
+						}
+						else {
+							if(line.len2() < aiming.getPosition().cpy().sub(getPosition()).len2()) {
+								aiming = p;
+							}
+						}
+						
+					}
+					
+				}
+			}
+			
+			if(aiming != null) {
+				
+				Vector2 end = aiming.getPosition().cpy().sub(getPosition().cpy()).nor().scl(1, -1);
+				
+				axis.add(end.cpy().sub(axis.cpy()).scl(1/10.0f));
+				
+			}
+			
 		}
 		
 		if(isFalling()){
@@ -873,13 +926,13 @@ public class Player implements Steerable<Vector2>{
 		
 		switch(getBuff()){
 		case Item.ATTACK:
-			setAtk(2);
+			setAtk(5);
 			break;
 		case Item.DEFFENSE:
-			def = 2;
+			def = 0;
 			break;
 		case Item.SPEED:
-			spd = 1.6f;
+			spd = 3f;
 			break;
 		}
 		
@@ -939,6 +992,8 @@ public class Player implements Steerable<Vector2>{
 			System.out.println("Velocity: " + body.getLinearVelocity());
 			System.exit(0);
 		}
+		angle.x += (axis.x - angle.x)/5.0f;
+		angle.y += (axis.y - angle.y)/5.0f;
 	}
 	
 	public void dash() {
@@ -1042,11 +1097,13 @@ public class Player implements Steerable<Vector2>{
 				}
 			}
 			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+				
 				xAxis = XBox.AXIS_LEFT_X;
 				yAxis = XBox.AXIS_LEFT_Y;
 				
 				xCam = XBox.AXIS_RIGHT_X;
 				yCam = XBox.AXIS_RIGHT_Y;
+				
 				
 				if(axisCode == XBox.AXIS_RIGHT_TRIGGER){
 					if(value < -0.7){
@@ -1108,17 +1165,24 @@ public class Player implements Steerable<Vector2>{
 			}
 			
 			if(axisCode == xCam){
-				angle.x = value;
+				//if(Math.abs(value) > 0.1) {
+					//TODO:
+					axis.x = value;
+				//}
 			}
 			
 			if(axisCode == yCam){
-				angle.y = value;
+				//if(Math.abs(value) > 0.1) {
+					axis.y = value;
+				//}
 			}
 		}
 		
 		return false;
 	}
 
+	Vector2 axis = new Vector2();
+	
 	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
 		return false;
 	}
@@ -1255,6 +1319,10 @@ public class Player implements Steerable<Vector2>{
 
 	public void setKills(int kills) {
 		this.kills = kills;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 

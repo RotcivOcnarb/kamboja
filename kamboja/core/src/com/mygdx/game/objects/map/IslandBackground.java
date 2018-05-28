@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.objects.Util;
 
 public class IslandBackground {
 	
@@ -42,15 +44,20 @@ public class IslandBackground {
 	}
 	
 	public void render(SpriteBatch sb, OrthographicCamera camera){
-		//parallaxCamera.position.set(camera.position.cpy());
-		//parallaxCamera.zoom = 1;
+		parallaxCamera.position.set(camera.position.cpy());
+		parallaxCamera.zoom = 0.5f;
 		
-		//parallaxCamera.update();
+		parallaxCamera.update();
 		
-		//sb.setProjectionMatrix(parallaxCamera.combined);
+		Vector3 up, down;
+		
+		up = camera.unproject(new Vector3(0, 0, 0));
+		down = camera.unproject(new Vector3(1920, 1080, 0));
+
+		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.setColor(1, 1, 1, 1);
 		sb.begin();
-		sb.draw(background, 0, 0, 1920, 1080, 0, 0, 1920, 1080, false, false);
+		sb.draw(background, 0, 0, 1920, 1080);
 		
 		for(int i = clouds.size() - 1; i >= 0; i --){
 			CloudObject co = clouds.get(i);

@@ -35,8 +35,8 @@ public class BetterBot extends Player{
 		pf.end();
 	}
 	
-	public BetterBot(Body body, int id, GameState state) {
-		super(body, id, state);
+	public BetterBot(Body body, int id, GameState state, String name) {
+		super(body, id, state, name);
 		path = new ArrayList<Vector2>();
 				
 

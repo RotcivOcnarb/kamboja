@@ -26,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
+import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.Util;
 
 public abstract class GenericInterface extends State{
@@ -238,7 +239,7 @@ public abstract class GenericInterface extends State{
 	}
 
 	public void render(SpriteBatch sb) {
-		shaderBuffer.begin();
+		FrameBufferStack.begin(shaderBuffer);
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
 		sb.draw(background, 0, 0, 1920, 1080);
@@ -247,14 +248,14 @@ public abstract class GenericInterface extends State{
 		sb.end();
 		insideRender(sb);
 		
-		shaderBuffer.end();
+		FrameBufferStack.end();
 		
 		shader.begin();
 		shader.setUniformf("intensity", shaderIntensity);
 		
 		sb.setShader(shader);
 			sb.begin();
-				sb.draw(shaderBuffer.getColorBufferTexture(),
+				sb.draw(FrameBufferStack.getTexture(),
 						0, 0,
 						1920,
 						1080,

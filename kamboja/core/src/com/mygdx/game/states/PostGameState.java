@@ -94,37 +94,39 @@ public class PostGameState extends GenericInterface{
 	}
 	
 	public void unlock() {
-		switch (nextUnlockable){
-		case Island:
-			KambojaMain.mapUnlocked[3] = true;
-			break;
-		case Iceland:
-			KambojaMain.mapUnlocked[4] = true;
-			break;
-		case Volcan:
-			KambojaMain.mapUnlocked[5] = true;
-			break;
-		case Space:
-			KambojaMain.mapUnlocked[6] = true;
-			break;
-		case MP5:
-			KambojaMain.weaponUnlocked[4] = true;
-			break;
-		case Shotgun:
-			KambojaMain.weaponUnlocked[3] = true;
-			break;
-		case Flamethrower:
-			KambojaMain.weaponUnlocked[5] = true;
-			break;
-		case Minigun:
-			KambojaMain.weaponUnlocked[2] = true;
-			break;
-		case Bazooka:
-			KambojaMain.weaponUnlocked[6] = true;
-			break;
-		case Laser:
-			KambojaMain.weaponUnlocked[7] = true;
-			break;
+		if(nextUnlockable != null) {
+			switch (nextUnlockable){
+			case Island:
+				KambojaMain.mapUnlocked[3] = true;
+				break;
+			case Iceland:
+				KambojaMain.mapUnlocked[4] = true;
+				break;
+			case Volcan:
+				KambojaMain.mapUnlocked[5] = true;
+				break;
+			case Space:
+				KambojaMain.mapUnlocked[6] = true;
+				break;
+			case MP5:
+				KambojaMain.weaponUnlocked[4] = true;
+				break;
+			case Shotgun:
+				KambojaMain.weaponUnlocked[3] = true;
+				break;
+			case Flamethrower:
+				KambojaMain.weaponUnlocked[5] = true;
+				break;
+			case Minigun:
+				KambojaMain.weaponUnlocked[2] = true;
+				break;
+			case Bazooka:
+				KambojaMain.weaponUnlocked[6] = true;
+				break;
+			case Laser:
+				KambojaMain.weaponUnlocked[7] = true;
+				break;
+			}
 		}
 	}
 	
@@ -369,6 +371,8 @@ public class PostGameState extends GenericInterface{
 		oliverFrag.draw(sb, "LVL " + KambojaMain.level, 50, 180, capsule.getWidth(), 1, false);
 		sb.draw(capsule_light, 50, 50);
 				
+		if(nextUnlockable != null) {
+		
 		sb.setColor(1, 1, 1, textTween);
 		sb.draw(unlockedText,
 				(1920 - unlockedText.getWidth()*textTween*2)/2f,
@@ -391,8 +395,10 @@ public class PostGameState extends GenericInterface{
 				unlockedImage.getWidth()*imageTween
 				);
 		
-		float imageWidth = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getWidth();
-		float imageHeight = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getHeight();
+		
+			
+		float imageWidth = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getWidth()*4;
+		float imageHeight = nextUnlockable.tipo.equals("Map") ? 300 : nextUnlockable.imagem.getHeight()*4;
 		
 		sb.draw(nextUnlockable.imagem,
 				(1920 - imageWidth*imageTween)/2f,
@@ -403,6 +409,8 @@ public class PostGameState extends GenericInterface{
 		oliverFrag.setColor(1, 1, 1, imageTween);
 		oliverFrag.draw(sb, nextUnlockable.nome, 0, (1080 - unlockedImage.getHeight()*imageTween)/2f + 150,
 				1920, 1, false);
+		
+		}
 		
 		oliverFrag.setColor(1, 1, 1, 1);
 		sb.setColor(1, 1, 1, 1);
@@ -453,8 +461,15 @@ public class PostGameState extends GenericInterface{
 				if(KambojaMain.experience > KambojaMain.maxExperience) {
 					KambojaMain.experience -= KambojaMain.maxExperience;
 					KambojaMain.level ++;
-					increasingEXP = false;
-					unlockable_frame_selection = 0;
+					if(getNextUnlockable() == null) {
+						unlockable_frame_selection = -1;
+					}
+					else {
+						unlockable_frame_selection = 0;
+						increasingEXP = false;
+					}
+					
+					
 				}
 			}
 		}

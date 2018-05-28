@@ -53,6 +53,7 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.Bullet;
+import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.GamePause;
 import com.mygdx.game.objects.Item;
@@ -114,6 +115,11 @@ public class GameState extends State{
 	private float menuPos = 0;
 	private float targetMenuPos = 0;
 	
+	private float id_alpha = 0.2f;
+	
+	private Texture blood_bar;
+	private Texture blood_case;
+	
 	private GlyphLayout layout;
 	
 	private float timer;
@@ -123,8 +129,10 @@ public class GameState extends State{
 	private Sound gameover[] = new Sound[3];
 	private Sound three, two, one, start;
 	private Sound bottle[] = new Sound[2];
+	private float[] life_tween = new float[4];
 	
 	private ArrayList<Player> players;
+	private Vector2[] namePositions = new Vector2[4];
 	
 	private static ArrayList<Body> forRemoval;	
 	
@@ -153,12 +161,12 @@ public class GameState extends State{
 	private IslandBackground islandBackground;
 	
 	//shader stuff
-	
 	ShaderProgram overlay;
 	FrameBuffer beforeBlood;
 	FrameBuffer afterBlood;
 	
 	KambojaMap kambojaMap;
+	
 	
 
 	
@@ -232,9 +240,16 @@ public class GameState extends State{
 	
 	public void create() {
 		
-		//shader stuff
+		id_alpha = 0.2f;
 		
-
+		blood_bar = KambojaMain.getTexture("player/blood_bar.png");
+		blood_case = KambojaMain.getTexture("player/blood_case.png");
+		
+		namePositions[0] = new Vector2(1920/4, 1080 * (3/4f));
+		namePositions[1] = new Vector2(1920 * (3/4f), 1080 * (3/4f));
+		namePositions[2] = new Vector2(1920 * (3/4f), 1080/4);
+		namePositions[3] = new Vector2(1920/4, 1080/4);
+		
 		parser = new Box2DMapObjectParser(1f/UNIT_SCALE);
 		
 		beforeBlood = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
@@ -382,7 +397,7 @@ public class GameState extends State{
 		bloodEffect.setMinScale(1f/UNIT_SCALE * .3f);
 		bloodEffect.setMaxScale(1f/UNIT_SCALE * .3f);
 		
-		bloodSpill = new PersistentParticleEffect(new Texture("particles/blood_spill.png"));
+		bloodSpill = new PersistentParticleEffect(bloods);
 		bloodSpill.setMinScale(1f/UNIT_SCALE);
 		bloodSpill.setMaxScale(1f/UNIT_SCALE);
 		
@@ -609,6 +624,7 @@ public class GameState extends State{
 //		else
 //			musicName = "the_league_of_mice";
 
+		System.out.println(tiledMap.getProperties().get("SongName"));
 		GameMusic.playSong(tiledMap.getProperties().get("SongName").toString());
 		
 	}
@@ -696,10 +712,10 @@ public class GameState extends State{
 		
 		Player player = null;
 		if(KambojaMain.getControllers().get(id) instanceof BotController){
-			player = new BetterBot(body, id, this);
+			player = new BetterBot(body, id, this, KambojaMain.getControllers().get(id).getName());
 		}
 		else{
-			player = new Player(body, id, this);
+			player = new Player(body, id, this, KambojaMain.getControllers().get(id).getName());
 		}
 		
 		player.setAngle(new Vector2((float)Math.sin(Math.toRadians(def.angle)), (float)Math.cos(Math.toRadians(def.angle))));
@@ -763,17 +779,18 @@ public class GameState extends State{
 	public void render(SpriteBatch sb) {
 				
 		
-		beforeBlood.begin();
+		FrameBufferStack.begin(beforeBlood);
 		Gdx.gl.glClearColor(0.0f, 0.6f, 0.9f, 0.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
+		sb.setProjectionMatrix(getCamera().combined);
 		if(kambojaMap != null)
 			kambojaMap.behindRender(sb, camera);
 		drawBackgroundTiles(sb);
 		Gdx.gl.glDisable(GL20.GL_BLEND);
-		beforeBlood.end();
+		FrameBufferStack.end();
 
 		drawPersistentParticles(sb);
 		drawBlocks(sb);
@@ -786,8 +803,7 @@ public class GameState extends State{
 		drawUI(sb);
 		drawDebug(sb);
 		drawPause(sb);
-		
-		
+
 		
 	}
 
@@ -855,20 +871,21 @@ public class GameState extends State{
 	
 	public void drawPersistentParticles(SpriteBatch sb){
 
-		afterBlood.begin();
-		Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		FrameBufferStack.begin(afterBlood);
+		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
 		bloodSpill.render(sb);
+		bloodEffect.render(sb);
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
-		afterBlood.end();
+		FrameBufferStack.end();
 		
 		renderBloodOverlay(sb);
 		
-		bloodEffect.render(sb);
+		
 		shellEffect.render(sb);
 		rockEffect.render(sb);
 		skullEffect.render(sb);
@@ -968,6 +985,9 @@ public class GameState extends State{
 		for(Player p : getPlayers()){
 			p.render(sb);
 		}
+		for(Player p : getPlayers()){
+			p.renderAbove(sb);
+		}
 		for(int i = getBullets().size() - 1; i >= 0; i --){
 			Bullet b = getBullets().get(i);
 			if(b.render(sb)){
@@ -1010,8 +1030,53 @@ public class GameState extends State{
 	}
 	
 	public void drawUI(SpriteBatch sb){
+		
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		sr.setProjectionMatrix(Util.getNormalProjection());
+		sr.begin(ShapeType.Filled);
+		
+			for(int i = 0; i < 4; i ++) {
+				if(i < players.size()) {
+					
+					switch(i) {
+					case 0:
+						sr.setColor(0, 0, 1, id_alpha);
+						sr.rect(0, 1080/2f, 1920/2, 1080/2);
+						break;
+					case 1:
+						sr.setColor(1, 0, 0, id_alpha);
+						sr.rect(1920/2, 1080/2f, 1920/2, 1080/2);
+						break;
+					case 2:
+						sr.setColor(0, 1, 0, id_alpha);
+						sr.rect(1920/2, 0, 1920/2, 1080/2);
+						break;
+					case 3:
+						sr.setColor(1, 1, 0, id_alpha);
+						sr.rect(0, 0, 1920/2, 1080/2);
+						break;
+					}
+					
+				}
+			}
+		
+		sr.end();
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
+		
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.begin();
+		
+		font.setColor(1, 1, 1, id_alpha * 5);
+		for(int i = 0; i < 4; i ++) {
+			if(i < players.size()) {
+				layout.setText(font, players.get(i).getName());
+				font.draw(sb, players.get(i).getName(), namePositions[i].x - layout.width/2, namePositions[i].y);
+			}
+		}
+		font.setColor(1, 1, 1, 1);
 		
 		layout.setText(font, "GAME!");
 		font.draw(sb, "GAME!", (1920 - layout.width)/2f, 1080/2 - menuPos + 1080 * 6 + 100);
@@ -1034,6 +1099,42 @@ public class GameState extends State{
 		
 		layout.setText(timeFont, time);
 		timeFont.draw(sb, time, (1920 - layout.width)/2f, 1080 - 30);
+		
+		
+		sb.setColor(1, 1, 1, 1);
+		float scl = 4;
+		for(int i = 0; i < 4; i ++) {
+			if(i < players.size()) {
+				switch(i) {
+				case 0:
+					sb.draw(blood_bar, 10, 1080 - blood_bar.getHeight()*scl - 10,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+					
+					sb.draw(blood_case, 10, 1080 - blood_bar.getHeight()*scl - 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
+					break;
+				case 1:
+					sb.draw(blood_bar, 1920 - blood_bar.getWidth()*scl - 10, 1080 - blood_bar.getHeight()*scl - 10,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+					sb.draw(blood_case, 1920 - blood_bar.getWidth()*scl - 10, 1080 - blood_bar.getHeight()*scl - 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
+					break;
+				case 2:
+					sb.draw(blood_bar, 1920 - blood_bar.getWidth()*scl - 10, 10,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+					sb.draw(blood_case, 1920 - blood_bar.getWidth()*scl - 10, 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
+					break;
+				case 3:
+					sb.draw(blood_bar, 10, 10,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+					sb.draw(blood_case, 10, 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
+					break;
+				}
+			}
+		}
+		
 		
 		sb.end();
 	}
@@ -1065,7 +1166,27 @@ public class GameState extends State{
 	
 	public void update(float delta) {
 		//GameMusic.fadeOut(GameMusic.MAIN_MENU);
-				
+
+		for(int i = 0; i < 4; i ++) {
+			if(i < players.size()) {
+				life_tween[i] += (players.get(i).getLife() - life_tween[i])/10.0f;
+			}
+		}
+		
+		if(timer > 4) {
+			
+			id_alpha += -id_alpha/50f;
+			
+			for(int i = 0; i < 4; i ++) {
+				if(i < players.size()) {
+					Vector3 project = camera.project(new Vector3(players.get(i).getPosition().x, players.get(i).getPosition().y, 0), 0, 0, 1920, 1080);
+					namePositions[i].add(new Vector2(project.x, project.y).sub(namePositions[i].cpy()).scl(1/30f));
+				}
+			}
+			
+		}
+		
+		
 		if(islandBackground != null){
 			islandBackground.update(delta);
 		}
@@ -1082,7 +1203,7 @@ public class GameState extends State{
 				world.QueryAABB(
 						new QueryCallback() {
 					public boolean reportFixture(Fixture fixture) {
-						if(fixture.getBody().getUserData() instanceof Block) {
+						if(fixture.getBody().getUserData() instanceof Block || (fixture.getUserData() != null && fixture.getUserData().equals("Block"))) {
 							bitmap[x][y] = 1;
 							return false;
 						}
@@ -1251,18 +1372,27 @@ public class GameState extends State{
 			if(itemTimer <= 0){
 				if(KambojaMain.hasItems()){
 					itemTimer = (float) (Math.random() * 10 + 10);
-					int bx = (int) (Math.random() * bitmap.length);
-					int by = (int) (Math.random() * bitmap[0].length);
+					
+					Vector2 itemPos = new Vector2(
+							(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
+							(float)(Math.random() * mapHeight * (32 / UNIT_SCALE))
+							);
+					
+					int bx = (int)(itemPos.x / (32/UNIT_SCALE));
+					int by = (int)(itemPos.y / (32/UNIT_SCALE));
 					
 					while(bitmap[bx][by] == 1) {
-						bx = (int) (Math.random() * bitmap.length);
-						by = (int) (Math.random() * bitmap[0].length);
+						itemPos = new Vector2(
+								(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
+								(float)(Math.random() * mapHeight * (32 / UNIT_SCALE))
+								);
+						
+						bx = (int)(itemPos.x / (32/UNIT_SCALE));
+						by = (int)(itemPos.y / (32/UNIT_SCALE));
 					}
 					
 					
-					addItem(new Vector2(
-							(16 + bx * 32) / GameState.UNIT_SCALE , (16 + by * 32) / GameState.UNIT_SCALE
-							), (int)(Math.random() * (BETA_ITEMS ? 6 : 4)));
+					addItem(itemPos, (int)(Math.random() * (BETA_ITEMS ? 6 : 4)));
 				}
 			}
 		}

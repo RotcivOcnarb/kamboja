@@ -2,6 +2,8 @@ package com.mygdx.game.objects.map;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -39,18 +41,30 @@ public class SpaceMap extends KambojaMap{
 		sb.setColor(1, 1, 1, 1);
 		sb.draw(background, 0, 0, 1920, 1080);
 
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		sb.setColor(1, 1, 1, 0.5f);
 		for(int i = 1; i <= 5; i ++) {
 			sb.draw(stars,
 					0, 0,
-					(int)1920,
-					(int)1080, 
+					1920/2f,
+					1080/2f,
+					1920,
+					1080,
+					1, 1,
+					i * 40,
 					(int)(camera.position.x * GameState.UNIT_SCALE / (i*2f)),
 					(int)(-camera.position.y * GameState.UNIT_SCALE / (i*2f)),
 					(int)stars.getWidth(),
 					(int)stars.getHeight(),
 					false, false);
+
 		}
+		sb.setColor(1, 1, 1, 1);
 		sb.end();
+		
+		Gdx.gl.glDisable(GL20.GL_BLEND);
 
 		sb.setProjectionMatrix(camera.combined);
 		
@@ -124,7 +138,7 @@ public class SpaceMap extends KambojaMap{
 		if(asteroids.contains(asteroid)) {
 			asteroids.remove(asteroid);
 			if(asteroid.size > 1) {
-				for(int i = 0; i < 4; i ++) {
+				for(int i = 0; i < 3; i ++) {
 					addAsteroid(asteroid.body.getWorldCenter(), asteroid.size - 1, false);
 				}
 			}

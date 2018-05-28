@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="62" height="42" tilewidth="32" tileheight="32" nextobjectid="5">
+<map version="1.0" tiledversion="1.1.0" orientation="orthogonal" renderorder="right-down" width="62" height="42" tilewidth="32" tileheight="32" infinite="0" nextobjectid="6">
  <properties>
   <property name="SongName" value="library"/>
  </properties>
@@ -214,4 +214,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup name="BOX2D">
+  <object id="5" type="object" x="1606.67" y="348">
+   <properties>
+    <property name="userData" value="Block"/>
+   </properties>
+   <polygon points="0,0 0,678.667 -1226.67,677.333 -1228,-1.33333 -641.333,0 -638.667,-468 -1734.67,-468 -1774.67,1188 473.333,1108 521.333,-476 -634.667,-466.667 -639,0"/>
+  </object>
+ </objectgroup>
 </map>

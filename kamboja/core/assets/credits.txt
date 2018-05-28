@@ -3,7 +3,7 @@
 <subtitle>Programmer</subtitle>
 <info>Victor "Rotciv" Branco</info>
 <space/>
-S<subtitle>Sprites and pixel arts</subtitle>
+<subtitle>Sprites and pixel arts</subtitle>
 <info>João Luis</info>
 <info>Fernando Leandro</info>
 <info>Victor "Rotciv" Branco</info>
@@ -39,3 +39,4 @@ S<subtitle>Sprites and pixel arts</subtitle>
 <info>Paulo Dias</info>
 <info>Victor "Blu Fox"</info>
 <info>Cláudio "Auso"</info>
+<info>Ataque da casa</info>

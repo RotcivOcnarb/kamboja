@@ -21,8 +21,16 @@ public class Assets {
 		helpState(assets);
 		creditsState(assets);
 		postGameState(assets);
+		gameState(assets);
 	}
 	
+	private static void gameState(AssetManager assets) {
+
+		assets.load("player/blood_bar.png", Texture.class);
+		assets.load("player/blood_case.png", Texture.class);
+
+	}
+
 	private static void postGameState(AssetManager assets) {
 		
 		assets.load("menu/postgame/bar_back.png", Texture.class);

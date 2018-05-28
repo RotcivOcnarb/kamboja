@@ -65,9 +65,9 @@ public class BotPlayer extends Player
   }
   
 
-  public BotPlayer(Body body, int id, GameState state)
+  public BotPlayer(Body body, int id, GameState state, String name)
   {
-    super(body, id, state);
+    super(body, id, state, name);
     
     switch(GameState.DIFFICULTY){
     case 0:

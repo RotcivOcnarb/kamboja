@@ -7,30 +7,29 @@ float lerp(float v0, float v1, float t) {
   return (1.0 - t) * v0 + t * v1;
 }
 
+vec4 lerp(vec4 v0, vec4 v1, float t) {
+  return (1.0 - t) * v0 + t * v1;
+}
+
+float len2(vec3 vec){
+	return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
+}
+
 void main()
 {
 
 	vec4 before = texture2D(beforeBlood, v_texCoords);
 	vec4 after = texture2D(afterBlood, v_texCoords);
 	
-	float r = after.r < 0.5 ? (2.0 * before.r * after.r) : (1.0 - 2.0*(1.0 - before.r) * (1.0 - after.r));
-	float g = after.g < 0.5 ? (2.0 * before.g * after.g) : (1.0 - 2.0*(1.0 - before.g) * (1.0 - after.g));
-	float b = after.b < 0.5 ? (2.0 * before.b * after.b) : (1.0 - 2.0*(1.0 - before.b) * (1.0 - after.b));
+	vec4 output = texture2D(afterBlood, v_texCoords) * texture2D(beforeBlood, v_texCoords);
 	
-	float alpha = 0.6;
+	if( len2(after.rgb) < 2.8){
+	
+		output = lerp(output, after, 0.2);
+	
+	}
 
-	/*
-	gl_FragColor = vec4(
-		lerp(before.r, r, alpha),
-		lerp(before.g, g, alpha),
-		lerp(before.b, b, alpha),
-		1.0);
-		*/
-		
-	//gl_FragColor = vec4(vec3(r, g, b) + before.rgb, 1.0);
-	
-	gl_FragColor = vec4(1.0 - (1.0 - before.rgb) * (1.0 - after.rgb), 1.0);
-	
+	gl_FragColor = output;
 
 	
    

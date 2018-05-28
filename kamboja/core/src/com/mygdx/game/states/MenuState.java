@@ -1,6 +1,8 @@
 package com.mygdx.game.states;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -23,6 +25,7 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.easing.Back;
+import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.GameMusic;
 
 public class MenuState extends State{
@@ -126,6 +129,7 @@ public class MenuState extends State{
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/color_shift.fs"));
+
 		
 		ShaderProgram.pedantic = false;
 		
@@ -181,7 +185,7 @@ public class MenuState extends State{
 		
 		
 		//desenha menu no frameBuffer
-		shaderBuffer.begin();
+		FrameBufferStack.begin(shaderBuffer);
 
 		sb.begin();
 		
@@ -358,14 +362,16 @@ public class MenuState extends State{
 		
 		//desenha frame buffer com shader aplicado
 		
-		shaderBuffer.end();
+		FrameBufferStack.end();
+		
 		
 		shader.begin();
 		shader.setUniformf("intensity", shaderIntensity);
+
 		
 		sb.setShader(shader);
 			sb.begin();
-				sb.draw(shaderBuffer.getColorBufferTexture(),
+				sb.draw(FrameBufferStack.getTexture(),
 						0, 0,
 						1920,
 						1080,

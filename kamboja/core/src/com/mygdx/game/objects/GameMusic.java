@@ -39,6 +39,15 @@ public class GameMusic{
 
 		inGameMusics.put("island", Gdx.audio.newMusic(Gdx.files.internal("music/ilha flutuante.ogg")));
 		inGameMusics.get("island").setLooping(true);
+		
+		inGameMusics.put("iceland", Gdx.audio.newMusic(Gdx.files.internal("music/iceland.ogg")));
+		inGameMusics.get("iceland").setLooping(true);
+		
+		inGameMusics.put("volcan", Gdx.audio.newMusic(Gdx.files.internal("music/volcan.ogg")));
+		inGameMusics.get("volcan").setLooping(true);
+		
+		inGameMusics.put("space", Gdx.audio.newMusic(Gdx.files.internal("music/space maybe.ogg")));
+		inGameMusics.get("space").setLooping(true);
 
 	}
 	
