@@ -82,6 +82,7 @@ public class Assets {
 		assets.load("menu/main_menu/fumaca_front.png", Texture.class);
 		
 		assets.load("menu/main_menu/VERSUS.png", Texture.class);
+		assets.load("menu/main_menu/EXIT.png", Texture.class);
 		assets.load("menu/main_menu/COOP_off.png", Texture.class);
 		assets.load("menu/main_menu/ONLINE_off.png", Texture.class);
 		assets.load("menu/main_menu/HELP.png", Texture.class);

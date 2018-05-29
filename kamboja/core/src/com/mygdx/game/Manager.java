@@ -81,36 +81,7 @@ public class Manager implements ControllerListener, InputProcessor{
 	
 	public void render(SpriteBatch sb){
 		if(!disposed){
-			
-			if(KambojaMain.vaporAmount) {
-				FrameBufferStack.begin(geralBuffer);
-				states.get(currentState).render(sb);
-				FrameBufferStack.end();
-				
-				shader.begin();
-				
-				Calendar calendar = Calendar.getInstance();
-
-				shader.setUniformf("iTime", globalTimer);
-				shader.setUniformf("iDate", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-						calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.SECOND) + calendar.get(Calendar.MINUTE)*60 + calendar.get(Calendar.HOUR)*60*60);
-				shader.setUniformf("screenSize", 1920/3f, 1080/3f);
-				shader.setUniformf("amt", 0.7f);
-				
-				sb.setShader(shader);
-				sb.setProjectionMatrix(Util.getNormalProjection());
-				sb.begin();	
-					sb.draw(FrameBufferStack.getTexture(),
-							0, 0, 1920, 1080, 0, 0, 1920, 1080, false, true);
-				sb.end();
-				sb.setShader(null);
-				shader.end();
-			}
-			else {
-				states.get(currentState).render(sb);
-			}
-			
-			
+			states.get(currentState).render(sb);
 		}
 		else{
 			disposed = false;

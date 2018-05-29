@@ -319,9 +319,7 @@ public class KambojaMain extends ApplicationAdapter {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		
-		
-		
+
 		GameMusic.initialize();
 		instance = this;
 		sr = new ShapeRenderer();

@@ -21,15 +21,15 @@ void main()
 	vec4 before = texture2D(beforeBlood, v_texCoords);
 	vec4 after = texture2D(afterBlood, v_texCoords);
 	
-	vec4 output = texture2D(afterBlood, v_texCoords) * texture2D(beforeBlood, v_texCoords);
+	vec4 saida = texture2D(afterBlood, v_texCoords) * texture2D(beforeBlood, v_texCoords);
 	
 	if( len2(after.rgb) < 2.8){
 	
-		output = lerp(output, after, 0.2);
+		saida = lerp(saida, after, 0.2);
 	
 	}
 
-	gl_FragColor = output;
+	gl_FragColor = saida;
 
 	
    

@@ -5,9 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -26,7 +32,101 @@ public class KambojaLauncher{
 		new KambojaLauncher();
 	}
 
+	int width;
+	int height;
+	boolean fullscreen;
+	
+	public void readConfig() {
+		//Loads the config.ini file and sets all the parameters
+				try {
+					File conf = new File("config.ini");
+					
+					BufferedReader br = new BufferedReader(new FileReader(conf));
+					
+					HashMap<String, String> configs = new HashMap<String, String>();
+					String s;
+					while((s = br.readLine()) != null){
+						try{
+							configs.put(s.split("=")[0], s.split("=")[1]);
+						}
+						catch(ArrayIndexOutOfBoundsException e){
+							
+						}
+						//System.out.println(s);
+					}
+					
+					br.close();
+					if (configs.get("Width") == null) {
+						GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+						GraphicsDevice dev = devices[0];
+						DisplayMode[] md = dev.getDisplayModes();
+						
+						width = md[md.length - 1].getWidth();
+						configs.put("Width", width + "");
+					}
+					else {
+						width = Integer.parseInt(configs.get("Width"));
+					}
+					
+					if (configs.get("Height") == null) {
+						GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+						GraphicsDevice dev = devices[0];
+						DisplayMode[] md = dev.getDisplayModes();
+
+						height = md[md.length - 1].getHeight();
+						configs.put("Height", height + "");
+					}
+					else {
+						height = Integer.parseInt(configs.get("Height"));
+					}
+					
+					if(configs.get("Fullscreen") == null) {
+						fullscreen = true;
+						configs.put("Fullscreen", fullscreen + "");
+					}
+					else {
+						fullscreen = Boolean.parseBoolean(configs.get("Fullscreen"));
+						
+					}
+					
+					BufferedWriter bw = new BufferedWriter(new FileWriter(conf));
+					
+					for(String key : configs.keySet()) {
+						bw.write(key + "=" + configs.get(key) + "\n");
+					}
+					
+					bw.close();
+					
+					
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					System.exit(0);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	}
+	
 	public KambojaLauncher() {
+		
+		readConfig();
+		
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.title = "Kamboja";
+		
+			config.width = width;
+			config.height = height;
+			config.fullscreen = fullscreen;
+			config.foregroundFPS = 60;
+			config.backgroundFPS = 60;
+			config.resizable = false;
+			config.addIcon("icon.png", FileType.Internal);
+			
+		new LwjglApplication(new KambojaMain(), config);
+		
+	}
+	
+	public void KaaambojaLauncher() {
 		boolean debug = false;
 		PrintStream logTxt;
 		try {
@@ -64,6 +164,8 @@ public class KambojaLauncher{
 				
 			}
 		}
+		
+		readConfig();
 		
 		if(debug) combo.setSelectedIndex(7);
 	

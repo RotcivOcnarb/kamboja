@@ -107,7 +107,7 @@ public class MenuState extends State{
 		eng_size[5] = 217.5f;
 		
 		options[0] = KambojaMain.getTexture("menu/main_menu/VERSUS.png");
-		options[1] = KambojaMain.getTexture("menu/main_menu/COOP_off.png");
+		options[1] = KambojaMain.getTexture("menu/main_menu/EXIT.png");
 		options[2] = KambojaMain.getTexture("menu/main_menu/ONLINE_off.png");
 		options[3] = KambojaMain.getTexture("menu/main_menu/HELP.png");
 		options[4] = KambojaMain.getTexture("menu/main_menu/OPTIONS.png");
@@ -605,7 +605,7 @@ public class MenuState extends State{
 			intro = false;
 			break;
 		case 1:
-			timerWrong = 0.5f;
+			Gdx.app.exit();
 			break;
 		case 2:
 			timerWrong = 0.5f;

@@ -166,10 +166,7 @@ public class GameState extends State{
 	FrameBuffer afterBlood;
 	
 	KambojaMap kambojaMap;
-	
-	
 
-	
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
 	
@@ -190,7 +187,6 @@ public class GameState extends State{
 	
 	public void screenshake(float amount){
 		getCamera().position.add((float)((Math.random()*2)-1)*amount, (float)((Math.random()*2)-1)*amount, 0);
-		
 	}
 	
 	public void dispose(){
@@ -261,7 +257,7 @@ public class GameState extends State{
 		ShaderProgram.pedantic = false;
 	
 		if (overlay.getLog().length()!=0)
-			System.out.println(overlay.getLog());
+			System.out.println("ERRO NO SHADER DE SANGUE: " + overlay.getLog());
 		
 		setBullets(new ArrayList<Bullet>());
 		setFlameParticles(new ArrayList<Body>());
@@ -780,7 +776,7 @@ public class GameState extends State{
 				
 		
 		FrameBufferStack.begin(beforeBlood);
-		Gdx.gl.glClearColor(0.0f, 0.6f, 0.9f, 0.0f);
+		Gdx.gl.glClearColor(0.0f, 0.6f, 0.9f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -791,7 +787,7 @@ public class GameState extends State{
 		drawBackgroundTiles(sb);
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		FrameBufferStack.end();
-
+		
 		drawPersistentParticles(sb);
 		drawBlocks(sb);
 		drawItems(sb);
@@ -813,9 +809,9 @@ public class GameState extends State{
 			islandBackground.render(sb, getCamera());
 		}
 		
-		sb.setProjectionMatrix(getCamera().combined);
-
 		
+		
+		sb.setProjectionMatrix(getCamera().combined);		
 		sb.begin();
 		
 		if(LIGHTS)
@@ -884,7 +880,6 @@ public class GameState extends State{
 		FrameBufferStack.end();
 		
 		renderBloodOverlay(sb);
-		
 		
 		shellEffect.render(sb);
 		rockEffect.render(sb);
