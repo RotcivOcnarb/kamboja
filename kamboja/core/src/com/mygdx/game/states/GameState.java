@@ -1386,8 +1386,13 @@ public class GameState extends State{
 						by = (int)(itemPos.y / (32/UNIT_SCALE));
 					}
 					
+					/*
+					int id_spwn = (int)(Math.random() * 7);
+					while(id_spwn == 5 || id_spwn == 6) {
+						id_spwn = (int)(Math.random() * 7);
+					}*/
 					
-					addItem(itemPos, (int)(Math.random() * (BETA_ITEMS ? 6 : 4)));
+					addItem(itemPos, Item.DRONE);
 				}
 			}
 		}

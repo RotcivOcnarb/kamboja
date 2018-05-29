@@ -110,6 +110,7 @@ public class Player implements Steerable<Vector2>{
 	private GameState state;
 	private Weapon weapon;
 	private Shift shift;
+	private Equipment equipment;
 	protected ShapeRenderer sr;
 	private static Sound sprint;
 	private static Sound grunt[] = new Sound[5];
@@ -219,6 +220,7 @@ public class Player implements Steerable<Vector2>{
 		this.setState(state);
 		body.setLinearDamping(30);
 		body.setFixedRotation(true);
+		equipment = new Equipment(this);
 		this.name = name;
 		
 		stamina = 0;
@@ -485,9 +487,14 @@ public class Player implements Steerable<Vector2>{
 					isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 					270 - getAngle());
 		}
+		
+		
+		
 		sb.end();
-
+		
 		sb.setShader(null);
+		
+		equipment.render(sb);
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	
@@ -726,6 +733,9 @@ public class Player implements Steerable<Vector2>{
 		else if(id == Item.BARRIER){
 			setShift(new Barrier(this));
 		}
+		else if(id == Item.DRONE) {
+			equipment.addDrone();
+		}
 		else{
 			buffTimer = 5;
 			buff = id;
@@ -747,6 +757,8 @@ public class Player implements Steerable<Vector2>{
 	public void update(float delta){
 		if(!isDead())
 		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd * (inSpace ? 0.1f : 1f)), true);
+		
+		equipment.update(delta);
 		
 		if(inSpace) {
 			if(body.getLinearVelocity().len() > 3) {

@@ -20,6 +20,8 @@ public class Item implements Steerable<Vector2>{
 	public static final int TURRET = 4;
 	public static final int BARRIER = 5;
 	
+	public static final int DRONE = 6;
+	
 	Body body;
 	public int id;
 	
@@ -79,6 +81,10 @@ public class Item implements Steerable<Vector2>{
 		case BARRIER:
 			texture = new Texture("imgs/shift/barrier.png");
 			break;
+			
+		case DRONE:
+			texture = new Texture("imgs/drone.png");
+			break;
 		}
 	}
 	
@@ -101,6 +107,7 @@ public class Item implements Steerable<Vector2>{
 			if(GameState.SFX)
 			life.play(GameState.VOLUME);
 			break;
+			
 		}
 	}
 	
