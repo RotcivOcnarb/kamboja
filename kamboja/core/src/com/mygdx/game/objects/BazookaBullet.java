@@ -16,14 +16,15 @@ import com.mygdx.game.states.GameState;
 public class BazookaBullet extends Bullet{
 	
 	ParticleEffect smoke;
+	boolean follow = false;
 	static Sound explosion;
 	static{
 		explosion = Gdx.audio.newSound(Gdx.files.internal("audio/weapon/explosion.ogg"));
 	}
 
-	public BazookaBullet(World world, Vector2 position, Vector2 direction, int id, float damage, float radius, Player player) {
-		super(world, position, direction, id, damage, radius, player);
-
+	public BazookaBullet(World world, Vector2 position, Vector2 direction, int id, float damage, float radius, Player player, float linearDamping, boolean follow) {
+		super(world, position, direction, id, damage, radius, player, linearDamping);
+		this.follow = follow;
 		smoke = new ParticleEffect();
 		smoke.load(Gdx.files.internal("particles/smoke.par"), Gdx.files.internal("particles"));
 		smoke.scaleEffect(1f/GameState.UNIT_SCALE / 2f);
@@ -90,8 +91,14 @@ public class BazookaBullet extends Bullet{
 	float force = 0;
 	
 	public boolean render(SpriteBatch sb){
+		if(body.getLinearVelocity().len2() < 0.01f && !canRemove){
+			canRemove = true;
+			explosionDamage();
+		}
+		
 		super.render(sb);
 
+		if(follow) {
 		Player closestP = null;
 		float closestD = 1000;
 		
@@ -115,6 +122,8 @@ public class BazookaBullet extends Bullet{
 									).nor().scl(force), true
 							
 					);
+		}
+		
 		}
 		
 		force += 0.001f;

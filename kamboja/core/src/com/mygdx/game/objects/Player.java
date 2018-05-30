@@ -736,6 +736,9 @@ public class Player implements Steerable<Vector2>{
 		else if(id == Item.DRONE) {
 			equipment.addDrone();
 		}
+		else if(id == Item.BOMB) {
+			equipment.addBomb();
+		}
 		else{
 			buffTimer = 5;
 			buff = id;

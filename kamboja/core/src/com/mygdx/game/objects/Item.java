@@ -21,6 +21,7 @@ public class Item implements Steerable<Vector2>{
 	public static final int BARRIER = 5;
 	
 	public static final int DRONE = 6;
+	public static final int BOMB = 7;
 	
 	Body body;
 	public int id;
@@ -84,6 +85,9 @@ public class Item implements Steerable<Vector2>{
 			
 		case DRONE:
 			texture = new Texture("imgs/drone.png");
+			break;
+		case BOMB:
+			texture = new Texture("Weapons/bomb.png");
 			break;
 		}
 	}

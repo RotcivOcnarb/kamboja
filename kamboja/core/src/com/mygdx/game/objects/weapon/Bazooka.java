@@ -75,7 +75,7 @@ public class Bazooka extends Weapon{
 				float vel =  1;
 				Vector2 direction = new Vector2((float)Math.sin(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel, (float)Math.cos(Math.toRadians(getPlayer().getShootingAngle() + 90 + rnd*PRECISION + Math.sin(globalTimer)*botPrecision)) * vel);
 				
-				BazookaBullet bullet = new BazookaBullet(world, position, direction, getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer());
+				BazookaBullet bullet = new BazookaBullet(world, position, direction.scl(15), getPlayer().getId(), DAMAGE * getPlayer().getAtk(), radius, getPlayer(), 0, true);
 				bullet.setTexture(bulletBazooka);
 				
 				player.getState().addBullet(bullet);

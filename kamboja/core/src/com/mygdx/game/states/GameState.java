@@ -1392,7 +1392,7 @@ public class GameState extends State{
 						id_spwn = (int)(Math.random() * 7);
 					}*/
 					
-					addItem(itemPos, Item.DRONE);
+					addItem(itemPos, Item.BOMB);
 				}
 			}
 		}
