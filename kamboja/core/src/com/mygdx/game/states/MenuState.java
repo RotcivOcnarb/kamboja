@@ -1,9 +1,6 @@
 package com.mygdx.game.states;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;

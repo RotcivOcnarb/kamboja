@@ -1,6 +1,5 @@
 package com.mygdx.game.objects;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import com.badlogic.gdx.Gdx;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.controllers.Gamecube;

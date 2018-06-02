@@ -29,6 +29,18 @@ public class Assets {
 		assets.load("player/blood_bar.png", Texture.class);
 		assets.load("player/blood_case.png", Texture.class);
 
+		assets.load("Weapons/ItemPoint.png", Texture.class);
+		assets.load("imgs/attack.png", Texture.class);
+		assets.load("imgs/shield.png", Texture.class);
+		assets.load("imgs/speed.png", Texture.class);
+		assets.load("imgs/heart.png", Texture.class);
+		assets.load("imgs/shift/turret.png", Texture.class);
+		assets.load("imgs/shift/barrier.png", Texture.class);
+		assets.load("Weapons/Drone.png", Texture.class);
+		assets.load("Weapons/bomb.png", Texture.class);
+		assets.load("Weapons/Icon/spike_icon.png", Texture.class);
+		assets.load("Weapons/Icon/glue_icon.png", Texture.class);
+		assets.load("Weapons/Icon/acid_icon.png", Texture.class);
 	}
 
 	private static void postGameState(AssetManager assets) {

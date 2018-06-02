@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.objects.Util;
 
 public class IslandBackground {
@@ -48,12 +47,7 @@ public class IslandBackground {
 		parallaxCamera.zoom = 0.5f;
 		
 		parallaxCamera.update();
-		
-		Vector3 up, down;
-		
-		up = camera.unproject(new Vector3(0, 0, 0));
-		down = camera.unproject(new Vector3(1920, 1080, 0));
-
+				
 		sb.setProjectionMatrix(Util.getNormalProjection());
 		sb.setColor(1, 1, 1, 1);
 		sb.begin();

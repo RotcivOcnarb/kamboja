@@ -50,6 +50,7 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.Bullet;
@@ -141,6 +142,8 @@ public class GameState extends State{
 	PersistentParticleEffect rockEffect;
 	PersistentParticleEffect skullEffect;
 	PersistentParticleEffect bloodSpill;
+	
+	ArrayList<AcidGlue> acidGlues;
 
 	private ParticleEffect explosion;
 	private ParticleEffectPool explosionPool;
@@ -235,6 +238,8 @@ public class GameState extends State{
 	boolean exitMap = false;
 	
 	public void create() {
+		
+		acidGlues = new ArrayList<AcidGlue>();
 		
 		id_alpha = 0.2f;
 		
@@ -704,6 +709,11 @@ public class GameState extends State{
 		circle.setRadius(10 / UNIT_SCALE);
 		Fixture f = body.createFixture(circle, 0.8f);
 		
+		circle = new CircleShape();
+		circle.setRadius(20 / UNIT_SCALE);
+		Fixture f2 = body.createFixture(circle, 0f);
+		f2.setSensor(true);
+		
 		circle.dispose();
 		
 		Player player = null;
@@ -718,6 +728,7 @@ public class GameState extends State{
 		
 		body.setUserData(player);
 		f.setUserData(player);
+		f2.setUserData(new PlayerSpike(player));
 		getPlayers().add(player);
 	
 
@@ -865,13 +876,26 @@ public class GameState extends State{
 		sb.end();
 	}
 	
+	public void addAcidGlue(Player p) {
+		
+		acidGlues.add(new AcidGlue(acidGlues, world, p, p.getEquipment().acid, p.getEquipment().glue));
+		
+	}
+	
+	//TODO:
 	public void drawPersistentParticles(SpriteBatch sb){
 
 		FrameBufferStack.begin(afterBlood);
-		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		
+		sb.begin();
+		for(int i = acidGlues.size() - 1; i >= 0; i --) {
+			acidGlues.get(i).render(sb);
+		}
+		sb.end();
 		
 		bloodSpill.render(sb);
 		bloodEffect.render(sb);
@@ -880,6 +904,8 @@ public class GameState extends State{
 		FrameBufferStack.end();
 		
 		renderBloodOverlay(sb);
+		
+	
 		
 		shellEffect.render(sb);
 		rockEffect.render(sb);
@@ -950,7 +976,7 @@ public class GameState extends State{
 		sb.setColor(1, 1, 1, 1);
 		for(int i = getItems().size() - 1; i >= 0; i --){
 			Item item = getItems().get(i);
-			if(item.render(sb)){
+			if(item.render(sb, camera)){
 				removeBody(item.getBody());
 				getItems().remove(item);
 				item.dispose();
@@ -1102,32 +1128,40 @@ public class GameState extends State{
 			if(i < players.size()) {
 				switch(i) {
 				case 0:
+					//Cima Esquerda
 					sb.draw(blood_bar, 10, 1080 - blood_bar.getHeight()*scl - 10,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
-					
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), false, false);
 					sb.draw(blood_case, 10, 1080 - blood_bar.getHeight()*scl - 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
+					
+
+					
 					break;
 				case 1:
+					//Cima Direita
 					sb.draw(blood_bar, 1920 - blood_bar.getWidth()*scl - 10, 1080 - blood_bar.getHeight()*scl - 10,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), false, false);
 					sb.draw(blood_case, 1920 - blood_bar.getWidth()*scl - 10, 1080 - blood_bar.getHeight()*scl - 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
 					break;
 				case 2:
+					//Baixo Direita
 					sb.draw(blood_bar, 1920 - blood_bar.getWidth()*scl - 10, 10,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), false, false);
 					sb.draw(blood_case, 1920 - blood_bar.getWidth()*scl - 10, 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
 					break;
 				case 3:
+					//Baixo Esquerda
 					sb.draw(blood_bar, 10, 10,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), scl, scl, 0,
-							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / 70f)), blood_bar.getHeight(), false, false);
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), scl, scl, 0,
+							0, 0, (int)(blood_bar.getWidth() * (life_tween[i] / players.get(i).getMaxLife())), blood_bar.getHeight(), false, false);
 					sb.draw(blood_case, 10, 10, blood_case.getWidth()*scl, blood_case.getHeight()*scl);
 					break;
 				}
+				players.get(i).getEquipment().renderUI(i, sb);
 			}
+			
 		}
 		
 		
@@ -1366,7 +1400,7 @@ public class GameState extends State{
 			
 			if(itemTimer <= 0){
 				if(KambojaMain.hasItems()){
-					itemTimer = (float) (Math.random() * 10 + 10);
+					itemTimer = (float) (Math.random() * 10);
 					
 					Vector2 itemPos = new Vector2(
 							(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
@@ -1386,13 +1420,13 @@ public class GameState extends State{
 						by = (int)(itemPos.y / (32/UNIT_SCALE));
 					}
 					
-					/*
-					int id_spwn = (int)(Math.random() * 7);
-					while(id_spwn == 5 || id_spwn == 6) {
-						id_spwn = (int)(Math.random() * 7);
-					}*/
 					
-					addItem(itemPos, Item.BOMB);
+					int id_spwn = (int)(Math.random() * 11);
+					while(id_spwn == Item.BARRIER || id_spwn == Item.TURRET) {
+						id_spwn = (int)(Math.random() * 11);
+					}
+					
+					addItem(itemPos, id_spwn);
 				}
 			}
 		}
@@ -1730,6 +1764,19 @@ public class GameState extends State{
 
 	public int[][] getBitmap() {
 		return bitmap;
+	}
+	
+	public class PlayerSpike extends Player{
+		
+		public PlayerSpike(Player player) {
+			super(player.getBody(), player.getId(), player.getState(), player.getName());
+		}
+
+		public PlayerSpike(Body body, int id, GameState state, String name) {
+			super(body, id, state, name);
+		}
+		
+		
 	}
 
 	

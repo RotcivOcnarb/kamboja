@@ -298,11 +298,11 @@ public class BotPlayer extends Player
       applySteering(delta);
     }
     
-    if ((life > 0.5 * maxLife) && (variancia() < 0.5F)) {
+    if ((life > 0.5 * getMaxLife()) && (variancia() < 0.5F)) {
       botState = BotPlayer.BotState.ATTACK_WEAKEST;
     }
     
-    if ((life < 0.3 * maxLife) && (getNearestLife() != null)) {
+    if ((life < 0.3 * getMaxLife()) && (getNearestLife() != null)) {
       botState = BotPlayer.BotState.GET_LIFE;
     }
     
@@ -311,7 +311,7 @@ public class BotPlayer extends Player
 //    }
     
     if(target != null){
-	    if ((life > 0.5 * maxLife) && (getNearestItem() != null) && 
+	    if ((life > 0.5 * getMaxLife()) && (getNearestItem() != null) && 
 	      (((Vector2)target.getPosition()).cpy().sub(getPosition()).len() > getNearestItem().getPosition().cpy().sub(getPosition()).len())) {
 	      botState = BotPlayer.BotState.NEAREST_ITEM;
 	    }
@@ -337,7 +337,7 @@ public class BotPlayer extends Player
     }
     
 
-    if ((life < 0.3 * maxLife) && (getNearestLife() != null)) {
+    if ((life < 0.3 * getMaxLife()) && (getNearestLife() != null)) {
       botState = BotPlayer.BotState.GET_LIFE;
     }
 //    
@@ -345,7 +345,7 @@ public class BotPlayer extends Player
 //      botState = BotPlayer.BotState.HIDING;
 //    }
     
-    if ((life > 0.5 * maxLife) && (getNearestItem() != null) && 
+    if ((life > 0.5 * getMaxLife()) && (getNearestItem() != null) && 
       (((Vector2)target.getPosition()).cpy().sub(getPosition()).len() > getNearestItem().getPosition().cpy().sub(getPosition()).len())) {
       botState = BotPlayer.BotState.NEAREST_ITEM;
     }
@@ -366,21 +366,21 @@ public class BotPlayer extends Player
       applySteeringReversed(delta);
     }
     
-    if ((life > 0.5 * maxLife) && (getNearestItem() != null)) {
+    if ((life > 0.5 * getMaxLife()) && (getNearestItem() != null)) {
       botState = BotPlayer.BotState.NEAREST_ITEM;
     }
     
-    if ((life < 0.3 * maxLife) && (getNearestLife() != null)) {
+    if ((life < 0.3 * getMaxLife()) && (getNearestLife() != null)) {
       botState = BotPlayer.BotState.GET_LIFE;
     }
     
-    if ((life > 0.5 * maxLife) && (getNearestPlayer().getPosition().cpy().sub(getPosition()).len() < 30.0F) && 
+    if ((life > 0.5 * getMaxLife()) && (getNearestPlayer().getPosition().cpy().sub(getPosition()).len() < 30.0F) && 
       (variancia() > 0.5D)) {
       botState = BotPlayer.BotState.ATTACK_NEAREST;
     }
     
 
-    if ((life > 0.5 * maxLife) && (variancia() < 0.5F)) {
+    if ((life > 0.5 * getMaxLife()) && (variancia() < 0.5F)) {
       botState = BotPlayer.BotState.ATTACK_WEAKEST;
     }
   }
@@ -398,7 +398,7 @@ public class BotPlayer extends Player
       applySteering(delta);
     }
     
-    if ((life > 0.5 * maxLife) && (getNearestItem() != null)) {
+    if ((life > 0.5 * getMaxLife()) && (getNearestItem() != null)) {
       botState = BotPlayer.BotState.NEAREST_ITEM;
     }
 //    
@@ -412,7 +412,7 @@ public class BotPlayer extends Player
     }
     
 
-    if ((life > 0.5 * maxLife) && (variancia() < 0.5F)) {
+    if ((life > 0.5 * getMaxLife()) && (variancia() < 0.5F)) {
       botState = BotPlayer.BotState.ATTACK_WEAKEST;
     }
   }
@@ -435,17 +435,17 @@ public class BotPlayer extends Player
 //      botState = BotPlayer.BotState.HIDING;
 //    }
 //    
-    if ((life < 0.3 * maxLife) && (getNearestLife() != null)) {
+    if ((life < 0.3 * getMaxLife()) && (getNearestLife() != null)) {
       botState = BotPlayer.BotState.GET_LIFE;
     }
     
-    if ((life > 0.5 * maxLife) && (getNearestPlayer().getPosition().cpy().sub(getPosition()).len() < 30.0F) && 
+    if ((life > 0.5 * getMaxLife()) && (getNearestPlayer().getPosition().cpy().sub(getPosition()).len() < 30.0F) && 
       (variancia() > 0.5D)) {
       botState = BotPlayer.BotState.ATTACK_NEAREST;
     }
     
 
-    if ((life > 0.5 * maxLife) && (variancia() < 0.5F) && (target != null) && 
+    if ((life > 0.5 * getMaxLife()) && (variancia() < 0.5F) && (target != null) && 
       (getWeakestPlayer().getPosition().cpy().sub(getPosition()).len() < ((Vector2)target.getPosition()).cpy().sub(getPosition()).len())) {
       botState = BotPlayer.BotState.ATTACK_WEAKEST;
     }

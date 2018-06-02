@@ -3,11 +3,14 @@ package com.mygdx.game.objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.states.GameState;
 
 public class Item implements Steerable<Vector2>{
@@ -22,11 +25,15 @@ public class Item implements Steerable<Vector2>{
 	
 	public static final int DRONE = 6;
 	public static final int BOMB = 7;
+	public static final int SPIKE = 8;
+	public static final int GLUE = 9;
+	public static final int ACID = 10;
 	
 	Body body;
 	public int id;
 	
 	Texture texture;
+	Texture itemPoint;
 	
 	float timer = 0;
 	
@@ -48,46 +55,57 @@ public class Item implements Steerable<Vector2>{
 	}
 	
 	public void dispose(){
-		texture.dispose();
+		//texture.dispose();
 	}
 	
 	public Item(Body body, int id){
 		this.body = body;
 		this.id = id;
 		
+		itemPoint = KambojaMain.getTexture("Weapons/ItemPoint.png");
+		
 		showing = new ParticleEffect();
 		showing.load(Gdx.files.internal("particles/item.par"), Gdx.files.internal("particles"));
-		showing.scaleEffect(1f/GameState.UNIT_SCALE / 3f);
+		showing.scaleEffect(1f/GameState.UNIT_SCALE / 2f);
 		
 		if(GameState.SFX)
 		spawn[(int)(Math.random()*4)].play(GameState.VOLUME);
 		
 		switch(id){
 		case ATTACK:
-			texture = new Texture("imgs/attack.png");
+			texture = KambojaMain.getTexture("imgs/attack.png");
 			break;
 		case DEFFENSE:
-			texture = new Texture("imgs/shield.png");
+			texture = KambojaMain.getTexture("imgs/shield.png");
 			break;
 		case SPEED:
-			texture = new Texture("imgs/speed.png");
+			texture = KambojaMain.getTexture("imgs/speed.png");
 			break;
 		case LIFE:
-			texture = new Texture("imgs/heart.png");
+			texture = KambojaMain.getTexture("imgs/heart.png");
 			break;
 			
 		case TURRET:
-			texture = new Texture("imgs/shift/turret.png");
+			texture = KambojaMain.getTexture("imgs/shift/turret.png");
 			break;
 		case BARRIER:
-			texture = new Texture("imgs/shift/barrier.png");
+			texture = KambojaMain.getTexture("imgs/shift/barrier.png");
 			break;
 			
 		case DRONE:
-			texture = new Texture("imgs/drone.png");
+			texture = KambojaMain.getTexture("Weapons/Drone.png");
 			break;
 		case BOMB:
-			texture = new Texture("Weapons/bomb.png");
+			texture = KambojaMain.getTexture("Weapons/bomb.png");
+			break;
+		case SPIKE:
+			texture = KambojaMain.getTexture("Weapons/Icon/spike_icon.png");
+			break;
+		case GLUE:
+			texture = KambojaMain.getTexture("Weapons/Icon/glue_icon.png");
+			break;	
+		case ACID:
+			texture = KambojaMain.getTexture("Weapons/Icon/acid_icon.png");
 			break;
 		}
 	}
@@ -115,7 +133,7 @@ public class Item implements Steerable<Vector2>{
 		}
 	}
 	
-	public boolean render(SpriteBatch sb){
+	public boolean render(SpriteBatch sb, Camera camera){
 		
 		timer += Gdx.graphics.getDeltaTime();
 
@@ -131,21 +149,91 @@ public class Item implements Steerable<Vector2>{
 		showing.update(Gdx.graphics.getDeltaTime());
 		showing.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
 		
+		showing.draw(sb);
+		
+		float clampedX = clamp(body.getWorldCenter().x, camera.unproject(new Vector3(0, 0, 0)).x, camera.unproject(new Vector3(1920, 0, 0)).x);
+		float clampedY = clamp(body.getWorldCenter().y, camera.unproject(new Vector3(0, 1080, 0)).y, camera.unproject(new Vector3(0, 0, 0)).y);
+
+		camera.frustum.pointInFrustum(new Vector3(body.getWorldCenter(), 0));
 		
 		sb.draw(texture,
-				body.getWorldCenter().x - (8 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
-				body.getWorldCenter().y - (8 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
-				(8 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
-				(8 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
-				(16 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
-				(16 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
+				clampedX - (16 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
+				clampedY - (16 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
+				(16 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
+				(16 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
+				(32 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
+				(32 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
 				1, 1, 0, 0, 0, texture.getWidth(), texture.getHeight(), false, false);
 		
-		showing.draw(sb);
+		renderArrow(sb, clampedX, clampedY);
 		
 		return canRemove;
 	}
+	
+	public void renderArrow(SpriteBatch sb, float clampedX, float clampedY) {
+		
+		int cx = 0;
+		int cy = 0;
+		
+		float angle = 0;
+		
+		if(clampedX > body.getWorldCenter().x) {
+			cx = -1;
+		}
+		else if(clampedX < body.getWorldCenter().x) {
+			cx = 1;
+		}
 
+		if(clampedY > body.getWorldCenter().y) {
+			cy = -1;
+		}
+		else if(clampedY < body.getWorldCenter().y) {
+			cy = 1;
+		}
+		
+		
+		if(cx == 0 && cy == 1) {
+			angle = 270;
+		}
+		else if(cx == 0 && cy == -1) {
+			angle = 90;
+		}
+		else if(cx == 1 && cy == 0) {
+			angle = 180;
+		}
+		else if(cx == 1 && cy == 1) {
+			angle = 225;
+		}
+		else if(cx == 1 && cy == -1) {
+			angle = 135;
+		}
+		else if(cx == -1 && cy == 0) {
+			angle = 0;
+		}
+		else if(cx == -1 && cy == 1) {
+			angle = 315;
+		}
+		else if(cx == -1 && cy == -1) {
+			angle = 45;
+		}
+		
+		//if(cx != 0 || cy != 0) {
+			sb.draw(itemPoint,
+					clampedX - (32 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
+					clampedY - (32 + (float)Math.sin(timer) * 2) / GameState.UNIT_SCALE,
+					(32 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
+					(32 + (float)Math.sin(timer) * 2) /GameState.UNIT_SCALE,
+					(64 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
+					(64 + (float)Math.sin(timer) * 4) /GameState.UNIT_SCALE,
+					1, 1, angle, 0, 0, itemPoint.getWidth(), itemPoint.getHeight(), false, false);
+		//}
+		
+	}
+	
+	public float clamp(float x, float min, float max) {
+		return Math.max(min, Math.min(max, x));
+		
+	}
 	public Body getBody() {
 		return body;
 	}

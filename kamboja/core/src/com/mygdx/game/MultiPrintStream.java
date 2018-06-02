@@ -1,6 +1,5 @@
 package com.mygdx.game;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class MultiPrintStream extends PrintStream {

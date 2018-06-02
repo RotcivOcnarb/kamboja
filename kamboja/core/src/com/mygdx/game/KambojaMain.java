@@ -21,6 +21,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -433,6 +434,10 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	public static Texture getTexture(String name) {
 		return getInstance().assets.get(name, Texture.class);
+	}
+	
+	public static BitmapFont getFont(String name) {
+		return getInstance().assets.get(name, BitmapFont.class);
 	}
 	
 	public void resize(int width, int height){

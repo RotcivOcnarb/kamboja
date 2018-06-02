@@ -53,8 +53,8 @@ public class Player implements Steerable<Vector2>{
 	
 	protected Body body;
 	protected Vector2 angle = new Vector2();
-	protected float maxLife = 70;
-	protected float life = maxLife;
+	private float maxLife = 70;
+	protected float life = getMaxLife();
 	protected float stamina = 0;
 	protected int maxStamina = 10;
 	protected float mana = 100;
@@ -124,6 +124,8 @@ public class Player implements Steerable<Vector2>{
 	ParticleEffect shield;
 	
 	ArrayList<Ghost> ghosts;
+	
+	public ArrayList<AcidGlue> stepping;
 	
 	static{
 		for(int i = 0; i < 5; i ++){
@@ -222,6 +224,8 @@ public class Player implements Steerable<Vector2>{
 		body.setFixedRotation(true);
 		equipment = new Equipment(this);
 		this.name = name;
+
+		stepping = new ArrayList<AcidGlue>();
 		
 		stamina = 0;
 		
@@ -492,9 +496,9 @@ public class Player implements Steerable<Vector2>{
 		
 		sb.end();
 		
-		sb.setShader(null);
-		
 		equipment.render(sb);
+		
+		sb.setShader(null);
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	
@@ -704,7 +708,7 @@ public class Player implements Steerable<Vector2>{
 		inputBlocked = false;
 		throwBlood = false;		
 		imunity = 1;
-		life = maxLife;
+		life = getMaxLife();
 		body.getFixtureList().get(0).setSensor(false);
 		
 		MapLayer ml = getState().getTiledMap().getLayers().get("Player");
@@ -725,7 +729,21 @@ public class Player implements Steerable<Vector2>{
 	public void setBuff(int id){
 		if(id == Item.LIFE){
 			life += 30;
-			if(getLife() > maxLife) life = maxLife;
+			setMaxLife(getMaxLife() + 10);
+			if(getLife() > getMaxLife()) life = getMaxLife();
+			equipment.addLife();
+		}
+		else if(id == Item.SPEED){
+			spd += 0.5f;
+			equipment.addSpeed();
+		}
+		else if(id == Item.ATTACK){
+			atk += 1;
+			equipment.addAtk();
+		}
+		else if(id == Item.DEFFENSE){
+			def *= 0.9f;
+			equipment.addDef();
 		}
 		else if(id == Item.TURRET){
 			setShift(new Turret(this));
@@ -739,9 +757,18 @@ public class Player implements Steerable<Vector2>{
 		else if(id == Item.BOMB) {
 			equipment.addBomb();
 		}
+		else if(id == Item.SPIKE) {
+			equipment.addSpikes();
+		}
+		else if(id == Item.GLUE) {
+			equipment.addGlue();
+		}
+		else if(id == Item.ACID) {
+			equipment.addAcid();
+		}
 		else{
-			buffTimer = 5;
-			buff = id;
+			//buffTimer = 5;
+			//buff = id;
 		}
 	}
 	
@@ -756,12 +783,41 @@ public class Player implements Steerable<Vector2>{
 	}
 	
 	float sptCooldown = 0.1f;
+	private float slowness = 1;
+	float acid_timer = 0;
 	
 	public void update(float delta){
 		if(!isDead())
-		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd * (inSpace ? 0.1f : 1f)), true);
+		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd * slowness * (inSpace ? 0.1f : 1f)), true);
 		
 		equipment.update(delta);
+		
+		float biggest_glue = 0;
+		AcidGlue biggest_acid = null;
+		
+		for(int i = stepping.size() - 1; i >= 0; i --) {
+			if(biggest_acid == null) {
+				biggest_acid = stepping.get(i);
+			}
+			else if(stepping.get(i).acid_level > biggest_acid.acid_level) {
+				biggest_acid = stepping.get(i);
+			}
+			if(stepping.get(i).glue_level > biggest_glue) {
+				biggest_glue = stepping.get(i).glue_level;
+			}
+		}
+		
+		slowness = 1/(1+biggest_glue);
+		
+		if(biggest_acid != null && biggest_acid.acid_level > 0) {
+			acid_timer += delta;
+			
+			if(acid_timer > 0.5f) {
+				acid_timer -= 0.5f;
+				takeDamage(Equipment.ACID_DAMAGE * biggest_acid.player.atk * biggest_acid.acid_level, biggest_acid.player, true);
+			}
+			//TODO: tirar vida periodicamente
+		}
 		
 		if(inSpace) {
 			if(body.getLinearVelocity().len() > 3) {
@@ -832,11 +888,11 @@ public class Player implements Steerable<Vector2>{
 		if(!dead){
 			spillTimer -= delta;
 			if(spillTimer < 0){
-				spillTimer = life/maxLife;
+				spillTimer = life/getMaxLife();
 				
-				if(life < maxLife){
+				if(life < getMaxLife()){
 					if(body.getLinearVelocity().len() > 1){
-						getState().showBloodSpill(body.getWorldCenter(), ((maxLife - life)/maxLife) * 0.5f);
+						getState().showBloodSpill(body.getWorldCenter(), ((getMaxLife() - life)/getMaxLife()) * 0.5f);
 					}
 				}
 			}
@@ -934,22 +990,8 @@ public class Player implements Steerable<Vector2>{
 		if(buffTimer <= 0){
 			setBuff(-1);
 		}
-		
-		setAtk(1);
-		def = 1;
-		spd = 1;
-		
-		switch(getBuff()){
-		case Item.ATTACK:
-			setAtk(5);
-			break;
-		case Item.DEFFENSE:
-			def = 0;
-			break;
-		case Item.SPEED:
-			spd = 3f;
-			break;
-		}
+
+
 		
 		if(getLife() <= 0 && !isDead()){
 			setDead(true);
@@ -1180,16 +1222,16 @@ public class Player implements Steerable<Vector2>{
 			}
 			
 			if(axisCode == xCam){
-				//if(Math.abs(value) > 0.1) {
+				if(Math.abs(value) > 0.1) {
 					//TODO:
 					axis.x = value;
-				//}
+				}
 			}
 			
 			if(axisCode == yCam){
-				//if(Math.abs(value) > 0.1) {
+				if(Math.abs(value) > 0.1) {
 					axis.y = value;
-				//}
+				}
 			}
 		}
 		
@@ -1338,6 +1380,18 @@ public class Player implements Steerable<Vector2>{
 
 	public String getName() {
 		return name;
+	}
+	
+	public Equipment getEquipment() {
+		return equipment;
+	}
+
+	public float getMaxLife() {
+		return maxLife;
+	}
+
+	public void setMaxLife(float maxLife) {
+		this.maxLife = maxLife;
 	}
 	
 

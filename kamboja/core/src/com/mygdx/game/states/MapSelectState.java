@@ -1100,10 +1100,10 @@ public class MapSelectState extends State{
 				selected_map = selection[id];
 				KambojaMain.setMapName(mapNames.get(selected_map));
 				if(selected_map == KambojaMain.randomIndex){
-					int randomMap = (int)(Math.random() * (KambojaMain.mapUnlocked.length - 1));
+					int randomMap = (int)(Math.random() * mapNames.size());
 					
 					while(!KambojaMain.mapUnlocked[randomMap]) {
-						randomMap = (int)(Math.random() * (KambojaMain.mapUnlocked.length - 1));
+						randomMap = (int)(Math.random() * mapNames.size());
 					}
 					
 					KambojaMain.setMapName(mapNames.get(randomMap));

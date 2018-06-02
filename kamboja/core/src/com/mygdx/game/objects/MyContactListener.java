@@ -15,10 +15,60 @@ import com.mygdx.game.objects.shift.TurretObject;
 import com.mygdx.game.objects.weapon.Flamethrower;
 import com.mygdx.game.objects.weapon.Laser;
 import com.mygdx.game.states.GameState;
+import com.mygdx.game.states.GameState.PlayerSpike;
 
 public class MyContactListener implements ContactListener{
-
+	
 	public void beginContact(Contact contact) {
+		
+		//Player com acidGlue
+		if(contact.getFixtureA().getBody().getUserData() instanceof Player &&
+				contact.getFixtureB().getUserData() instanceof AcidGlue) {
+			
+			AcidGlue ag = (AcidGlue) contact.getFixtureB().getUserData();
+			Player p = (Player) contact.getFixtureA().getBody().getUserData();
+			
+			if(!ag.player.equals(p) && !p.stepping.contains(ag)) {
+				p.stepping.add(ag);
+			}
+			
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Player &&
+				contact.getFixtureA().getUserData() instanceof AcidGlue) {
+			
+			AcidGlue ag = (AcidGlue) contact.getFixtureA().getUserData();
+			Player p = (Player) contact.getFixtureB().getBody().getUserData();
+			
+			if(!ag.player.equals(p) && !p.stepping.contains(ag)) {
+				p.stepping.add(ag);
+			}
+			
+		}
+		
+		//Player com espínho
+		if(
+				contact.getFixtureA().getUserData() instanceof PlayerSpike &&
+				!contact.getFixtureB().isSensor() &&
+				contact.getFixtureB().getBody().getUserData() instanceof Player &&
+				!contact.getFixtureA().getBody().equals(contact.getFixtureB().getBody())) {
+			
+			Player p1 = (Player)contact.getFixtureA().getBody().getUserData();
+			Player p2 = (Player)contact.getFixtureB().getBody().getUserData();
+			if(p1.getEquipment().spike_level > 0)
+			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true);
+			
+		}
+		if(
+				contact.getFixtureB().getUserData() instanceof PlayerSpike &&
+				!contact.getFixtureA().isSensor() &&
+				contact.getFixtureA().getBody().getUserData() instanceof Player &&
+				!contact.getFixtureB().getBody().equals(contact.getFixtureA().getBody())) {
+			
+			Player p1 = (Player)contact.getFixtureB().getBody().getUserData();
+			Player p2 = (Player)contact.getFixtureA().getBody().getUserData();
+			if(p1.getEquipment().spike_level > 0)
+			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true);
+		}
 
 		//player com buraco
 		if(contact.getFixtureA().getUserData() instanceof PlayerFall && contact.getFixtureB().getUserData() instanceof HoleBlock){
@@ -162,7 +212,7 @@ public class MyContactListener implements ContactListener{
 		//player com item
 		if(contact.getFixtureA().getUserData() instanceof Player && contact.getFixtureB().getUserData() instanceof Item){
 			Item it = (Item) contact.getFixtureB().getUserData();
-			Player pl = (Player) contact.getFixtureA().getUserData();
+			Player pl = (Player) contact.getFixtureA().getBody().getUserData();
 			
 			pl.setBuff(it.id);
 			it.remove();
@@ -170,7 +220,7 @@ public class MyContactListener implements ContactListener{
 		
 		if(contact.getFixtureB().getUserData() instanceof Player && contact.getFixtureA().getUserData() instanceof Item){
 			Item it = (Item) contact.getFixtureA().getUserData();
-			Player pl = (Player) contact.getFixtureB().getUserData();
+			Player pl = (Player) contact.getFixtureB().getBody().getUserData();
 			
 			pl.setBuff(it.id);
 			it.remove();
@@ -287,6 +337,31 @@ public class MyContactListener implements ContactListener{
 					l.removeRange(contact.getFixtureA().getBody());
 				}
 		
+		//Player com acidGlue
+				if(contact.getFixtureA().getBody().getUserData() instanceof Player &&
+						contact.getFixtureB().getUserData() instanceof AcidGlue) {
+					
+					AcidGlue ag = (AcidGlue) contact.getFixtureB().getUserData();
+					Player p = (Player) contact.getFixtureA().getBody().getUserData();
+					
+					if(!ag.player.equals(p) && p.stepping.contains(ag)) {
+						p.stepping.remove(ag);
+					}
+					
+				}
+				if(contact.getFixtureB().getBody().getUserData() instanceof Player &&
+						contact.getFixtureA().getUserData() instanceof AcidGlue) {
+					
+					AcidGlue ag = (AcidGlue) contact.getFixtureA().getUserData();
+					Player p = (Player) contact.getFixtureB().getBody().getUserData();
+					
+					if(!ag.player.equals(p) && p.stepping.contains(ag)) {
+						p.stepping.remove(ag);
+					}
+					
+				}
+				
+				
 	}
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
