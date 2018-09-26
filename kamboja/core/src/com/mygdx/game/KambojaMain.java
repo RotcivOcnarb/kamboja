@@ -7,14 +7,20 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Stack;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONObject;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -26,12 +32,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Json;
+import com.brsanthu.googleanalytics.GoogleAnalytics;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamAuth.AuthSessionResponse;
 import com.codedisaster.steamworks.SteamException;
 import com.codedisaster.steamworks.SteamID;
 import com.codedisaster.steamworks.SteamUser;
 import com.codedisaster.steamworks.SteamUserCallback;
+import com.mixpanel.mixpanelapi.ClientDelivery;
+import com.mixpanel.mixpanelapi.MessageBuilder;
+import com.mixpanel.mixpanelapi.MixpanelAPI;
+import com.mygdx.game.analytics.Crashlytics;
+import com.mygdx.game.analytics.EventData;
+import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
@@ -52,6 +65,15 @@ import com.mygdx.game.states.GameState;
 
 public class KambojaMain extends ApplicationAdapter {
 	
+	//Analytics
+	
+	static final String PROJECT_TOKEN = "4ed6b1469a6b971d39ada468f7d260e5";
+	static String userID;
+	static String sessionID;
+	static Thread eventBatch;
+	public static Stack<EventData> dataLayer;
+	static String currentScreen;
+	//Resto
 	
 	private SpriteBatch sb;
 	private Manager manager; //the list of states
@@ -81,6 +103,7 @@ public class KambojaMain extends ApplicationAdapter {
 	AssetManager assets;
 	
 	ShapeRenderer sr;
+
 	
 	public static KambojaMain getInstance() {
 		return instance;
@@ -309,12 +332,13 @@ public class KambojaMain extends ApplicationAdapter {
 			e.printStackTrace();
 		}
     }
-	
+    
 	public void create () {
 		
+
 		MultiPrintStream logTxt;
 		try {
-			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")));
+			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")), new Crashlytics());
 			System.setErr(logTxt);
 			//System.setOut(logTxt);
 		} catch (FileNotFoundException e1) {
@@ -347,6 +371,62 @@ public class KambojaMain extends ApplicationAdapter {
 			public void onMicroTxnAuthorization(int appID, long orderID, boolean authorized) {				
 			}
 		});
+		
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest((""+steamUser.getSteamID().getAccountID()).getBytes(StandardCharsets.UTF_8));
+			userID = new String(hash);
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+		
+		sessionID = generateUnique128ID();
+		
+		dataLayer = new Stack<EventData>();
+		
+		eventBatch = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while(true) {
+					if(!dataLayer.isEmpty()) {
+						EventData data = dataLayer.pop();
+						try {
+						MessageBuilder messageBuilder =
+							    new MessageBuilder(PROJECT_TOKEN);
+
+							JSONObject props = new JSONObject();
+							
+							props.put("sessionID", sessionID);
+							props.put("Country", Locale.getDefault().getCountry());
+							
+							for(String key : data.getData().keySet()) {
+								props.put(key, data.getData().get(key));
+							}
+
+							JSONObject event =
+							    messageBuilder.event(userID, data.getName(), props);
+
+							ClientDelivery delivery = new ClientDelivery();
+							delivery.addMessage(event);
+
+							MixpanelAPI mixpanel = new MixpanelAPI();
+							mixpanel.deliver(delivery);
+						}
+						catch(Exception e) {
+							System.out.println("Não consegui enviar o disparo, motivo:");
+							System.out.println(e.getMessage());
+						}
+						//TODO:
+					}
+				}
+			}
+		
+		});
+		
+		eventBatch.start();
+		
 		
 		loadGame();
 		//Loads the config.ini file and sets all the parameters
@@ -421,13 +501,13 @@ public class KambojaMain extends ApplicationAdapter {
 			e.printStackTrace();
 			System.exit(0);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		capsule = new Texture("menu/postgame/lvl_capsule.png");
 		loading_bar = new Texture("menu/postgame/bar_front.png");
 		loading_case = new Texture("menu/postgame/bar_back.png");
+
 	}
 	
 	Texture capsule, loading_bar, loading_case;
@@ -541,5 +621,38 @@ public class KambojaMain extends ApplicationAdapter {
 		super.dispose();
 		saveGame();
 		SteamAPI.shutdown();
+	}
+
+	public static void screenView(State state) {
+			EventData data = new EventData("screenView");
+			currentScreen = state.getClass().getSimpleName();
+			event(data);
+	}
+	
+	public static void event(EventData data) {
+		data.put("screenName", currentScreen);
+		data.put("level", level);
+		dataLayer.push(data);
+	}
+	
+	public static String generateUnique128ID() {
+		
+		String id = "";
+		
+		for(int i = 0; i < 128; i ++) {
+			int rnd = (int) (Math.random() * 122);
+			while(
+					(rnd < 48) ||
+					(rnd > 57 && rnd < 65) ||
+					(rnd > 90 && rnd < 97) ||
+					(rnd > 122)
+					) {
+				rnd = (int) (Math.random() * 122);
+			}
+			id += new String(new char[] {(char) rnd});
+			
+		}
+		return id;
+		
 	}
 }

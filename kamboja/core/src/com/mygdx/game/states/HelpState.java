@@ -63,6 +63,7 @@ public class HelpState extends GenericInterface{
 	
 	public void create() {
 		super.create();
+		KambojaMain.screenView(this);
 		shootBody = createBox(
 				new Vector2(1920/2 -700, 1080),
 				new Vector2(shoot.getWidth()/2f, shoot.getHeight()/2f),

@@ -81,6 +81,7 @@ public class CreditsState extends GenericInterface{
 	public void create() {
 		super.create();
 		credit_y = -3620;
+		KambojaMain.screenView(this);
 	}
 
 	public void insideRender(SpriteBatch sb) {

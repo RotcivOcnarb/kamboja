@@ -74,13 +74,11 @@ public class MyContactListener implements ContactListener{
 		if(contact.getFixtureA().getUserData() instanceof PlayerFall && contact.getFixtureB().getUserData() instanceof HoleBlock){
 			PlayerFall p = (PlayerFall) contact.getFixtureA().getUserData();
 			p.player.setFalling();
-			System.out.println("player fall");
 		}
 		if(contact.getFixtureB().getUserData() instanceof PlayerFall && contact.getFixtureA().getUserData() instanceof HoleBlock){
 			PlayerFall p = (PlayerFall) contact.getFixtureB().getUserData();
 			
 			p.player.setFalling();
-			System.out.println("player fall");
 		}
 
 		//qualquer objeto com range do laser
@@ -229,13 +227,11 @@ public class MyContactListener implements ContactListener{
 		
 		//bala atinge inimigo
 		if(contact.getFixtureA().getUserData() instanceof Player && contact.getFixtureB().getUserData() instanceof Bullet){
-			System.out.println("bazooka -> player A");
 			Player player = (Player) contact.getFixtureA().getUserData();
 			Bullet b = (Bullet) contact.getFixtureB().getUserData();
 			
 			if(b.getID() != player.getId()){
 				if(!player.isDead()){
-					System.out.println("\ttaking damage");
 					player.takeDamage(b.getDamage(), b.getPlayer(), true);
 					
 					if(b instanceof BazookaBullet){
@@ -245,7 +241,6 @@ public class MyContactListener implements ContactListener{
 					GameState.removeBody(contact.getFixtureB().getBody());
 				}
 				else{
-					System.out.println("\tdisable contact");
 					contact.setEnabled(false);
 					return;
 				}

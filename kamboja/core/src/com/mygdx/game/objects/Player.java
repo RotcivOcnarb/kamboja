@@ -1255,6 +1255,10 @@ public class Player implements Steerable<Vector2>{
 	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
 		return false;
 	}
+	
+	public boolean isKeyboard() {
+		return keyboard;
+	}
 
 	public float getMaxLinearSpeed() {return 0;}
 	public void setMaxLinearSpeed(float maxLinearSpeed) {}

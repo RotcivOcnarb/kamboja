@@ -24,6 +24,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.objects.FrameBufferStack;
@@ -118,7 +119,6 @@ public abstract class GenericInterface extends State{
 	
 	@Override
 	public void create() {
-		
 		chainBody.clear();
 		
 		shaderIntensity = 0;

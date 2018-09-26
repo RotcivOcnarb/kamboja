@@ -22,6 +22,29 @@ public abstract class Weapon {
 		lerpPosition = player.getBody().getWorldCenter().cpy();
 	}
 	
+	public static String getName(int id) {
+		
+		switch(id) {
+		case 0:
+			return "Pistol";
+		case 1:
+			return "DoublePistol";
+		case 2:
+			return "Minigun";
+		case 3:
+			return "Shotgun";
+		case 4:
+			return "MP5";
+		case 5:
+			return "Flamethrower";
+		case 6:
+			return "Bazooka";
+		case 7:
+			return "Laser";
+		}
+		return "";
+	}
+	
 	public abstract void render(SpriteBatch sb);
 	public abstract void update(float delta);
 	public abstract void dispose();

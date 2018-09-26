@@ -48,6 +48,7 @@ import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.objects.weapon.Weapon;
 
 public class PlayerSelectState extends State{
 	
@@ -246,6 +247,7 @@ public class PlayerSelectState extends State{
 
 	@Override
 	public void create() {
+		KambojaMain.screenView(this);
 		outro = false;
 		intro = true;
 		alpha = 1;

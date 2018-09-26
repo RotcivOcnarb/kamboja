@@ -238,7 +238,7 @@ public class GameState extends State{
 	boolean exitMap = false;
 	
 	public void create() {
-		
+		KambojaMain.screenView(this);
 		acidGlues = new ArrayList<AcidGlue>();
 		
 		id_alpha = 0.2f;
@@ -1373,6 +1373,7 @@ public class GameState extends State{
 				targetMenuPos = 1080 * 6;
 				inputBlocked = true;
 				setEnd(true);
+				PostGameState.gameTime = timeCount;
 				//acabou o tempo
 				
 				for(Player p : getPlayers()){
@@ -1448,6 +1449,7 @@ public class GameState extends State{
 				}
 				setEnd(true);
 				//só sobrou um player
+				PostGameState.gameTime = timeCount;
 				
 				for(Player p : getPlayers()){
 					p.getWeapon().analog = 0;

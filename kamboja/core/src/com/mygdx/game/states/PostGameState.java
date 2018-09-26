@@ -27,6 +27,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
+import com.mygdx.game.analytics.EventData;
+import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
@@ -40,6 +42,8 @@ public class PostGameState extends GenericInterface{
 	Texture kill_icon, death_icon;
 	Texture unlockedText;
 	Texture unlockedImage;
+	
+	public static float gameTime;
 	
 	Texture capsule, capsule_light, progress_case, progress_bar;
 		
@@ -230,10 +234,19 @@ public class PostGameState extends GenericInterface{
 	
 	public void create() {
 		super.create();
+		KambojaMain.screenView(this);
+		
+		EventData gameData = new EventData("matchFinish");
+		gameData.put("qtdPlayers", KambojaMain.getPostGamePlayers().size());
+		gameData.put("map", KambojaMain.getMapName());
+		gameData.put("gameTime", gameTime);
+		
+		KambojaMain.event(gameData);
 		
 		layout = new GlyphLayout();
 
 		for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
+
 			float margin = (1920 - 4*main_frame[i].getWidth())/5f;
 			frame_body[i] = createBox(new Vector2(
 					margin + i*(main_frame[i].getWidth() + margin) + main_frame[i].getWidth()/2f,
@@ -254,6 +267,36 @@ public class PostGameState extends GenericInterface{
 				return  arg1.getKills() - arg0.getKills();
 			}
 		});
+		
+		for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
+				
+			//	Hit de player
+			//Tipo (controller, pc ou bot)
+			//Qual posição (1 2 3 ou 4)
+			//Qual arma
+			//Quantas vezes morreu
+			//Quantos matou
+			
+			
+				Player pl = KambojaMain.getPostGamePlayers().get(i);
+				String playerType = "Controller";
+				if(pl.isKeyboard()) {
+					playerType = "Keyboard";
+				}
+				if(pl instanceof BetterBot) {
+					playerType = "Bot";
+				}
+				
+				EventData playerData = new EventData("playerFinish");
+				playerData.put("type", playerType);
+				playerData.put("rank", i + 1);
+				playerData.put("weapon", pl.getWeapon().getClass().getSimpleName());
+				playerData.put("deaths", pl.getDeaths());
+				playerData.put("kills", pl.getKills());
+				
+				KambojaMain.event(playerData);
+				
+		}
 		
 	}
 	
