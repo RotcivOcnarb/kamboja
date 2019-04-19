@@ -78,14 +78,15 @@ public class GoogleAnalytics implements Runnable{
 	public void sendHit(HitData data) {
 		try {
 			
-			String url = "https://www.google-analytics.com";
+			String url = "https://www.google-analytics.com/collect";
 			URL obj = new URL(url);
 			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
 			//add request header
 			con.setRequestMethod("POST");
 			con.setRequestProperty("User-Agent", user_agent);
-
+			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+			
 			String urlParameters = data.payload();
 			
 			// Send post request
@@ -109,10 +110,7 @@ public class GoogleAnalytics implements Runnable{
 				response.append(inputLine);
 			}
 			in.close();
-			
-			//print result
-			//System.out.println(response.toString());
-		
+
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -144,7 +142,7 @@ public class GoogleAnalytics implements Runnable{
 		data.put("ds", "game");
 		data.put("cid", sessionID);
 		data.put("uid", userID);
-		data.put("dr", URLEncoder.encode("http://ocnarb.netai.net/rotciv", StandardCharsets.UTF_8.toString()));
+		data.put("an", "Kamboja");
 		data.put("sr", Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
 		data.put("t", hitType);
 		}
