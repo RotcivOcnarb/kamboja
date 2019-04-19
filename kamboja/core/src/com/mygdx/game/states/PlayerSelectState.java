@@ -247,7 +247,6 @@ public class PlayerSelectState extends State{
 
 	@Override
 	public void create() {
-		KambojaMain.screenView(this);
 		outro = false;
 		intro = true;
 		alpha = 1;

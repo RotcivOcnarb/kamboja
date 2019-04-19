@@ -27,7 +27,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
-import com.mygdx.game.analytics.EventData;
+import com.mygdx.game.analytics.HitData;
 import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
@@ -233,15 +233,13 @@ public class PostGameState extends GenericInterface{
 	}
 	
 	public void create() {
-		super.create();
-		KambojaMain.screenView(this);
-		
-		EventData gameData = new EventData("matchFinish");
-		gameData.put("qtdPlayers", KambojaMain.getPostGamePlayers().size());
-		gameData.put("map", KambojaMain.getMapName());
-		gameData.put("gameTime", gameTime);
-		
-		KambojaMain.event(gameData);
+		super.create();		
+//		HitData gameData = new HitData("matchFinish");
+//		gameData.put("qtdPlayers", KambojaMain.getPostGamePlayers().size());
+//		gameData.put("map", KambojaMain.getMapName());
+//		gameData.put("gameTime", gameTime);
+//		
+//		KambojaMain.event(gameData);
 		
 		layout = new GlyphLayout();
 
@@ -287,14 +285,14 @@ public class PostGameState extends GenericInterface{
 					playerType = "Bot";
 				}
 				
-				EventData playerData = new EventData("playerFinish");
-				playerData.put("type", playerType);
-				playerData.put("rank", i + 1);
-				playerData.put("weapon", pl.getWeapon().getClass().getSimpleName());
-				playerData.put("deaths", pl.getDeaths());
-				playerData.put("kills", pl.getKills());
-				
-				KambojaMain.event(playerData);
+//				HitData playerData = new HitData("playerFinish");
+//				playerData.put("type", playerType);
+//				playerData.put("rank", i + 1);
+//				playerData.put("weapon", pl.getWeapon().getClass().getSimpleName());
+//				playerData.put("deaths", pl.getDeaths());
+//				playerData.put("kills", pl.getKills());
+//				
+//				KambojaMain.event(playerData);
 				
 		}
 		

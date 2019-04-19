@@ -238,7 +238,6 @@ public class GameState extends State{
 	boolean exitMap = false;
 	
 	public void create() {
-		KambojaMain.screenView(this);
 		acidGlues = new ArrayList<AcidGlue>();
 		
 		id_alpha = 0.2f;

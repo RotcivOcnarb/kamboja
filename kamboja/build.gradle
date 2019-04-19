@@ -46,7 +46,7 @@ project(":desktop") {
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
         compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
 		compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
-		compile "com.mixpanel:mixpanel-java:1.4.4"
+		//compile "com.mixpanel:mixpanel-java:1.4.4"
     }
 }
 
@@ -70,9 +70,9 @@ project(":core") {
         compile "com.code-disaster.steamworks4j:steamworks4j:1.6.3-SNAPSHOT"
         compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
         compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
-        compile 'com.brsanthu:google-analytics-java:2.0.0'
+        //compile 'com.brsanthu:google-analytics-java:2.0.0'
 		testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
-		compile "com.mixpanel:mixpanel-java:1.4.4"
+		//compile "com.mixpanel:mixpanel-java:1.4.4"
     }
 }
 

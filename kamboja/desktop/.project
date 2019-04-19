@@ -24,7 +24,13 @@
 		<link>
 			<name>assets</name>
 			<type>2</type>
-			<location>C:/Users/rotci/Games/Kamboja-src/kamboja/kamboja/core/assets</location>
+			<locationURI>Assets</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>Assets</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/core/assets</value>
+		</variable>
+	</variableList>
 </projectDescription>

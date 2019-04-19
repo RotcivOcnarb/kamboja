@@ -59,7 +59,6 @@ public class OptionsState extends GenericInterface{
 
 	public void create() {
 		super.create();
-		KambojaMain.screenView(this);
 		background = KambojaMain.getTexture("menu/options/fundo.jpg");
 		main_sign = KambojaMain.getTexture("menu/options/main_sign.png");
 		above_bar = KambojaMain.getTexture("menu/options/above_bar.png");

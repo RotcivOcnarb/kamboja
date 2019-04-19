@@ -138,9 +138,7 @@ public class MenuState extends State{
 		
 	}
 
-	public void create() {
-		KambojaMain.screenView(this);
-		
+	public void create() {		
 		globalTimer = 0;
 		outro = false;
 		intro = true;

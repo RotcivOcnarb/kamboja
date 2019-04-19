@@ -244,9 +244,7 @@ public class MapSelectState extends State{
 
 	}
 
-	public void create() {
-		KambojaMain.screenView(this);
-		
+	public void create() {		
 		intro = true;
 		outro = false;
 		alpha = 1;

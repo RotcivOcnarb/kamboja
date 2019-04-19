@@ -12,15 +12,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Stack;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -32,19 +29,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Json;
-import com.brsanthu.googleanalytics.GoogleAnalytics;
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamAuth.AuthSessionResponse;
 import com.codedisaster.steamworks.SteamException;
 import com.codedisaster.steamworks.SteamID;
 import com.codedisaster.steamworks.SteamUser;
 import com.codedisaster.steamworks.SteamUserCallback;
-import com.mixpanel.mixpanelapi.ClientDelivery;
-import com.mixpanel.mixpanelapi.MessageBuilder;
-import com.mixpanel.mixpanelapi.MixpanelAPI;
-import com.mygdx.game.analytics.Crashlytics;
-import com.mygdx.game.analytics.EventData;
-import com.mygdx.game.objects.AcidGlue;
+import com.mygdx.game.analytics.GoogleAnalytics;
+import com.mygdx.game.analytics.HitData;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
@@ -67,12 +59,8 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	//Analytics
 	
-	static final String PROJECT_TOKEN = "4ed6b1469a6b971d39ada468f7d260e5";
+	static GoogleAnalytics analytics;
 	static String userID;
-	static String sessionID;
-	static Thread eventBatch;
-	public static Stack<EventData> dataLayer;
-	static String currentScreen;
 	//Resto
 	
 	private SpriteBatch sb;
@@ -99,6 +87,7 @@ public class KambojaMain extends ApplicationAdapter {
 	public static int maxExperience = 10000;
 	public static boolean vaporAmount = false;
 	static SteamUser steamUser;
+	public static boolean gameAlive;
 	
 	AssetManager assets;
 	
@@ -338,7 +327,7 @@ public class KambojaMain extends ApplicationAdapter {
 
 		MultiPrintStream logTxt;
 		try {
-			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")), new Crashlytics());
+			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")));
 			System.setErr(logTxt);
 			//System.setOut(logTxt);
 		} catch (FileNotFoundException e1) {
@@ -376,57 +365,15 @@ public class KambojaMain extends ApplicationAdapter {
 		try {
 			digest = MessageDigest.getInstance("SHA-256");
 			byte[] hash = digest.digest((""+steamUser.getSteamID().getAccountID()).getBytes(StandardCharsets.UTF_8));
-			userID = new String(hash);
+			userID = bytesToHex(hash).substring(0, 9);
 		} catch (NoSuchAlgorithmException e1) {
 			e1.printStackTrace();
 		}
 		
-		sessionID = generateUnique128ID();
-		
-		dataLayer = new Stack<EventData>();
-		
-		eventBatch = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while(true) {
-					if(!dataLayer.isEmpty()) {
-						EventData data = dataLayer.pop();
-						try {
-						MessageBuilder messageBuilder =
-							    new MessageBuilder(PROJECT_TOKEN);
-
-							JSONObject props = new JSONObject();
-							
-							props.put("sessionID", sessionID);
-							props.put("Country", Locale.getDefault().getCountry());
-							
-							for(String key : data.getData().keySet()) {
-								props.put(key, data.getData().get(key));
-							}
-
-							JSONObject event =
-							    messageBuilder.event(userID, data.getName(), props);
-
-							ClientDelivery delivery = new ClientDelivery();
-							delivery.addMessage(event);
-
-							MixpanelAPI mixpanel = new MixpanelAPI();
-							mixpanel.deliver(delivery);
-						}
-						catch(Exception e) {
-							System.out.println("Não consegui enviar o disparo, motivo:");
-							System.out.println(e.getMessage());
-						}
-						//TODO:
-					}
-				}
-			}
-		
-		});
-		
-		eventBatch.start();
-		
+		gameAlive = true;
+				
+		analytics = new GoogleAnalytics(userID, "UA-63640521-2");
+		analytics.sessionStart();
 		
 		loadGame();
 		//Loads the config.ini file and sets all the parameters
@@ -508,6 +455,16 @@ public class KambojaMain extends ApplicationAdapter {
 		loading_bar = new Texture("menu/postgame/bar_front.png");
 		loading_case = new Texture("menu/postgame/bar_back.png");
 
+	}
+	
+	private static String bytesToHex(byte[] hash) {
+	    StringBuffer hexString = new StringBuffer();
+	    for (int i = 0; i < hash.length; i++) {
+	    String hex = Integer.toHexString(0xff & hash[i]);
+	    if(hex.length() == 1) hexString.append('0');
+	        hexString.append(hex);
+	    }
+	    return hexString.toString();
 	}
 	
 	Texture capsule, loading_bar, loading_case;
@@ -621,38 +578,35 @@ public class KambojaMain extends ApplicationAdapter {
 		super.dispose();
 		saveGame();
 		SteamAPI.shutdown();
+		analytics.sessionEnd();
+		gameAlive = false;
 	}
 
-	public static void screenView(State state) {
-			EventData data = new EventData("screenView");
-			currentScreen = state.getClass().getSimpleName();
-			event(data);
-	}
-	
-	public static void event(EventData data) {
-		data.put("screenName", currentScreen);
-		data.put("level", level);
-		dataLayer.push(data);
-	}
-	
-	public static String generateUnique128ID() {
+	public static void event(String category, String action, String label, HashMap<String, Object> cds) {
 		
-		String id = "";
+		//HitData data = analytics.constructBaseHit();
 		
-		for(int i = 0; i < 128; i ++) {
-			int rnd = (int) (Math.random() * 122);
-			while(
-					(rnd < 48) ||
-					(rnd > 57 && rnd < 65) ||
-					(rnd > 90 && rnd < 97) ||
-					(rnd > 122)
-					) {
-				rnd = (int) (Math.random() * 122);
-			}
-			id += new String(new char[] {(char) rnd});
-			
-		}
-		return id;
 		
 	}
+//	
+//	private static String generateUnique128ID() {
+//		
+//		String id = "";
+//		
+//		for(int i = 0; i < 128; i ++) {
+//			int rnd = (int) (Math.random() * 122);
+//			while(
+//					(rnd < 48) ||
+//					(rnd > 57 && rnd < 65) ||
+//					(rnd > 90 && rnd < 97) ||
+//					(rnd > 122)
+//					) {
+//				rnd = (int) (Math.random() * 122);
+//			}
+//			id += new String(new char[] {(char) rnd});
+//			
+//		}
+//		return id;
+//		
+//	}
 }
