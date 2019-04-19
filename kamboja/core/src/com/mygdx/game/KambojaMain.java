@@ -373,7 +373,6 @@ public class KambojaMain extends ApplicationAdapter {
 		gameAlive = true;
 				
 		analytics = new GoogleAnalytics(userID, "UA-63640521-2");
-		analytics.sessionStart();
 		
 		loadGame();
 		//Loads the config.ini file and sets all the parameters
@@ -578,35 +577,18 @@ public class KambojaMain extends ApplicationAdapter {
 		super.dispose();
 		saveGame();
 		SteamAPI.shutdown();
-		analytics.sessionEnd();
 		gameAlive = false;
 	}
 
-	public static void event(String category, String action, String label, HashMap<String, Object> cds) {
-		
-		//HitData data = analytics.constructBaseHit();
-		
-		
+	public static void event(String category, String action, String label, HashMap<String, String> cds) {
+		analytics.event(category, action, label, cds);
 	}
-//	
-//	private static String generateUnique128ID() {
-//		
-//		String id = "";
-//		
-//		for(int i = 0; i < 128; i ++) {
-//			int rnd = (int) (Math.random() * 122);
-//			while(
-//					(rnd < 48) ||
-//					(rnd > 57 && rnd < 65) ||
-//					(rnd > 90 && rnd < 97) ||
-//					(rnd > 122)
-//					) {
-//				rnd = (int) (Math.random() * 122);
-//			}
-//			id += new String(new char[] {(char) rnd});
-//			
-//		}
-//		return id;
-//		
-//	}
+	public static void event(String category, String action, String label) {
+		analytics.event(category, action, label);
+	}
+	
+	public static void screenview(String screenName) {
+		analytics.screenview(screenName);
+	}
+
 }

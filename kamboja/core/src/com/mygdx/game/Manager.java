@@ -70,9 +70,8 @@ public class Manager implements ControllerListener, InputProcessor{
 	}
 	
 	public void create(){
-		states.get(currentState).create();
-		
-		
+		KambojaMain.screenview(states.get(currentState).getClass().getSimpleName().toLowerCase());
+		states.get(currentState).create();		
 	}
 	
 	public void render(SpriteBatch sb){

@@ -55,6 +55,13 @@ public class GoogleAnalytics implements Runnable{
 		
 	}
 	
+	public HitData screenview(String screenName) {
+		HitData data = constructBaseHit("screenview");
+		data.put("cd", screenName);
+		sendHit(data);
+		return data;
+	}
+	
 	public HitData event(String category, String action, String label) {
 		return event(category, action, label, null);
 	}
@@ -71,7 +78,7 @@ public class GoogleAnalytics implements Runnable{
 				data.put(s, customs.get(s));
 			}
 		}
-		
+		sendHit(data);
 		return data;
 	}
 	
@@ -118,20 +125,6 @@ public class GoogleAnalytics implements Runnable{
 			e.printStackTrace();
 		}
 		
-	}
-	
-	public void sessionStart() {
-		HitData data = constructBaseHit("screenview");
-		data.put("sc", "start");
-		data.put("cd", "Kamboja");
-		sendHit(data);
-	}
-	
-	public void sessionEnd() {
-		HitData data = constructBaseHit("screenview");
-		data.put("sc", "end");
-		data.put("cd", "Kamboja");
-		sendHit(data);
 	}
 	
 	public HitData constructBaseHit(String hitType) {

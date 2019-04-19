@@ -416,10 +416,12 @@ public class Player implements Steerable<Vector2>{
 						owner.kills ++;
 						owner.ghosts.add(new Ghost(getId(), getPosition()));
 						owner.score += 100;
+						KambojaMain.event("game", "player_kill", "weapon_" + owner.getWeapon().getClass().getSimpleName().toLowerCase());
 					}
 					setDead(true);
 					body.getFixtureList().get(0).setSensor(true);
 					getState().showSkull(body.getWorldCenter(), getAngle());
+					KambojaMain.event("game", "player_death", "weapon_" + getWeapon().getClass().getSimpleName().toLowerCase());
 				}
 			}
 			if(gruntTimer < 0){

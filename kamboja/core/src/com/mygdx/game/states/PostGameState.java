@@ -2,6 +2,7 @@ package com.mygdx.game.states;
 
 import java.io.File;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
@@ -233,7 +234,8 @@ public class PostGameState extends GenericInterface{
 	}
 	
 	public void create() {
-		super.create();		
+		super.create();
+		
 //		HitData gameData = new HitData("matchFinish");
 //		gameData.put("qtdPlayers", KambojaMain.getPostGamePlayers().size());
 //		gameData.put("map", KambojaMain.getMapName());
@@ -267,33 +269,23 @@ public class PostGameState extends GenericInterface{
 		});
 		
 		for(int i = 0; i < KambojaMain.getPostGamePlayers().size(); i ++) {
-				
-			//	Hit de player
-			//Tipo (controller, pc ou bot)
-			//Qual posição (1 2 3 ou 4)
-			//Qual arma
-			//Quantas vezes morreu
-			//Quantos matou
-			
-			
 				Player pl = KambojaMain.getPostGamePlayers().get(i);
-				String playerType = "Controller";
+				String playerType = "controller";
 				if(pl.isKeyboard()) {
-					playerType = "Keyboard";
+					playerType = "keyboard";
 				}
 				if(pl instanceof BetterBot) {
-					playerType = "Bot";
+					playerType = "bot";
 				}
 				
-//				HitData playerData = new HitData("playerFinish");
-//				playerData.put("type", playerType);
-//				playerData.put("rank", i + 1);
-//				playerData.put("weapon", pl.getWeapon().getClass().getSimpleName());
-//				playerData.put("deaths", pl.getDeaths());
-//				playerData.put("kills", pl.getKills());
-//				
-//				KambojaMain.event(playerData);
 				
+				HashMap<String, String> customs = new HashMap<String, String>();
+				customs.put("cd12", "pos_" + (i+1));
+				customs.put("cd3", "weapon_" + pl.getWeapon().getClass().getSimpleName().toLowerCase());
+				customs.put("cm1", "" + pl.getKills());
+				customs.put("cm2", "" + pl.getDeaths());
+				
+				KambojaMain.event("game", "match_finish", "player_" + playerType, customs);
 		}
 		
 	}
