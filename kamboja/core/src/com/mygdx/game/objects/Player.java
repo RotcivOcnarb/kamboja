@@ -422,10 +422,21 @@ public class Player implements Steerable<Vector2>{
 					body.getFixtureList().get(0).setSensor(true);
 					getState().showSkull(body.getWorldCenter(), getAngle());
 					
-					HashMap<String, String> customs = new HashMap<String, String>();
-					customs.put("cd3", getWeapon().getClass().getSimpleName());
 					
-					String ow = "suicide";
+					String playerType = "controller";
+					if(isKeyboard()) {
+						playerType = "keyboard";
+					}
+					if(this instanceof BetterBot) {
+						playerType = "bot";
+					}
+					
+					HashMap<String, String> customs = new HashMap<String, String>();
+					customs.put("cd1", KambojaMain.getMapName());
+					customs.put("cd3", getWeapon().getClass().getSimpleName());
+					customs.put("cd4", "player_" + playerType);
+					
+					String ow = "Suicide";
 					
 					if(owner != null)
 						ow = owner.getWeapon().getClass().getSimpleName();
