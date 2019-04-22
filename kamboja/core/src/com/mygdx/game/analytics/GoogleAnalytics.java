@@ -30,6 +30,8 @@ public class GoogleAnalytics implements Runnable{
 	
 	Stack<HitData> queue;
 	
+	boolean debug = true;
+	
 	public GoogleAnalytics(String userID, String UA) {
 		
 		this.userID = userID;
@@ -104,20 +106,12 @@ public class GoogleAnalytics implements Runnable{
 			wr.close();
 
 			int responseCode = con.getResponseCode();
-			System.out.println("\nSending 'POST' request to URL : " + url);
-			System.out.println("Post parameters : " + urlParameters);
-			System.out.println("Response Code : " + responseCode);
-
-			BufferedReader in = new BufferedReader(
-			        new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
+			
+			if(debug) {
+				System.out.println("\nSending 'POST' request to URL : " + url);
+				System.out.println("Post parameters : " + urlParameters);
+				System.out.println("Response Code : " + responseCode);
 			}
-			in.close();
-
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

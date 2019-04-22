@@ -1,6 +1,7 @@
 package com.mygdx.game.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -416,12 +417,20 @@ public class Player implements Steerable<Vector2>{
 						owner.kills ++;
 						owner.ghosts.add(new Ghost(getId(), getPosition()));
 						owner.score += 100;
-						KambojaMain.event("game", "player_kill", "weapon_" + owner.getWeapon().getClass().getSimpleName().toLowerCase());
 					}
 					setDead(true);
 					body.getFixtureList().get(0).setSensor(true);
 					getState().showSkull(body.getWorldCenter(), getAngle());
-					KambojaMain.event("game", "player_death", "weapon_" + getWeapon().getClass().getSimpleName().toLowerCase());
+					
+					HashMap<String, String> customs = new HashMap<String, String>();
+					customs.put("cd3", getWeapon().getClass().getSimpleName());
+					
+					String ow = "suicide";
+					
+					if(owner != null)
+						ow = owner.getWeapon().getClass().getSimpleName();
+					
+					KambojaMain.event("game", "player_kill",  ow, customs);
 				}
 			}
 			if(gruntTimer < 0){

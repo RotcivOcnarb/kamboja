@@ -280,8 +280,8 @@ public class PostGameState extends GenericInterface{
 				
 				
 				HashMap<String, String> customs = new HashMap<String, String>();
-				customs.put("cd12", "pos_" + (i+1));
-				customs.put("cd3", "weapon_" + pl.getWeapon().getClass().getSimpleName().toLowerCase());
+				customs.put("cd1", "pos_" + (i+1));
+				customs.put("cd3", pl.getWeapon().getClass().getSimpleName());
 				customs.put("cm1", "" + pl.getKills());
 				customs.put("cm2", "" + pl.getDeaths());
 				
