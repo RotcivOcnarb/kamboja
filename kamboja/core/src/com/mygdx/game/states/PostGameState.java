@@ -280,12 +280,15 @@ public class PostGameState extends GenericInterface{
 				
 				
 				HashMap<String, String> customs = new HashMap<String, String>();
-				customs.put("cd12", "pos_" + (i+1));
-				customs.put("cd3", "weapon_" + pl.getWeapon().getClass().getSimpleName().toLowerCase());
+				customs.put("cd1", KambojaMain.getMapName());
+				customs.put("cd2", "pos_" + (i+1));
+				customs.put("cd3", pl.getWeapon().getClass().getSimpleName());
+				customs.put("cd4", "player_" + playerType);
 				customs.put("cm1", "" + pl.getKills());
 				customs.put("cm2", "" + pl.getDeaths());
 				
-				KambojaMain.event("game", "match_finish", "player_" + playerType, customs);
+				
+				KambojaMain.event("game", "match_finish", "", customs);
 		}
 		
 	}
