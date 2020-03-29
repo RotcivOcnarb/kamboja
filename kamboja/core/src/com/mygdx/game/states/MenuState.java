@@ -1,13 +1,17 @@
 package com.mygdx.game.states;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -24,6 +28,7 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.easing.Back;
 import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.GameMusic;
+import com.mygdx.game.objects.Util;
 
 public class MenuState extends State{
 	
@@ -45,7 +50,6 @@ public class MenuState extends State{
 	float eng_size[] = new float[6];
 	Texture options[] = new Texture[6];
 	
-
 	boolean outro;
 	boolean intro;
 	float outro_vel;
@@ -75,9 +79,13 @@ public class MenuState extends State{
 	
 	ShaderProgram shader;
 	FrameBuffer shaderBuffer;
+	
+	BitmapFont font;
 		
 	public MenuState(Manager manager) {
 		super(manager);
+		
+		buttonPress = new ArrayList<Integer>();
 		
 		background = KambojaMain.getTexture("menu/main_menu/background.png");
 		bolinha = KambojaMain.getTexture("menu/main_menu/bolinha.png");
@@ -127,15 +135,15 @@ public class MenuState extends State{
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/color_shift.fs"));
 
+		ShaderProgram.pedantic = false; //so it doesnt shout at me for not using all uniforms defined in shader
 		
-		ShaderProgram.pedantic = false;
-		
-		if(shader.getLog().length() > 0){
+		if(shader.getLog().length() > 0){ //if there is any error in the shader, spits it out
 			System.out.println(shader.getLog());
 		}
 		
 		GameMusic.startMenu();
 		
+		font = KambojaMain.getFont("fonts/olivers barney.ttf");
 	}
 
 	public void create() {		
@@ -636,6 +644,7 @@ public class MenuState extends State{
 			A = XBox.BUTTON_A;
 		}
 		else if(controller.getName().equals(Gamecube.getID())){
+			buttonPress.add(buttonCode);
 			A = Gamecube.A;
 		}
 		else{
@@ -654,7 +663,9 @@ public class MenuState extends State{
 		return false;
 	}
 	
-
+	
+	ArrayList<Integer> buttonPress;
+	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
 		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
 			if(axisCode == XBox.AXIS_LEFT_X){
@@ -662,6 +673,7 @@ public class MenuState extends State{
 			}
 		}
 		else if(controller.getName().equals(Gamecube.getID())){
+
 			if(axisCode == Gamecube.MAIN_X){
 				x_value = value;
 			}

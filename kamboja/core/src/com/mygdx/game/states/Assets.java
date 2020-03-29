@@ -11,6 +11,13 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 
+/** Class responsible for loading all assets of the game. All textures and fonts that are used in the game
+ * needs to be loaded here so it can be loaded at the start of the game (in the loading screen). And
+ * instantaneously accessed further when needed
+ * 
+ * @author Rotciv
+ *
+ */
 public class Assets {
 	
 	public static void LOADSHIT(AssetManager assets) {
@@ -41,6 +48,8 @@ public class Assets {
 		assets.load("Weapons/Icon/spike_icon.png", Texture.class);
 		assets.load("Weapons/Icon/glue_icon.png", Texture.class);
 		assets.load("Weapons/Icon/acid_icon.png", Texture.class);
+		
+		assets.load("player/melee_1.png", Texture.class);
 	}
 
 	private static void postGameState(AssetManager assets) {
@@ -185,6 +194,7 @@ public class Assets {
 		}
 		
 		assets.load("menu/player_select/back_btn.png", Texture.class);
+		assets.load("Weapons/granada.png", Texture.class);
 	}
 	
 	private static void helpState(AssetManager assets) {

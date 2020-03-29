@@ -69,9 +69,9 @@ public class PostGameState extends GenericInterface{
 	
 	enum Unlockable{
 		Island("Island", "Map", "maps/thumb_Disland.png"),
-		Iceland("Iceland", "Map", "maps/thumb_Eiceland.png"),
-		Volcan("Volcan", "Map", "maps/thumb_Fvolcan.png"),
-		Space("Space", "Map", "maps/thumb_Gspace.png"),
+		//Iceland("Iceland", "Map", "maps/thumb_Eiceland.png"),
+		//Volcan("Volcan", "Map", "maps/thumb_Fvolcan.png"),
+		//Space("Space", "Map", "maps/thumb_Gspace.png"),
 		MP5("MP5", "Weapon", "Weapons/Icon/Mp5.png"),
 		Shotgun("Shotgun", "Weapon", "Weapons/Icon/shotgun.png"),
 		Flamethrower("Flamethrower", "Weapon", "Weapons/Icon/Flamethrower.png"),
@@ -104,15 +104,15 @@ public class PostGameState extends GenericInterface{
 			case Island:
 				KambojaMain.mapUnlocked[3] = true;
 				break;
-			case Iceland:
-				KambojaMain.mapUnlocked[4] = true;
-				break;
-			case Volcan:
-				KambojaMain.mapUnlocked[5] = true;
-				break;
-			case Space:
-				KambojaMain.mapUnlocked[6] = true;
-				break;
+//			case Iceland:
+//				KambojaMain.mapUnlocked[4] = true;
+//				break;
+//			case Volcan:
+//				KambojaMain.mapUnlocked[5] = true;
+//				break;
+//			case Space:
+//				KambojaMain.mapUnlocked[6] = true;
+//				break;
 			case MP5:
 				KambojaMain.weaponUnlocked[4] = true;
 				break;
@@ -214,18 +214,12 @@ public class PostGameState extends GenericInterface{
 		case 3:
 			return Unlockable.Shotgun;
 		case 4:
-			return Unlockable.Iceland;
-		case 5:
 			return Unlockable.Flamethrower;
-		case 6:
-			return Unlockable.Volcan;
-		case 7:
+		case 5:
 			return Unlockable.Minigun;
-		case 8:
-			return Unlockable.Space;
-		case 9:
+		case 6:
 			return Unlockable.Bazooka;
-		case 10:
+		case 7:
 			return Unlockable.Laser;
 		default:
 				return null;

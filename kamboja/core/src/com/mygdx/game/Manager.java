@@ -22,7 +22,14 @@ import com.mygdx.game.states.MenuState;
 import com.mygdx.game.states.OptionsState;
 import com.mygdx.game.states.PlayerSelectState;
 import com.mygdx.game.states.PostGameState;
-
+/** A class that contains a list of renderable scenes, and switches between them depending on the game beheviour.
+ * It manages all the Scenes in the game (calles States)
+ * 
+ * Most of the methods here just are forwarded to the state method
+ * 
+ * @author Rotciv
+ *
+ */
 public class Manager implements ControllerListener, InputProcessor{
 	
 	private ArrayList<State> states;
@@ -38,6 +45,7 @@ public class Manager implements ControllerListener, InputProcessor{
 	public static final int POST_GAME_STATE = 6;
 	public static final int OPTIONS_STATE = 7;
 	
+	//Post processing shader
 	FrameBuffer geralBuffer;
 	ShaderProgram shader;
 	
@@ -58,8 +66,8 @@ public class Manager implements ControllerListener, InputProcessor{
 		Controllers.addListener(this);	
 		Gdx.input.setInputProcessor(this);
 		
+		//Loads the post processing objects needed
 		geralBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
-		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/vaporwave.fs"));
 	}
@@ -91,10 +99,12 @@ public class Manager implements ControllerListener, InputProcessor{
 	}
 
 	public void connected(Controller controller) {
+		System.out.println("Controller Connected");
 		states.get(currentState).connected(controller);
 	}
 
 	public void disconnected(Controller controller) {
+		System.out.println("Controller disconnected");
 		states.get(currentState).disconnected(controller);
 	}
 
@@ -157,6 +167,8 @@ public class Manager implements ControllerListener, InputProcessor{
 		return states.get(currentState).keyUp(keycode);
 	}
 
+	//Not needed methods, since not working with keyboard typing, mobile devices, or mouse scrolls
+	
 	@Override
 	public boolean keyTyped(char character) {
 		// TODO Auto-generated method stub
@@ -189,7 +201,6 @@ public class Manager implements ControllerListener, InputProcessor{
 
 	@Override
 	public boolean scrolled(int amount) {
-
 		return false;
 	}
 

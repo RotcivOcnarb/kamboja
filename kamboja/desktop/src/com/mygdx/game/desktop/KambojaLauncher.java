@@ -17,13 +17,17 @@ import java.util.HashMap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.mygdx.game.KambojaMain;
 
 
@@ -35,6 +39,7 @@ public class KambojaLauncher{
 	int width;
 	int height;
 	boolean fullscreen;
+	boolean debug;
 	
 	public void readConfig() {
 		//Loads the config.ini file and sets all the parameters
@@ -86,7 +91,13 @@ public class KambojaLauncher{
 					}
 					else {
 						fullscreen = Boolean.parseBoolean(configs.get("Fullscreen"));
-						
+					}
+					
+					if(configs.get("DebugMode") == null) {
+						debug = false;
+					}
+					else {
+						debug = Boolean.parseBoolean(configs.get("DebugMode"));
 					}
 					
 					BufferedWriter bw = new BufferedWriter(new FileWriter(conf));
@@ -111,85 +122,30 @@ public class KambojaLauncher{
 		
 		readConfig();
 		
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Kamboja";
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setTitle("Kamboja");
+				
+			config.setWindowedMode(width, height);
+			config.setIdleFPS(60);
+			config.setResizable(false);
+			config.setWindowIcon("icon.png");
 		
-			config.width = width;
-			config.height = height;
-			config.fullscreen = fullscreen;
-			config.foregroundFPS = 60;
-			config.backgroundFPS = 60;
-			config.resizable = false;
-			config.addIcon("icon.png", FileType.Internal);
+		if(debug)
+			openConsoleWindow();
 			
-		new LwjglApplication(new KambojaMain(), config);
+		new Lwjgl3Application(new KambojaMain(), config);
+		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 		
 	}
 	
-	public void KaaambojaLauncher() {
-		boolean debug = false;
-		PrintStream logTxt;
-		try {
-			logTxt = new PrintStream(new File ("log.txt"));
-			System.setErr(logTxt);
-			//System.setOut(logTxt);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
+	static void openConsoleWindow() {
 		
-		JPanel panel = new JPanel();
+		JFrame frame = new JFrame("Kamboja Console");
+		frame.setContentPane(new KambojaConsoleWindow());
+		frame.setSize(800, 600);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 		
-		JCheckBox chk_full = new JCheckBox("Fullscreen");
-		chk_full.setSelected(!debug);
-		
-		JLabel lbl_res = new JLabel("Resolution: ");
-		JComboBox<ScreenSize> combo = new JComboBox<ScreenSize>();
-		
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		GraphicsDevice dev = devices[0];
-		DisplayMode[] md = dev.getDisplayModes();
-		
-		int cont = 0;
-		for(DisplayMode mode : md){
-			ScreenSize d = new ScreenSize(mode.getWidth(), mode.getHeight());			
-			if(!contains(combo, d)) {// && Math.abs(d.width / (float)d.height - (16/9f)) < 0.1f){
-				combo.addItem(d);
-				
-				if(Toolkit.getDefaultToolkit().getScreenSize().getWidth() == d.getWidth() &&
-						Toolkit.getDefaultToolkit().getScreenSize().getHeight() == d.getHeight()){
-					combo.setSelectedIndex(cont);
-				}
-				
-				cont++;
-				
-			}
-		}
-		
-		readConfig();
-		
-		if(debug) combo.setSelectedIndex(7);
-	
-		panel.setLayout(new FlowLayout());
-
-		panel.add(chk_full);
-		panel.add(lbl_res);
-		panel.add(combo);
-				
-		if(JOptionPane.showConfirmDialog(null, panel, "Kamboja", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION){
-				
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Kamboja";
-		
-			config.width = ((ScreenSize)combo.getSelectedItem()).getWidth();
-			config.height = ((ScreenSize)combo.getSelectedItem()).getHeight();
-			config.fullscreen = chk_full.isSelected();
-			config.foregroundFPS = 60;
-			config.backgroundFPS = 60;
-			config.resizable = false;
-			config.addIcon("icon.png", FileType.Internal);
-			
-		new LwjglApplication(new KambojaMain(), config);
-		}
 	}
 	
 	static class ScreenSize{

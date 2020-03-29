@@ -24,7 +24,7 @@
 		<link>
 			<name>assets</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/core/assets</locationURI>
+			<location>D:/kamboja/kamboja/core/assets</location>
 		</link>
 	</linkedResources>
 	<variableList>

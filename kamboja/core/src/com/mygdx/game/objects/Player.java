@@ -30,18 +30,21 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Shift;
 import com.mygdx.game.objects.shift.Turret;
 import com.mygdx.game.objects.weapon.Bazooka;
 import com.mygdx.game.objects.weapon.DoublePistol;
 import com.mygdx.game.objects.weapon.Flamethrower;
+import com.mygdx.game.objects.weapon.Granade;
 import com.mygdx.game.objects.weapon.Laser;
 import com.mygdx.game.objects.weapon.Minigun;
 import com.mygdx.game.objects.weapon.Mp5;
@@ -96,6 +99,7 @@ public class Player implements Steerable<Vector2>{
 	private static Texture[] players;
 	private TextureRegion player;
 	private Animation<TextureRegion> legsAnimation;
+	private Animation<TextureRegion> meleeAnimation;
 
 
 	private boolean dead = false;
@@ -115,16 +119,27 @@ public class Player implements Steerable<Vector2>{
 	protected ShapeRenderer sr;
 	private static Sound sprint;
 	private static Sound grunt[] = new Sound[5];
+	private float meleeAnimTimer = 0;
 	private float legTimer = 0;
 	private float legAngle = 0;
 	private float dashImpulse = 3;
 	private float spillTimer = 0;
+	
+	public ArrayList<Player> inMeleeRange;
+	protected Granade lastGranade;
 	
 	ParticleEffect fire;
 	ParticleEffect wind;
 	ParticleEffect shield;
 	
 	ArrayList<Ghost> ghosts;
+	
+	float[] raycastAroundVertices;
+	int raycastAroundRays = 100;
+	float raycastAroundDistance = 1.5f;
+	
+	Color transparentRed = new Color(1, 0, 0, 0);
+	Color endRaycastRed = new Color(1, 0, 0, .5f);
 	
 	public ArrayList<AcidGlue> stepping;
 	
@@ -226,6 +241,9 @@ public class Player implements Steerable<Vector2>{
 		equipment = new Equipment(this);
 		this.name = name;
 
+		raycastAroundVertices = new float[raycastAroundRays * 2];
+		
+		inMeleeRange = new ArrayList<Player>();
 		stepping = new ArrayList<AcidGlue>();
 		
 		stamina = 0;
@@ -236,7 +254,6 @@ public class Player implements Steerable<Vector2>{
 		stamina_on = new Texture("player/stamina_on.png");
 		
 		ghosts = new ArrayList<Ghost>();
-		
 		
 				
 		fire = new ParticleEffect();
@@ -265,7 +282,6 @@ public class Player implements Steerable<Vector2>{
 				legFrames[i + j*5] = new TextureRegion(players[id], i*32, j*32, 32, 32);
 			}
 		}
-	
 		
 		legsAnimation = new Animation<TextureRegion>(1f,
 				legFrames[5],
@@ -278,10 +294,19 @@ public class Player implements Steerable<Vector2>{
 				legFrames[9],
 				legFrames[4],
 				legFrames[3],
-				legFrames[4]
-						
-						);
+				legFrames[4]);
+		
 		legsAnimation.setPlayMode(PlayMode.LOOP);
+		
+		TextureRegion[] meleeFrames = new TextureRegion[4];
+		
+		Texture meleeSpriteSheet = KambojaMain.getTexture("player/melee_1.png");
+		
+		for(int i = 0; i < 4; i ++) {
+			meleeFrames[i] = new TextureRegion(meleeSpriteSheet, i*32, 0, 32, 32);
+		}
+		
+		meleeAnimation = new Animation<TextureRegion>(1/12f, meleeFrames);
 		
 		Shape s = new CircleShape();
 		s.setRadius(3/GameState.UNIT_SCALE);
@@ -289,9 +314,6 @@ public class Player implements Steerable<Vector2>{
 		f.setUserData(new PlayerFall(this));
 		s.dispose();
 
-
-
-		
 		aim = new Texture("player/aim.png");
 		
 		if(KambojaMain.getControllers().get(id) instanceof KeyboardController){
@@ -483,20 +505,21 @@ public class Player implements Steerable<Vector2>{
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - legAngle);
-		
-
-		
+				
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-
-		sb.draw(player,
-				body.getWorldCenter().x - player.getRegionWidth()/2 / GameState.UNIT_SCALE,
-				body.getWorldCenter().y - player.getRegionHeight()/2 / GameState.UNIT_SCALE,
-				player.getRegionWidth()/2 /GameState.UNIT_SCALE,
-				player.getRegionHeight()/2 /GameState.UNIT_SCALE,
-				player.getRegionWidth() /GameState.UNIT_SCALE,
-				player.getRegionHeight() /GameState.UNIT_SCALE,
+		TextureRegion plr = player;
+		
+		if(getMeleeAnimTimer() >= 0) plr = meleeAnimation.getKeyFrame(.5f - Math.max(0, getMeleeAnimTimer()));
+		
+		sb.draw(plr,
+				body.getWorldCenter().x - plr.getRegionWidth()/2 / GameState.UNIT_SCALE,
+				body.getWorldCenter().y - plr.getRegionHeight()/2 / GameState.UNIT_SCALE,
+				plr.getRegionWidth()/2 /GameState.UNIT_SCALE,
+				plr.getRegionHeight()/2 /GameState.UNIT_SCALE,
+				plr.getRegionWidth() /GameState.UNIT_SCALE,
+				plr.getRegionHeight() /GameState.UNIT_SCALE,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				isFalling() ? Math.max(0.3f, getFallingTimer()) : 1,
 				270 - getAngle());
@@ -679,7 +702,54 @@ public class Player implements Steerable<Vector2>{
 		}
 		sb.end();
 		
+		for(int i = 0; i < raycastAroundRays; i ++) {
+			
+			float normz = (i / (float)raycastAroundRays) * 2f - 1; //Range -1 to 1
+			
+			Vector2 direction = angle.cpy().scl(1, -1).rotate(normz * 45);
+			
+			Vector2 endPoint = body.getWorldCenter().cpy().add(direction.scl(raycastAroundDistance));
+			
+			final int idx = i;
+			
+			raycastAroundVertices[idx*2 + 0] = endPoint.x;
+			raycastAroundVertices[idx*2 + 1] = endPoint.y;
+			
+			state.getWorld().rayCast(new RayCastCallback() {
+				public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+					if(fixture.getBody().getUserData() == this) return -1;
+					
+					if(!fixture.isSensor()) {					
+						raycastAroundVertices[idx*2 + 0] = point.x;
+						raycastAroundVertices[idx*2 + 1] = point.y;
+						return fraction;
+					}
+					return -1;
+				}
+			}, body.getWorldCenter().cpy(), endPoint);
 		
+		}
+		
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				
+		sr.begin(ShapeType.Filled);
+		for(int i = 0; i < raycastAroundRays - 1; i ++) {
+			
+			int i1 = i;
+			int i2 = i+1;
+			
+
+			float dst1 = new Vector2(raycastAroundVertices[i1*2+0], raycastAroundVertices[i1*2+1]).sub(body.getWorldCenter()).len();
+			float dst2 = new Vector2(raycastAroundVertices[i2*2+0], raycastAroundVertices[i2*2+1]).sub(body.getWorldCenter()).len();
+			
+			sr.triangle(
+					body.getWorldCenter().x, body.getWorldCenter().y,
+					raycastAroundVertices[i1*2+0], raycastAroundVertices[i1*2+1],
+					raycastAroundVertices[i2*2+0], raycastAroundVertices[i2*2+1],
+					transparentRed, transparentRed.cpy().lerp(endRaycastRed, dst1), transparentRed.cpy().lerp(endRaycastRed, dst2));
+		}
+		sr.end();
 	}
 	
 	public void renderAbove(SpriteBatch sb) {
@@ -814,6 +884,10 @@ public class Player implements Steerable<Vector2>{
 		
 		equipment.update(delta);
 		
+		if(lastGranade != null && lastGranade.dead) {
+			lastGranade = null;
+		}
+		
 		float biggest_glue = 0;
 		AcidGlue biggest_acid = null;
 		
@@ -922,6 +996,8 @@ public class Player implements Steerable<Vector2>{
 		
 		legTimer += body.getLinearVelocity().len()/10.0f;
 		
+		setMeleeAnimTimer(getMeleeAnimTimer() - delta);
+		
 		if(calculateDifferenceBetweenAngles(getAngle(), legAngle) > 30){
 			legAngle = getAngle() + 30;
 		}
@@ -990,7 +1066,14 @@ public class Player implements Steerable<Vector2>{
 			if(Gdx.input.isKeyJustPressed(Keys.SPACE) && !isDead() && !inputBlocked){
 				if(getSprintCooldown() < 0){
 					dash();
-					}
+				}
+			}
+			
+			if(Gdx.input.isKeyJustPressed(Keys.Z) && !isDead() && !inputBlocked){
+				meleeHit();
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.X) && !isDead() && !inputBlocked){
+				throwGranade();
 			}
 
 		}
@@ -1071,8 +1154,11 @@ public class Player implements Steerable<Vector2>{
 			System.out.println("Velocity: " + body.getLinearVelocity());
 			System.exit(0);
 		}
-		angle.x += (axis.x - angle.x)/5.0f;
-		angle.y += (axis.y - angle.y)/5.0f;
+		
+		if(!(this instanceof BetterBot)) {
+			angle.x += (axis.x - angle.x)/5.0f;
+			angle.y += (axis.y - angle.y)/5.0f;
+		}
 	}
 	
 	public void dash() {
@@ -1096,18 +1182,31 @@ public class Player implements Steerable<Vector2>{
 	public boolean buttonDown(Controller controller, int buttonCode) {
 		if(!isDead() && !inputBlocked){
 			int z = 0;
+			int a = 0;
+			
+			System.out.println("Controller ["+controller.getName()+"] button pressed: " + buttonCode + "\nZ = " + Gamecube.Z + "\nB = " + Gamecube.B);
+			
+			String cn = "";
 			
 			if(controller.getName().equals(Gamecube.getID())){
 				z = Gamecube.Z;
+				a = Gamecube.B;
+				cn = "GC";
 			}
-			if(controller.getName().equals(XBox.getID())){				
+			else if(controller.getName().equals(XBox.getID())){				
 				z = XBox.BUTTON_RB;
+				a = XBox.BUTTON_LB;
+				cn = "XBOX";
 			}
 			else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 				z = Playstation3.R1;
+				a = Playstation3.L1;
+				cn = "PS3";
 			}
 			else{
+				cn = "GENERIC";
 				z = GenericController.R1;
+				a = GenericController.L1;
 				
 				if(buttonCode == GenericController.R2){
 					if(getSprintCooldown() < 0){
@@ -1120,10 +1219,16 @@ public class Player implements Steerable<Vector2>{
 				}
 			}
 			
+			System.out.println(cn);
+			
 			if(buttonCode == z){
-				if(getShift() != null)
-				getShift().fire();
+				throwGranade();
 			}
+			
+			if(buttonCode == a) {
+				meleeHit();
+			}
+		
 
 		}
 
@@ -1258,6 +1363,22 @@ public class Player implements Steerable<Vector2>{
 		}
 		
 		return false;
+	}
+	
+	protected void throwGranade() {
+		if(lastGranade == null) {
+			lastGranade = new Granade(getState(), this);
+			getState().addGranade(lastGranade);
+		}
+	}
+	
+	protected void meleeHit() {
+		if(getMeleeAnimTimer() < 0) {
+			setMeleeAnimTimer(.5f);
+			for(Player p : inMeleeRange) {
+				p.takeDamage(10, this, true);
+			}
+		}
 	}
 
 	Vector2 axis = new Vector2();
@@ -1418,6 +1539,14 @@ public class Player implements Steerable<Vector2>{
 
 	public void setMaxLife(float maxLife) {
 		this.maxLife = maxLife;
+	}
+
+	public float getMeleeAnimTimer() {
+		return meleeAnimTimer;
+	}
+
+	public void setMeleeAnimTimer(float meleeAnimTimer) {
+		this.meleeAnimTimer = meleeAnimTimer;
 	}
 	
 

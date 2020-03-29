@@ -1,5 +1,6 @@
 package com.mygdx.game.objects;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -29,7 +30,7 @@ public class BetterBot extends Player{
 	boolean canHit = false;
 	
 	RayCastCallback raycast;
-	
+		
 	public void dispose() {
 		super.dispose();
 		pf.end();
@@ -38,7 +39,6 @@ public class BetterBot extends Player{
 	public BetterBot(Body body, int id, GameState state, String name) {
 		super(body, id, state, name);
 		path = new ArrayList<Vector2>();
-				
 
 		target = new Vector2();
 	
@@ -90,118 +90,90 @@ public class BetterBot extends Player{
 		
 	}
 	
-	public void update(float delta) {
-		//System.out.println("\tframe start");
-		//long startTime = System.nanoTime();
-		super.update(delta);
-		
+	void IA(float delta) {
 		target = null;
 		
-			for(Player p : getState().getPlayers()) {
-				if(p != this) {
-					if(target == null) {
-						if(!p.isDead()) {
-							target = p.getPosition();
-						}
-					}
-					else if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
-						if(!p.isDead())
+		for(Player p : getState().getPlayers()) {
+			if(p != this) {
+				if(target == null) {
+					if(!p.isDead()) {
 						target = p.getPosition();
 					}
 				}
-			}
-		
-		
-		//int elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		//float percent = (elapsed / (1000/60f))*100;
-		//System.out.println("target detected in: " + percent + "% of total frame time");
-		//startTime = System.nanoTime();
-
-		if(target != null && !isDead()) {
-		Vector2 aimingTarget = target.cpy().sub(getPosition().cpy()).nor();
-		angleAiming.add(aimingTarget.cpy().sub(angleAiming.cpy()).scl(difficulty));
-		setAngle(angleAiming.cpy().scl(1, -1));
-		
-		if(target.cpy().sub(getPosition().cpy()).len2() > 0) {
-			getState().getWorld().rayCast(raycast, getPosition().cpy(), target.cpy());
-		}
-		else {
-			System.out.println("Ha! This should have given an error (i think)");
-		}
-		
-		//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		//percent = (elapsed / (1000/60f))*100;
-		//System.out.println("raycasted in: " + percent + "% of total frame time");
-		//startTime = System.nanoTime();
-		
-		
-		
-			pf.setSx((int)(getPosition().x / (32 / GameState.UNIT_SCALE)));
-			pf.setSy((int)(getPosition().y / (32 / GameState.UNIT_SCALE)));
-			pf.setEx((int)(target.x / (32 / GameState.UNIT_SCALE)));
-			pf.setEy((int)(target.y / (32 / GameState.UNIT_SCALE)));
-			pf.setMap(getState().getBitmap());
-			path = pf.getPath();
-		
-		//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-		//percent = (elapsed / (1000/60f))*100;
-		//System.out.println("path attributting in: " + percent + "% of total frame time");
-		//startTime = System.nanoTime();
-		
-		}
-		
-		if(path != null) {
-			for(Vector2 p : path) {
-				p.scl(32 / GameState.UNIT_SCALE);
-				p.add(16 / GameState.UNIT_SCALE, 16 / GameState.UNIT_SCALE);
-			}
-			Collections.reverse(path);
-			
-			if(!path.isEmpty())
-				path.remove(0);
-			
-			//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-			//percent = (elapsed / (1000/60f))*100;
-			//System.out.println("path adjusted in: " + percent + "% of total frame time");
-			//startTime = System.nanoTime();
-		}
-		
-		if(path.size() > 0 && !isDead()) {
-			if(getWeapon() instanceof Flamethrower || getWeapon() instanceof Shotgun) {
-				body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
-			}
-			else {
-				if(!canHit)
-				body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
-				else {
-					body.applyForceToCenter(angleAiming.cpy().rotate(90).scl(5, -5), true);
+				else if(p.getPosition().cpy().sub(getPosition()).len() < target.cpy().sub(getPosition()).len()) {
+					if(!p.isDead())
+					target = p.getPosition();
 				}
 			}
-			
-			//elapsed = (int)((System.nanoTime() - startTime) / 1000000f);
-			//percent = (elapsed / (1000/60f))*100;
-			//System.out.println("force applied in: " + percent + "% of total frame time");
-			//startTime = System.nanoTime();
+		}
+	
+	if(target != null && !isDead()) {
+	Vector2 aimingTarget = target.cpy().sub(getPosition().cpy()).nor();
+	angleAiming.add(aimingTarget.cpy().sub(angleAiming.cpy()).scl(difficulty));
+	setAngle(angleAiming.cpy().scl(1, -1));
+	
+	if(target.cpy().sub(getPosition().cpy()).len2() > 0) {
+		getState().getWorld().rayCast(raycast, getPosition().cpy(), target.cpy());
+	}
+	else {
+		System.out.println("Ha! This should have given an error (i think)");
+	}
+	
+		pf.setSx((int)(getPosition().x / (32 / GameState.UNIT_SCALE)));
+		pf.setSy((int)(getPosition().y / (32 / GameState.UNIT_SCALE)));
+		pf.setEx((int)(target.x / (32 / GameState.UNIT_SCALE)));
+		pf.setEy((int)(target.y / (32 / GameState.UNIT_SCALE)));
+		pf.setMap(getState().getBitmap());
+		path = pf.getPath();
+	
+	}
+	
+	if(path != null) {
+		for(Vector2 p : path) {
+			p.scl(32 / GameState.UNIT_SCALE);
+			p.add(16 / GameState.UNIT_SCALE, 16 / GameState.UNIT_SCALE);
+		}
+		Collections.reverse(path);
+		
+		if(!path.isEmpty())
+			path.remove(0);
+	}
+	
+	if(path.size() > 0 && !isDead()) {
+		if(getWeapon() instanceof Flamethrower || getWeapon() instanceof Shotgun) {
+			body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
+		}
+		else {
+			if(!canHit)
+			body.applyForceToCenter(path.get(0).cpy().sub(body.getWorldCenter().cpy()).nor().scl(speed * spd), true);
+			else {
+				body.applyForceToCenter(angleAiming.cpy().rotate(90).scl(5, -5), true);
+			}
 		}
 		
-		if(!isDead()) {
-			if(getWeapon() instanceof Flamethrower || getWeapon() instanceof Shotgun) {
+	}
+	
+	if(!isDead()) {
+		if(getWeapon() instanceof Flamethrower || getWeapon() instanceof Shotgun) {
+			getWeapon().analog = 1;
+		}
+		else {
+		
+			if(canHit) {
 				getWeapon().analog = 1;
 			}
 			else {
-			
-				if(canHit) {
-					getWeapon().analog = 1;
-				}
-				else {
-					getWeapon().analog = 0;
-				}
-				
+				getWeapon().analog = 0;
 			}
+			
 		}
-		
-
-
+	}
+	}
+	
+	public void update(float delta) {
+		super.update(delta);
+				
+		//IA();
 		
 	}
 

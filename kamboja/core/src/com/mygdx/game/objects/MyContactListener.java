@@ -13,6 +13,7 @@ import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.shift.BarrierObject;
 import com.mygdx.game.objects.shift.TurretObject;
 import com.mygdx.game.objects.weapon.Flamethrower;
+import com.mygdx.game.objects.weapon.Granade;
 import com.mygdx.game.objects.weapon.Laser;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.GameState.PlayerSpike;
@@ -21,10 +22,85 @@ public class MyContactListener implements ContactListener{
 	
 	public void beginContact(Contact contact) {
 		
+		//granada com melee (ricochet)
+		if(contact.getFixtureA().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("Melee")) {
+			
+			Granade g = (Granade) contact.getFixtureA().getBody().getUserData();
+			Player p = (Player) contact.getFixtureB().getBody().getUserData();
+			
+			if(g.owner != p) {
+				if(p.getMeleeAnimTimer() > 0) {
+					g.ricochet(p);
+				}
+			}
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("Melee")) {
+			
+			Granade g = (Granade) contact.getFixtureB().getBody().getUserData();
+			Player p = (Player) contact.getFixtureA().getBody().getUserData();
+			
+			if(g.owner != p) {
+				if(p.getMeleeAnimTimer() > 0) {
+					g.ricochet(p);
+				}
+			}
+		}
+		
+		
+		//Granada com player
+		if(contact.getFixtureA().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureB().getBody().getUserData() instanceof Player) {
+			
+			Granade g = (Granade) contact.getFixtureA().getBody().getUserData();
+			Player p = (Player) contact.getFixtureB().getBody().getUserData();
+			
+			if(g.owner != p) {
+				g.explode();
+			}
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureA().getBody().getUserData() instanceof Player) {
+			
+			Granade g = (Granade) contact.getFixtureB().getBody().getUserData();
+			Player p = (Player) contact.getFixtureA().getBody().getUserData();
+			
+			if(g.owner != p) {
+				g.explode();
+			}
+		}
+		
+		//Granada com bloco
+		if(contact.getFixtureA().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureB().getBody().getUserData() instanceof Block) {
+			
+			Granade g = (Granade) contact.getFixtureA().getBody().getUserData();
+			g.explode();
+		}
+		if(contact.getFixtureB().getBody().getUserData() instanceof Granade &&
+				contact.getFixtureA().getBody().getUserData() instanceof Block) {
+
+			Granade g = (Granade) contact.getFixtureB().getBody().getUserData();
+			g.explode();
+		}
+		
+		
+		//melee area com outro player
+		if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("Melee") && contact.getFixtureB().getBody().getUserData() instanceof Player) {
+			Player attacker = (Player) contact.getFixtureA().getBody().getUserData();
+			Player target = (Player) contact.getFixtureB().getBody().getUserData();
+			attacker.inMeleeRange.add(target);
+		}
+		if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("Melee") && contact.getFixtureA().getBody().getUserData() instanceof Player) {
+			Player attacker = (Player) contact.getFixtureB().getBody().getUserData();
+			Player target = (Player) contact.getFixtureA().getBody().getUserData();
+			attacker.inMeleeRange.add(target);
+		}
+		
 		//Player com acidGlue
 		if(contact.getFixtureA().getBody().getUserData() instanceof Player &&
 				contact.getFixtureB().getUserData() instanceof AcidGlue) {
-			
 			AcidGlue ag = (AcidGlue) contact.getFixtureB().getUserData();
 			Player p = (Player) contact.getFixtureA().getBody().getUserData();
 			
@@ -321,6 +397,18 @@ public class MyContactListener implements ContactListener{
 	}
 
 	public void endContact(Contact contact) {
+		
+		//melee area com outro player
+		if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("Melee") && contact.getFixtureB().getBody().getUserData() instanceof Player) {
+			Player attacker = (Player) contact.getFixtureA().getBody().getUserData();
+			Player target = (Player) contact.getFixtureB().getBody().getUserData();
+			attacker.inMeleeRange.remove(target);
+		}
+		if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("Melee") && contact.getFixtureA().getBody().getUserData() instanceof Player) {
+			Player attacker = (Player) contact.getFixtureB().getBody().getUserData();
+			Player target = (Player) contact.getFixtureA().getBody().getUserData();
+			attacker.inMeleeRange.remove(target);
+		}
 		
 		//qualquer objeto com range do laser
 				if(contact.getFixtureA().getUserData() instanceof Laser){

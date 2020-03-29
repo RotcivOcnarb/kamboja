@@ -69,6 +69,7 @@ import com.mygdx.game.objects.map.IslandBackground;
 import com.mygdx.game.objects.map.KambojaMap;
 import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.map.WaterBlock;
+import com.mygdx.game.objects.weapon.Granade;
 
 import box2dLight.RayHandler;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
@@ -102,6 +103,7 @@ public class GameState extends State{
 	
 	private ArrayList<Bullet> bullets;
 	private ArrayList<Body> flameParticles;
+	private ArrayList<Granade> granades;
 	
 	private ShapeRenderer sr;
 	
@@ -263,6 +265,7 @@ public class GameState extends State{
 		if (overlay.getLog().length()!=0)
 			System.out.println("ERRO NO SHADER DE SANGUE: " + overlay.getLog());
 		
+		granades = new ArrayList<Granade>();
 		setBullets(new ArrayList<Bullet>());
 		setFlameParticles(new ArrayList<Body>());
 		
@@ -434,9 +437,7 @@ public class GameState extends State{
 		setBlocks(new ArrayList<Block>());
 		
 		getBlocks().clear();
-		
-		
-		
+				
 		TiledMapTileLayer bg = ((TiledMapTileLayer)getTiledMap().getLayers().get("breakable"));
 		if(bg != null){
 			for(int i = 0; i < mapWidth; i ++){
@@ -715,6 +716,13 @@ public class GameState extends State{
 		
 		circle.dispose();
 		
+		PolygonShape boxShape = new PolygonShape();
+		boxShape.setAsBox(10 / UNIT_SCALE, 20 / UNIT_SCALE, new Vector2(20 / UNIT_SCALE, 0), 0);
+		
+		Fixture bfix = body.createFixture(boxShape, 0f);
+		bfix.setSensor(true);
+		bfix.setUserData("Melee");
+		
 		Player player = null;
 		if(KambojaMain.getControllers().get(id) instanceof BotController){
 			player = new BetterBot(body, id, this, KambojaMain.getControllers().get(id).getName());
@@ -805,6 +813,7 @@ public class GameState extends State{
 		drawPlayersAndLight(sb);
 		if(kambojaMap != null)
 		kambojaMap.render(sb, camera);
+		drawGranades(sb);
 		drawCeilingTiles(sb);
 		drawUI(sb);
 		drawDebug(sb);
@@ -876,9 +885,7 @@ public class GameState extends State{
 	}
 	
 	public void addAcidGlue(Player p) {
-		
 		acidGlues.add(new AcidGlue(acidGlues, world, p, p.getEquipment().acid, p.getEquipment().glue));
-		
 	}
 	
 	//TODO:
@@ -1190,6 +1197,20 @@ public class GameState extends State{
 		}
 	}
 
+	public void drawGranades(SpriteBatch sb) {
+		
+		sb.setProjectionMatrix(camera.combined);
+		sb.begin();
+		for(int i = granades.size() - 1; i >= 0; i --) {
+			if(granades.get(i).render(sb)) {
+				removeBody(granades.get(i).body);
+				granades.remove(i);
+			}
+		}
+		sb.end();
+		
+	}
+	
 	//Update
 	
 	public void update(float delta) {
@@ -1529,6 +1550,10 @@ public class GameState extends State{
 		getCamera().update();
 		
 		
+	}
+	
+	public void addGranade(Granade granade) {
+		granades.add(granade);
 	}
 
 	//Input

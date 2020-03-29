@@ -33,6 +33,7 @@ import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamAuth.AuthSessionResponse;
 import com.codedisaster.steamworks.SteamException;
 import com.codedisaster.steamworks.SteamID;
+import com.codedisaster.steamworks.SteamResult;
 import com.codedisaster.steamworks.SteamUser;
 import com.codedisaster.steamworks.SteamUserCallback;
 import com.mygdx.game.analytics.GoogleAnalytics;
@@ -89,9 +90,12 @@ public class KambojaMain extends ApplicationAdapter {
 	static SteamUser steamUser;
 	public static boolean gameAlive;
 	
-	AssetManager assets;
 	
+	//Instance variables
+	
+	AssetManager assets;	
 	ShapeRenderer sr;
+	BitmapFont font;
 
 	
 	public static KambojaMain getInstance() {
@@ -213,6 +217,13 @@ public class KambojaMain extends ApplicationAdapter {
 		KambojaMain.items = items;
 	}
 
+	/** Encrypts a string using a key and an initVector using AES encryption 
+	 * 
+	 * @param key The key used to encrypt
+	 * @param initVector have no idea what this is for, just use a random string
+	 * @param value the string you want to encrypt
+	 * @return the encrypted string
+	 */
 	public static String encrypt(String key, String initVector, String value) {
         try {
             IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
@@ -230,7 +241,14 @@ public class KambojaMain extends ApplicationAdapter {
 
         return null;
     }
-
+	/** Decrypts a AES encrypted string, assuming you have the key and the initVector used
+	 * 
+	 * @param key the key used to encrypt
+	 * @param initVector the initVector used to Encrypt
+	 * @param encrypted the encrypted string
+	 * @return the decrypted string (original)
+	 * @throws RuntimeException
+	 */
     public static String decrypt(String key, String initVector, String encrypted) throws RuntimeException{
         try {
             IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
@@ -247,10 +265,18 @@ public class KambojaMain extends ApplicationAdapter {
         }
     }
     
+    /** Clamps a string to a maximum size
+     * 
+     * @param str the string you want to clamp
+     * @param size the maximum size
+     * @return
+     */
     public static String clampLength(String str, int size) {
     	return str.substring(0, size);
     }
-    
+    /** Loads a game data from folder "SavesDir/save.sav" into the game
+     * 
+     */
     public static void loadGame() {
     	String encrypted;
     	
@@ -301,6 +327,10 @@ public class KambojaMain extends ApplicationAdapter {
     	
     }
     
+    /**
+     * Saves a game data of current data into "SavesDir/save.sav" file
+     */
+    
     public static void saveGame() {
     	SaveObject so = new SaveObject();
 		so.setMaps(mapUnlocked);
@@ -322,9 +352,11 @@ public class KambojaMain extends ApplicationAdapter {
 		}
     }
     
+    /** LibGDX default create method
+     * 
+     */
 	public void create () {
 		
-
 		MultiPrintStream logTxt;
 		try {
 			logTxt = new MultiPrintStream(System.err, new PrintStream(new File ("log.txt")));
@@ -344,6 +376,7 @@ public class KambojaMain extends ApplicationAdapter {
 		sb = new SpriteBatch();
 
 		try {
+			SteamAPI.loadLibraries();
 			//SteamAPI.restartAppIfNecessary(747110);
 		    if (!SteamAPI.init()) {
 		    	System.err.println("Steam not connected");
@@ -358,6 +391,9 @@ public class KambojaMain extends ApplicationAdapter {
 					SteamID ownerSteamID) {				
 			}
 			public void onMicroTxnAuthorization(int appID, long orderID, boolean authorized) {				
+			}
+			public void onEncryptedAppTicket(SteamResult result) {
+				
 			}
 		});
 		
@@ -456,6 +492,12 @@ public class KambojaMain extends ApplicationAdapter {
 
 	}
 	
+	
+	/** Convert a byte array to its text representation in Hexadecimal
+	 * 
+	 * @param hash the byte array
+	 * @return A string that represents this byte array in hexadecimal
+	 */
 	private static String bytesToHex(byte[] hash) {
 	    StringBuffer hexString = new StringBuffer();
 	    for (int i = 0; i < hash.length; i++) {
@@ -468,16 +510,23 @@ public class KambojaMain extends ApplicationAdapter {
 	
 	Texture capsule, loading_bar, loading_case;
 	
+	/** Gets a Asset loaded texture. The texture needs to be loaded to this method to function correctly
+	 *  @see Assets
+	 * 
+	 * @param name the texture file path
+	 * @return the Texture object
+	 */
 	public static Texture getTexture(String name) {
 		return getInstance().assets.get(name, Texture.class);
 	}
-	
+	/** Gets a Asset loaded font. The font needs to be loaded to this method to function correctly
+	 *  @see Assets
+	 * 
+	 * @param name the font file path
+	 * @return the Font object
+	 */
 	public static BitmapFont getFont(String name) {
 		return getInstance().assets.get(name, BitmapFont.class);
-	}
-	
-	public void resize(int width, int height){
-		//manager.resize(width, height);
 	}
 	
 	boolean managerLoaded = false;
@@ -485,41 +534,53 @@ public class KambojaMain extends ApplicationAdapter {
 	float gcTimer = 0;
 	float smoothProgress = 0;
 	float alpha = 0;
+	
+	/** LibGDX default render method
+	 * 
+	 */
 	public void render () {
+		//Steam execution loop
 		if (SteamAPI.isSteamRunning()) {
 			SteamAPI.runCallbacks();
 		}
 		
-		//summons the garbage collector every 30 seconds
-		//not really sure if it makes any difference but nah, whatever
-		gcTimer += Gdx.graphics.getDeltaTime();
-		if(gcTimer >= 30){
-			gcTimer = 0;
-			System.gc();
-		}
-		
-		
-		
+		//Resets screen for next frame draw
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);//clear screen
 		Gdx.gl.glEnable(GL20.GL_BLEND); //enables transparency
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		Gdx.input.setCursorCatched(true); //hides the cursor
 		
-		
 		if(alpha == 1) {
+			
+			//Creates the State Manager, if it isn't already created
 			if(!managerLoaded) {
-				manager = new Manager();
+				manager = new Manager(); //If you are studying, this is the next class you may want to check
 				manager.create();
 				managerLoaded = true;
 			}
+			//Updates and renders the scenes
 			manager.update(Gdx.graphics.getDeltaTime());
 			manager.render(sb);
+						
+			// Draws FPS at the top of the screen, regardless of scene
+			if(GameState.DEBUG) {			
+				if(assets.isLoaded("fonts/olivers barney.ttf")) {
+					if(font == null)
+						font = (BitmapFont) assets.get("fonts/olivers barney.ttf");
+					sb.setProjectionMatrix(Util.getNormalProjection());
+					
+					sb.begin();
+					font.draw(sb, (int)Math.floor(1/Gdx.graphics.getDeltaTime()) + "", 10, Gdx.graphics.getHeight() - 20);
+					sb.end();
+				}
+			}
 		}
 		else {
+			//Draw load screen, if the assets hasn't been loaded yet
 			
 			sb.setProjectionMatrix(Util.getNormalProjection());
-			smoothProgress += (assets.getProgress() - smoothProgress)/5.0f;
+			smoothProgress += (assets.getProgress() - smoothProgress)/5.0f; //percentage of loading progression
 			sb.begin();
 			
 			sb.draw(loading_case,
@@ -557,12 +618,13 @@ public class KambojaMain extends ApplicationAdapter {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
 			Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			
+			//Blackscreen fade in / out
 			sr.begin(ShapeType.Filled);
 			sr.setColor(0, 0, 0, alpha);
 			sr.rect(0, 0, 1920, 1080);
 			sr.end();
 			
-			if(assets.update()) {
+			if(assets.update()) { //Actually LOADS things (if true, means load is compelte)
 				alpha += Gdx.graphics.getDeltaTime();
 				if(alpha > 1) alpha = 1;
 			}
@@ -580,13 +642,29 @@ public class KambojaMain extends ApplicationAdapter {
 		gameAlive = false;
 	}
 
+	/** Sends an event to Google Analytics
+	 * 
+	 * @param category
+	 * @param action
+	 * @param label
+	 * @param cds Custom Dimensions list
+	 */
 	public static void event(String category, String action, String label, HashMap<String, String> cds) {
 		analytics.event(category, action, label, cds);
 	}
+	/** Sends an event to Google Analytics
+	 * 
+	 * @param category
+	 * @param action
+	 * @param label
+	 */
 	public static void event(String category, String action, String label) {
 		analytics.event(category, action, label);
 	}
-	
+	/** Sends an screenview to Google Analytics
+	 * 
+	 * @param screenName the screenName
+	 */
 	public static void screenview(String screenName) {
 		analytics.screenview(screenName);
 	}
