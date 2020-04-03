@@ -1,49 +1,90 @@
 package com.mygdx.game.multiplayer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
+import com.mygdx.game.KambojaMain;
 import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 
 public class KambojaHost {
 
-	DatagramSocket receiveSocket;
-	DatagramSocket sendSocket;
+	UDPConnection connection;
 	InetAddress ip;
-	byte[] receive = new byte[65535]; 
 	
-	public KambojaHost() {
+	ServerSocket server;
+	
+	public HashMap<String, Socket> connectedClients;
+	
+	KambojaConnectionListener listener;
+	
+	public KambojaHost(KambojaConnectionListener listener) {
+		this.listener = listener;
 		try {
-			System.out.println("Creating host...");
-			receiveSocket = new DatagramSocket(12345);
-			sendSocket = new DatagramSocket();
+			connectedClients = new HashMap<String, Socket>();
+			
+			System.out.println("Creating host at IP " + InetAddress.getLocalHost().getHostAddress());
+			connection = new UDPConnection(12345, 54321);
 			ip = InetAddress.getLocalHost();
 			
-			final DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+			//Recebimento de conexão TCP
+			server = new ServerSocket(54321);
+			new Thread(() -> {
+				while(KambojaMain.gameAlive) {
+					try {
+						final Socket client = server.accept();
+						final String clientIP = client.getInetAddress().getHostAddress();
+						System.out.println("Um cliente acabou de se conectar [" + client.getInetAddress().getHostAddress() + "]");
+						if(!connectedClients.containsKey(clientIP)) {
+							connectedClients.put(clientIP, client);
+							
+							new Thread(() -> {
+								while(KambojaMain.gameAlive) {
+									try {
+										if(client.getInputStream().read() != -1) {
+											System.out.println("Packet received from client " + clientIP);
+											ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+											receiveTCPPackage(client, ois.readObject());
+										}
+										else {
+											//Client disconnected
+											System.out.println("Client " + clientIP + " disconnected");
+											connectedClients.remove(clientIP);
+										}
+									}
+									catch(Exception e) {
+										e.printStackTrace();
+									}
+								}
+							}).start();
+						}
+						else {
+							//Opa, alquem que já tá conectado tá tentando conectar de novo
+						}
+
+						//mandar pacotes
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 			
+			
+			//Recebimento de pacotes UDP
 			new Thread(new Runnable() {
 				public void run() {
 					System.out.println("Thread start");
-					try {
-						
-						receiveSocket.receive(receivePacket);
-						System.out.println("package received");
-						
-						ByteArrayInputStream bis = new ByteArrayInputStream(receive);
-						ObjectInputStream ois = new ObjectInputStream(bis);
-						
-						KambojaPacket kp = (KambojaPacket) ois.readObject();
+					
+					while(KambojaMain.gameAlive) {
+						KambojaPacket kp = (KambojaPacket) connection.receive();
 						System.out.println("Packet of type " + kp.type + " received!");
 						receivePackage(kp);
-						
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
 				}
 			}).start();
@@ -55,29 +96,31 @@ public class KambojaHost {
 		}
 	}
 	
-	public void receivePackage(KambojaPacket kp) throws UnknownHostException {
-		
-		if(kp.type == PacketType.CONNECT_TO_SERVER) {
-			sendPackage(new KambojaPacket(PacketType.CONNECTION_CONFIRM, InetAddress.getLocalHost()), kp.ipOrigin);
+	public void receiveTCPPackage(Socket client, Object data) {
+		listener.receiveTCP((KambojaPacket)data);
+	}
+	
+	public void receivePackage(KambojaPacket kp) {
+		listener.receiveUDP(kp);
+	}
+	
+	public void sendTCPPackage(KambojaPacket kp, String ip) {
+		if(connectedClients.containsKey(ip)) {
+			try {
+				Socket client = connectedClients.get(ip);
+				ObjectOutputStream saida = new ObjectOutputStream(client.getOutputStream());
+		        saida.flush();
+		        saida.writeObject(kp);
+		        saida.close();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
-		
-		
-		//Trata o q tem q tratar
 	}
 	
 	public void sendPackage(KambojaPacket kp, InetAddress ip) {
-		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(kp);
-			oos.flush();
-			
-			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), ip, 12345);
-			sendSocket.send(dp);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		connection.send(kp, ip);
 	}
 	
 }

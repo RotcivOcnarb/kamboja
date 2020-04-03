@@ -10,8 +10,7 @@ import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,6 +41,10 @@ import com.codedisaster.steamworks.SteamResult;
 import com.codedisaster.steamworks.SteamUser;
 import com.codedisaster.steamworks.SteamUserCallback;
 import com.mygdx.game.analytics.GoogleAnalytics;
+import com.mygdx.game.multiplayer.KambojaClient;
+import com.mygdx.game.multiplayer.KambojaConnectionListener;
+import com.mygdx.game.multiplayer.KambojaHost;
+import com.mygdx.game.multiplayer.KambojaPacket;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
@@ -102,7 +105,38 @@ public class KambojaMain extends ApplicationAdapter {
 	AssetManager assets;	
 	ShapeRenderer sr;
 	BitmapFont font;
+	
+	//Multiplayer
+	public KambojaClient client;
+	public KambojaHost host;
+	public boolean isServer = false;
 
+	public void createClientConnection(String ip, KambojaConnectionListener listener) {
+		client = new KambojaClient(ip, listener);
+		if(!client.connected) {
+			client = null;
+		}
+		host = null;
+		isServer = false;
+	}
+	
+	public void createHostConnection(KambojaConnectionListener listener) {
+		host = new KambojaHost(listener);
+		client = null;
+		isServer = true;
+	}
+	
+	public void sendToServer(KambojaPacket kp) {
+		client.sendPackage(kp);
+	}
+	
+	public void sendToClient(KambojaPacket kp, String clientIP) {
+		host.sendPackage(kp, host.connectedClients.get(clientIP).getInetAddress());
+	}
+	
+	public HashMap<String, Socket> getConnectedPlayers(){
+		return host.connectedClients;
+	}
 	
 	public static KambojaMain getInstance() {
 		return instance;

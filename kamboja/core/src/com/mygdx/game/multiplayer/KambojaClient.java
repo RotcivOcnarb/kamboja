@@ -1,95 +1,85 @@
 package com.mygdx.game.multiplayer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
+import java.net.Socket;
 
 public class KambojaClient {
 	
-	DatagramSocket receiveSocket;
-	DatagramSocket sendSocket;
+	UDPConnection connection;
 	InetAddress ip;
-	byte[] receive = new byte[65535]; 
-	String hostIP;
-	KambojaPacketCallback confirmCallback;
+	String hostIP;	
+	Socket tcpSocket;
+	KambojaConnectionListener listener;
+	public boolean connected = true;
 	
-	public KambojaClient() {
+	public KambojaClient(String hostIP, KambojaConnectionListener listener) {
+		this.listener = listener;
+		this.hostIP = hostIP;
 		try {
+			System.out.println("Creating Client connection to server");
 			
-			receiveSocket = new DatagramSocket(12345);
-			sendSocket = new DatagramSocket();
+			connection = new UDPConnection(12345, 54321);
 			ip = InetAddress.getLocalHost();
 			
-			final DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
-			
-			System.out.println("Creating listening thread");
-			
-			new Thread(new Runnable() {
-				public void run() {
+			try {
+				tcpSocket = new Socket(InetAddress.getByName(hostIP), 54321);
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+				listener.connectionFailed("Could not connect to host");
+				connected = false;
+				return;
+			}
+
+			//Receive server TCP
+			new Thread(() -> {
+				while(true) {
 					try {
-						
-						receiveSocket.receive(receivePacket);
-						
-						System.out.println("Packet received, decoding");
-						
-						ByteArrayInputStream bis = new ByteArrayInputStream(receive);
-						ObjectInputStream ois = new ObjectInputStream(bis);
-						
-						KambojaPacket kp = (KambojaPacket) ois.readObject();
-						System.out.println("Kamboja packed read successfully, forwarding");
-						receivePackage(kp);
-						
-					} catch (Exception e) {
+						if(tcpSocket.getInputStream().read() != -1){
+							ObjectInputStream ois = new ObjectInputStream(tcpSocket.getInputStream());
+							listener.receiveTCP((KambojaPacket) ois.readObject());
+						}
+						else {
+							listener.disconnected();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				}
+				
+			}).start();
+			
+			//Receive server UDP
+			new Thread(() -> {
+				while(true) {						
+					KambojaPacket kp = (KambojaPacket) connection.receive();
+					System.out.println("Kamboja packed read successfully, forwarding");
+					receivePackage(kp);
 				}
 			}).start();
 			
 			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void receivePackage(KambojaPacket kp) {
-		if(kp.type == PacketType.CONNECTION_CONFIRM) {
-			confirmCallback.callback(kp);
-		}
-		
-		//Trata o q tem q tratar
-		
+		listener.receiveUDP(kp);
 	}
 	
 	public void sendPackage(KambojaPacket kp) {
 		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(kp);
-			oos.flush();
-			
-			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), InetAddress.getByName(hostIP), 12345);
-			sendSocket.send(dp);
+			connection.send(kp, InetAddress.getByName(hostIP));
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void connectToHost(String ip, KambojaPacketCallback callback) throws UnknownHostException {
-		hostIP = ip;
-		KambojaPacket kp = new KambojaPacket(PacketType.CONNECT_TO_SERVER, InetAddress.getLocalHost());
-		sendPackage(kp);
-		confirmCallback = callback;
-	}
-	
-
 }

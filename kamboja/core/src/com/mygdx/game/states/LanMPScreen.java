@@ -18,13 +18,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
-import com.mygdx.game.multiplayer.KambojaClient;
-import com.mygdx.game.multiplayer.KambojaHost;
+import com.mygdx.game.multiplayer.KambojaConnectionListener;
 import com.mygdx.game.multiplayer.KambojaPacket;
-import com.mygdx.game.multiplayer.KambojaPacketCallback;
 import com.mygdx.game.objects.Util;
 
-public class LanMPScreen extends GenericInterface{
+public class LanMPScreen extends GenericInterface implements KambojaConnectionListener{
 
 	BitmapFont olivers_barney;
 	BitmapFont olivers_barney_big;
@@ -272,35 +270,11 @@ public class LanMPScreen extends GenericInterface{
 			manager.changeState(Manager.MENU_STATE);
 			break;
 		case 1:
-			KambojaClient client = new KambojaClient();
-			
-			System.out.println("Trying to connect to host " + rawIP);
-			
-			try {
-				
-				client.connectToHost(rawIP, new KambojaPacketCallback() {
-					public void callback(KambojaPacket packet) {
-						//Tenho q passar algumas infos além de só mandar pra tela certa
-						System.out.println("Connected successfully!");
-						manager.changeState(Manager.PLAYER_SELECT_STATE);
-					}
-				});
-				
-			} catch (UnknownHostException e1) {
-				e1.printStackTrace();
-			}
-			
+			KambojaMain.getInstance().createClientConnection(rawIP, this);
 			break;
 		case 2:
 			
-			KambojaHost host = new KambojaHost();
-			
-			try {
-				System.out.println("Hosting at IP " + InetAddress.getLocalHost().getHostAddress());
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			KambojaMain.getInstance().createHostConnection(this);
 			
 			manager.changeState(Manager.PLAYER_SELECT_STATE);
 			
@@ -405,5 +379,32 @@ public class LanMPScreen extends GenericInterface{
 	public void resize(int width, int height) {
 		
 	}
+
+	@Override
+	public void receiveUDP(KambojaPacket data) {
+		System.out.println("I just received an UDP package!");
+	}
+
+	@Override
+	public void receiveTCP(KambojaPacket data) {
+		System.out.println("I just received a TCP package!");
+	}
+	
+	@Override
+	public void connected() {
+		System.out.println("I have connected successfully!");
+	}
+
+	@Override
+	public void disconnected() {
+		System.out.println("I have been disconnected");
+	}
+
+	@Override
+	public void connectionFailed(String message) {
+		System.out.println(message);
+	}
+
+	
 
 }
