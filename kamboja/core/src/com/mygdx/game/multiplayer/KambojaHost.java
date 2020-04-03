@@ -55,6 +55,7 @@ public class KambojaHost {
 											//Client disconnected
 											System.out.println("Client " + clientIP + " disconnected");
 											connectedClients.remove(clientIP);
+											break;
 										}
 									}
 									catch(Exception e) {

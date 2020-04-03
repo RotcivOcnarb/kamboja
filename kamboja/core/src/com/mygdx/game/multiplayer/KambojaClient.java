@@ -32,6 +32,7 @@ public class KambojaClient {
 				connected = false;
 				return;
 			}
+			listener.connected();
 
 			//Receive server TCP
 			new Thread(() -> {
