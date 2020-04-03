@@ -77,3 +77,12 @@ project(":core") {
 tasks.eclipse.doLast {
     delete ".project"
 }
+
+gradle.projectsEvaluated {
+	task copyToLib(type: Copy) {
+	    into "$buildDir/output/libs"
+	    from configurations.runtime
+	}
+}
+
+copyToLib.dependsOn(build);

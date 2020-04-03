@@ -17,6 +17,7 @@ import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.states.CreditsState;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.HelpState;
+import com.mygdx.game.states.LanMPScreen;
 import com.mygdx.game.states.MapSelectState;
 import com.mygdx.game.states.MenuState;
 import com.mygdx.game.states.OptionsState;
@@ -44,6 +45,7 @@ public class Manager implements ControllerListener, InputProcessor{
 	public static final int CREDITS_STATE = 5;
 	public static final int POST_GAME_STATE = 6;
 	public static final int OPTIONS_STATE = 7;
+	public static final int LAN_MP_STATE = 8;
 	
 	//Post processing shader
 	FrameBuffer geralBuffer;
@@ -61,6 +63,7 @@ public class Manager implements ControllerListener, InputProcessor{
 		states.add(new CreditsState(this));
 		states.add(new PostGameState(this));
 		states.add(new OptionsState(this));
+		states.add(new LanMPScreen(this));
 		
 		Controllers.clearListeners();
 		Controllers.addListener(this);	

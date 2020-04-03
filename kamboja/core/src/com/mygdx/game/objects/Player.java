@@ -1069,10 +1069,10 @@ public class Player implements Steerable<Vector2>{
 				}
 			}
 			
-			if(Gdx.input.isKeyJustPressed(Keys.Z) && !isDead() && !inputBlocked){
+			if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT) && !isDead() && !inputBlocked){
 				meleeHit();
 			}
-			if(Gdx.input.isKeyJustPressed(Keys.X) && !isDead() && !inputBlocked){
+			if(Gdx.input.isKeyJustPressed(Keys.C) && !isDead() && !inputBlocked){
 				throwGranade();
 			}
 
@@ -1218,9 +1218,7 @@ public class Player implements Steerable<Vector2>{
 					getWeapon().analog = 1;
 				}
 			}
-			
-			System.out.println(cn);
-			
+						
 			if(buttonCode == z){
 				throwGranade();
 			}
@@ -1228,8 +1226,6 @@ public class Player implements Steerable<Vector2>{
 			if(buttonCode == a) {
 				meleeHit();
 			}
-		
-
 		}
 
 		

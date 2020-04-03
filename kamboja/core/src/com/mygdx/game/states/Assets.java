@@ -106,9 +106,15 @@ public class Assets {
 		assets.load("menu/main_menu/EXIT.png", Texture.class);
 		assets.load("menu/main_menu/COOP_off.png", Texture.class);
 		assets.load("menu/main_menu/ONLINE_off.png", Texture.class);
+		assets.load("menu/main_menu/ONLINE.png", Texture.class);
 		assets.load("menu/main_menu/HELP.png", Texture.class);
 		assets.load("menu/main_menu/OPTIONS.png", Texture.class);
 		assets.load("menu/main_menu/CREDITS.png", Texture.class);
+		
+		assets.load("menu/main_menu/host_cog.png", Texture.class);
+		assets.load("menu/main_menu/connect_cog.png", Texture.class);
+		assets.load("menu/main_menu/mp_container.png", Texture.class);
+		assets.load("menu/main_menu/mp_ip_container.png", Texture.class);
 		
 		for(int i = 0; i < 6; i ++)
 		assets.load("menu/main_menu/E" + (i+1) + ".png", Texture.class);

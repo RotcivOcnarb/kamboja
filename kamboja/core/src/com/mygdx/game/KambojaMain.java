@@ -7,6 +7,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,7 +42,6 @@ import com.codedisaster.steamworks.SteamResult;
 import com.codedisaster.steamworks.SteamUser;
 import com.codedisaster.steamworks.SteamUserCallback;
 import com.mygdx.game.analytics.GoogleAnalytics;
-import com.mygdx.game.analytics.HitData;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.PlayerController;
@@ -58,8 +62,9 @@ import com.mygdx.game.states.GameState;
 
 public class KambojaMain extends ApplicationAdapter {
 	
-	//Analytics
+	public static boolean STEAM_ACTIVATION = false;
 	
+	//Analytics
 	static GoogleAnalytics analytics;
 	static String userID;
 	//Resto
@@ -88,6 +93,7 @@ public class KambojaMain extends ApplicationAdapter {
 	public static int maxExperience = 10000;
 	public static boolean vaporAmount = false;
 	static SteamUser steamUser;
+	
 	public static boolean gameAlive;
 	
 	
@@ -285,7 +291,9 @@ public class KambojaMain extends ApplicationAdapter {
 			encrypted = fw.readLine();
 			fw.close();
 			
-	    	String save = decrypt(clampLength("" + steamUser.getSteamID() + steamUser.getSteamID(), 16), "RandomInitVector", encrypted);
+			String accountKey = userID;
+			
+	    	String save = decrypt(clampLength("" + accountKey + accountKey, 16), "RandomInitVector", encrypted);
 
 	    	System.out.println(save);
 	    	
@@ -340,7 +348,9 @@ public class KambojaMain extends ApplicationAdapter {
 		
 		Json json = new Json();
 
-		String encrypted = encrypt(clampLength("" + steamUser.getSteamID() + steamUser.getSteamID(), 16), "RandomInitVector", json.toJson(so));
+		String accountKey = userID;
+		
+		String encrypted = encrypt(clampLength("" + accountKey + accountKey, 16), "RandomInitVector", json.toJson(so));
 		//System.out.println(encrypted);
 		
 		try {
@@ -356,6 +366,22 @@ public class KambojaMain extends ApplicationAdapter {
      * 
      */
 	public void create () {
+		
+		
+		try {
+			DatagramSocket ds = new DatagramSocket();
+			InetAddress ip = InetAddress.getLocalHost();
+			
+			byte[] bts = "batatinha".getBytes();
+			
+			DatagramPacket dp = new DatagramPacket(bts, bts.length, ip, 3224);
+			ds.send(dp);
+			
+			ds.close();
+			
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
 		MultiPrintStream logTxt;
 		try {
@@ -375,49 +401,46 @@ public class KambojaMain extends ApplicationAdapter {
 
 		sb = new SpriteBatch();
 
-		try {
-			SteamAPI.loadLibraries();
-			//SteamAPI.restartAppIfNecessary(747110);
-		    if (!SteamAPI.init()) {
-		    	System.err.println("Steam not connected");
-		       System.exit(1);
-		    }
-		} catch (SteamException e) {
-		    e.printStackTrace();
+		if(STEAM_ACTIVATION) {
+			try {
+				SteamAPI.loadLibraries();
+			    if (!SteamAPI.init()) {
+			    	System.err.println("Steam not connected");
+			       System.exit(1);
+			    }
+			} catch (SteamException e) {
+			    e.printStackTrace();
+			}
+			
+			
+			steamUser = new SteamUser(new SteamUserCallback() {
+				public void onValidateAuthTicket(SteamID steamID, AuthSessionResponse authSessionResponse,
+						SteamID ownerSteamID) {				
+				}
+				public void onMicroTxnAuthorization(int appID, long orderID, boolean authorized) {				
+				}
+				public void onEncryptedAppTicket(SteamResult result) {
+					
+				}
+			});
 		}
 		
-		steamUser = new SteamUser(new SteamUserCallback() {
-			public void onValidateAuthTicket(SteamID steamID, AuthSessionResponse authSessionResponse,
-					SteamID ownerSteamID) {				
-			}
-			public void onMicroTxnAuthorization(int appID, long orderID, boolean authorized) {				
-			}
-			public void onEncryptedAppTicket(SteamResult result) {
-				
-			}
-		});
 		
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("SHA-256");
-			byte[] hash = digest.digest((""+steamUser.getSteamID().getAccountID()).getBytes(StandardCharsets.UTF_8));
-			userID = bytesToHex(hash).substring(0, 9);
-		} catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-		}
+
 		
 		gameAlive = true;
 				
-		analytics = new GoogleAnalytics(userID, "UA-63640521-2");
+
 		
 		loadGame();
 		//Loads the config.ini file and sets all the parameters
+		HashMap<String, String> configs = new HashMap<String, String>();
 		try {
 			File conf = new File("config.ini");
 			
 			BufferedReader br = new BufferedReader(new FileReader(conf));
 			
-			HashMap<String, String> configs = new HashMap<String, String>();
+			
 			String s;
 			while((s = br.readLine()) != null){
 				try{
@@ -430,6 +453,19 @@ public class KambojaMain extends ApplicationAdapter {
 			}
 			
 			br.close();
+			
+			if(!configs.containsKey("identifier")) {
+				
+				if(STEAM_ACTIVATION) {
+					configs.put("identifier", steamUser.getSteamID().toString());
+					configs.put("acc_identifier", steamUser.getSteamID().getAccountID() + "");
+				}
+				else {
+					configs.put("identifier", randomKey(10));
+					configs.put("acc_identifier", randomKey(10));
+				}
+				
+			}
 			
 			Bazooka.DAMAGE = Float.parseFloat(configs.get("BazookaDamage"));
 			Bazooka.PRECISION = Float.parseFloat(configs.get("BazookaPrecision"));
@@ -486,6 +522,16 @@ public class KambojaMain extends ApplicationAdapter {
 			e.printStackTrace();
 		}
 		
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest((""+configs.get("acc_identifier")).getBytes(StandardCharsets.UTF_8));
+			userID = bytesToHex(hash).substring(0, 9);
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+		analytics = new GoogleAnalytics(userID, "UA-63640521-2");
+		
 		capsule = new Texture("menu/postgame/lvl_capsule.png");
 		loading_bar = new Texture("menu/postgame/bar_front.png");
 		loading_case = new Texture("menu/postgame/bar_back.png");
@@ -540,8 +586,10 @@ public class KambojaMain extends ApplicationAdapter {
 	 */
 	public void render () {
 		//Steam execution loop
-		if (SteamAPI.isSteamRunning()) {
-			SteamAPI.runCallbacks();
+		if(STEAM_ACTIVATION) {
+			if (SteamAPI.isSteamRunning()) {
+				SteamAPI.runCallbacks();
+			}
 		}
 		
 		//Resets screen for next frame draw
@@ -638,8 +686,24 @@ public class KambojaMain extends ApplicationAdapter {
 	public void dispose(){
 		super.dispose();
 		saveGame();
-		SteamAPI.shutdown();
+		if(STEAM_ACTIVATION)
+			SteamAPI.shutdown();
 		gameAlive = false;
+	}
+	
+	public String randomKey(int size) {
+		
+		String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		
+		String key = "";
+		
+		for(int i = 0; i < size; i ++) {
+			int rnd = (int) (Math.random() * characters.length());
+			key += characters.substring(rnd, rnd+1);
+		}
+		
+		return key;
+		
 	}
 
 	/** Sends an event to Google Analytics

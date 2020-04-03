@@ -113,7 +113,7 @@ public class MenuState extends State{
 		
 		options[0] = KambojaMain.getTexture("menu/main_menu/VERSUS.png");
 		options[1] = KambojaMain.getTexture("menu/main_menu/EXIT.png");
-		options[2] = KambojaMain.getTexture("menu/main_menu/ONLINE_off.png");
+		options[2] = KambojaMain.getTexture("menu/main_menu/ONLINE.png");
 		options[3] = KambojaMain.getTexture("menu/main_menu/HELP.png");
 		options[4] = KambojaMain.getTexture("menu/main_menu/OPTIONS.png");
 		options[5] = KambojaMain.getTexture("menu/main_menu/CREDITS.png");
@@ -426,6 +426,9 @@ public class MenuState extends State{
 					//Player select
 					manager.changeState(Manager.PLAYER_SELECT_STATE);
 					break;
+				case 2:
+					manager.changeState(Manager.LAN_MP_STATE);
+					break;
 				case 3:
 					//Help
 					manager.changeState(Manager.HELP_STATE);
@@ -612,7 +615,8 @@ public class MenuState extends State{
 			Gdx.app.exit();
 			break;
 		case 2:
-			timerWrong = 0.5f;
+			outro = true;
+			intro = false;
 			break;
 		case 3:
 			outro = true;
