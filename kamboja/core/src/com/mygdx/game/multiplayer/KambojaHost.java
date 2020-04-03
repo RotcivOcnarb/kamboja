@@ -97,6 +97,10 @@ public class KambojaHost {
 		}
 	}
 	
+	public void setConnectionListener(KambojaConnectionListener listener) {
+		this.listener = listener;
+	}
+	
 	public void receiveTCPPackage(Socket client, Object data) {
 		listener.receiveTCP((KambojaPacket)data);
 	}

@@ -2,20 +2,31 @@ package com.mygdx.game.multiplayer;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class KambojaPacket implements Serializable{
 
 	public enum PacketType{
-		CONNECT_TO_SERVER, //client requesting connection to server -- Client -> Server
-		CONNECTION_CONFIRM, //Server has confirmed connection -- Server -> Client
+		PLAYER_INPUT,
+		PLAYER_ENTER
 	}
 	
 	public InetAddress ipOrigin;
 	public PacketType type;
+	public Object data;
 	
 	public KambojaPacket(PacketType type, InetAddress ipOrigin) {
 		this.type = type;
 		this.ipOrigin = ipOrigin;
+	}
+	
+	public KambojaPacket(PacketType type) {
+		this.type = type;
+		try {
+			ipOrigin = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

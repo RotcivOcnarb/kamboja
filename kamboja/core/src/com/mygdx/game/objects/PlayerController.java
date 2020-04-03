@@ -9,12 +9,14 @@ public class PlayerController {
 	Controller controller;
 	int player;
 	String name;
+	String controllerName;
 	
-	public PlayerController(int weapon, Controller controller, int player, String name){
+	public PlayerController(int weapon, Controller controller, int player, String name, String controllerName){
 		this.weapon = weapon;
 		this.controller = controller;
 		this.player = player;
 		this.name = name;
+		this.controllerName = controllerName;
 	}
 
 	public int getWeapon() {
@@ -42,8 +44,12 @@ public class PlayerController {
 		this.player = player;
 	}
 
-	public String getName() {
+	public String getPlayerName() {
 		return name;
+	}
+	
+	public String getControllerName() {
+		return controllerName;
 	}
 
 	public void addLetterToName(String letter) {

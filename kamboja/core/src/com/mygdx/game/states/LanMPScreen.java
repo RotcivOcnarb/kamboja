@@ -393,6 +393,7 @@ public class LanMPScreen extends GenericInterface implements KambojaConnectionLi
 	@Override
 	public void connected() {
 		System.out.println("I have connected successfully!");
+		manager.changeState(Manager.PLAYER_SELECT_STATE);
 	}
 
 	@Override

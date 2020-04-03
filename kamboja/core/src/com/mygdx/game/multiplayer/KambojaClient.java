@@ -2,6 +2,7 @@ package com.mygdx.game.multiplayer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -71,8 +72,23 @@ public class KambojaClient {
 		}
 	}
 	
+	public void setConnectionListener(KambojaConnectionListener listener) {
+		this.listener = listener;
+	}
+	
 	public void receivePackage(KambojaPacket kp) {
 		listener.receiveUDP(kp);
+	}
+	
+	public void sendTCPPackage(KambojaPacket kp) {
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(tcpSocket.getOutputStream());
+			oos.flush();
+			oos.writeObject(kp);
+			oos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendPackage(KambojaPacket kp) {

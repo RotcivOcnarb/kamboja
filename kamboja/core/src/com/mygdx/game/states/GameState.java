@@ -725,10 +725,10 @@ public class GameState extends State{
 		
 		Player player = null;
 		if(KambojaMain.getControllers().get(id) instanceof BotController){
-			player = new BetterBot(body, id, this, KambojaMain.getControllers().get(id).getName());
+			player = new BetterBot(body, id, this, KambojaMain.getControllers().get(id).getPlayerName());
 		}
 		else{
-			player = new Player(body, id, this, KambojaMain.getControllers().get(id).getName());
+			player = new Player(body, id, this, KambojaMain.getControllers().get(id).getPlayerName());
 		}
 		
 		player.setAngle(new Vector2((float)Math.sin(Math.toRadians(def.angle)), (float)Math.cos(Math.toRadians(def.angle))));

@@ -695,8 +695,8 @@ public class Player implements Steerable<Vector2>{
 		}
 		
 		if(!isDead()){
-		layout.setText(font, KambojaMain.getControllers().get(getId()).getName());
-		font.draw(sb, KambojaMain.getControllers().get(getId()).getName(),
+		layout.setText(font, KambojaMain.getControllers().get(getId()).getPlayerName());
+		font.draw(sb, KambojaMain.getControllers().get(getId()).getPlayerName(),
 				(body.getWorldCenter().x - getState().getCamera().position.x) / getState().getCamera().zoom + 1920/2 - layout.width/2,
 				(body.getWorldCenter().y - getState().getCamera().position.y) / getState().getCamera().zoom + 1080/2 + layout.height*3);
 		}

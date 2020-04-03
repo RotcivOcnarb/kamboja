@@ -8,7 +8,7 @@ public class BotController extends PlayerController{
 			"Alexius", "Haidar", "Nyoman", "Stefan", "Zephyros"};
 
 	public BotController(int player) {
-		super(0, null, player, "");
+		super(0, null, player, "", "BOT");
 		
 		weapon = (int)(Math.random() * KambojaMain.getWeaponSize());
 		

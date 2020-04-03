@@ -25,6 +25,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net.Protocol;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -110,6 +111,11 @@ public class KambojaMain extends ApplicationAdapter {
 	public KambojaClient client;
 	public KambojaHost host;
 	public boolean isServer = false;
+	public boolean multiplayerConnection = false;
+	
+	public enum Protocol{
+		TCP, UDP
+	}
 
 	public void createClientConnection(String ip, KambojaConnectionListener listener) {
 		client = new KambojaClient(ip, listener);
@@ -118,20 +124,56 @@ public class KambojaMain extends ApplicationAdapter {
 		}
 		host = null;
 		isServer = false;
+		multiplayerConnection = true;
 	}
 	
 	public void createHostConnection(KambojaConnectionListener listener) {
 		host = new KambojaHost(listener);
 		client = null;
 		isServer = true;
+		multiplayerConnection = true;
 	}
 	
-	public void sendToServer(KambojaPacket kp) {
-		client.sendPackage(kp);
+	public void disconnectClient() {
+		client = null;
+		host = null;
+		isServer = false;
+		multiplayerConnection = false;
 	}
 	
-	public void sendToClient(KambojaPacket kp, String clientIP) {
-		host.sendPackage(kp, host.connectedClients.get(clientIP).getInetAddress());
+	public void setConnectionListener(KambojaConnectionListener listener) {
+		if(isServer) {
+			if(host != null)
+				host.setConnectionListener(listener);
+		}
+		else {
+			if(client != null)
+				client.setConnectionListener(listener);
+		}
+	}
+	
+	public void sendToServer(KambojaPacket kp, Protocol protocol) {
+		switch(protocol) {
+		case TCP:
+			client.sendTCPPackage(kp);
+			break;
+		case UDP:
+			client.sendPackage(kp);
+			break;
+		}
+	}
+	
+	public void sendToClient(KambojaPacket kp, String clientIP, Protocol protocol) {
+		
+		switch(protocol) {
+		case TCP:
+			host.sendTCPPackage(kp, clientIP);
+			break;
+		case UDP:
+			host.sendPackage(kp, host.connectedClients.get(clientIP).getInetAddress());
+			break;
+		}
+		
 	}
 	
 	public HashMap<String, Socket> getConnectedPlayers(){

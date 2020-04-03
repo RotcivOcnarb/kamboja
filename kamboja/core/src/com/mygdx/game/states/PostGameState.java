@@ -302,7 +302,7 @@ public class PostGameState extends GenericInterface{
 					name_frame[i].getWidth(), name_frame[i].getHeight());
 			
 			oliver.draw(sb,
-					KambojaMain.getControllers().get(KambojaMain.getPostGamePlayers().get(i).getId()).getName(),
+					KambojaMain.getControllers().get(KambojaMain.getPostGamePlayers().get(i).getId()).getPlayerName(),
 					(main_buffer[i].getWidth() - name_frame[i].getWidth())/2f,
 					main_buffer[i].getHeight() - name_frame[i].getHeight() + 40,
 					name_frame[i].getWidth(), 1, false);
