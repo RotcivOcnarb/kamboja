@@ -2027,7 +2027,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	@Override
 	public void disconnected() {
 		KambojaMain.getInstance().disconnectClient();
-		
+		System.out.println("I have been disconnected! oh no");
 	}
 
 }

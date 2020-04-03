@@ -164,7 +164,6 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 	
 	public void sendToClient(KambojaPacket kp, String clientIP, Protocol protocol) {
-		
 		switch(protocol) {
 		case TCP:
 			host.sendTCPPackage(kp, clientIP);
@@ -173,7 +172,6 @@ public class KambojaMain extends ApplicationAdapter {
 			host.sendPackage(kp, host.connectedClients.get(clientIP).getInetAddress());
 			break;
 		}
-		
 	}
 	
 	public HashMap<String, Socket> getConnectedPlayers(){

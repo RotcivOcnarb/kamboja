@@ -45,6 +45,7 @@ public class KambojaClient {
 						}
 						else {
 							listener.disconnected();
+							break;
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
