@@ -276,12 +276,20 @@ public class LanMPScreen extends GenericInterface{
 			
 			System.out.println("Trying to connect to host " + rawIP);
 			
-			client.connectToHost(rawIP, new KambojaPacketCallback() {
-				public void callback(KambojaPacket packet) {
-					//Tenho q passar algumas infos além de só mandar pra tela certa
-					manager.changeState(Manager.PLAYER_SELECT_STATE);
-				}
-			});
+			try {
+				
+				client.connectToHost(rawIP, new KambojaPacketCallback() {
+					public void callback(KambojaPacket packet) {
+						//Tenho q passar algumas infos além de só mandar pra tela certa
+						System.out.println("Connected successfully!");
+						manager.changeState(Manager.PLAYER_SELECT_STATE);
+					}
+				});
+				
+			} catch (UnknownHostException e1) {
+				e1.printStackTrace();
+			}
+			
 			break;
 		case 2:
 			

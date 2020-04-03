@@ -8,12 +8,14 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 
 public class KambojaClient {
 	
-	DatagramSocket datagramSocket;
+	DatagramSocket receiveSocket;
+	DatagramSocket sendSocket;
 	InetAddress ip;
 	byte[] receive = new byte[65535]; 
 	String hostIP;
@@ -22,21 +24,27 @@ public class KambojaClient {
 	public KambojaClient() {
 		try {
 			
-			datagramSocket = new DatagramSocket();
+			receiveSocket = new DatagramSocket(12345);
+			sendSocket = new DatagramSocket();
 			ip = InetAddress.getLocalHost();
 			
-			DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+			final DatagramPacket receivePacket = new DatagramPacket(receive, receive.length);
+			
+			System.out.println("Creating listening thread");
 			
 			new Thread(new Runnable() {
 				public void run() {
 					try {
 						
-						datagramSocket.receive(receivePacket);
+						receiveSocket.receive(receivePacket);
+						
+						System.out.println("Packet received, decoding");
 						
 						ByteArrayInputStream bis = new ByteArrayInputStream(receive);
 						ObjectInputStream ois = new ObjectInputStream(bis);
 						
 						KambojaPacket kp = (KambojaPacket) ois.readObject();
+						System.out.println("Kamboja packed read successfully, forwarding");
 						receivePackage(kp);
 						
 					} catch (Exception e) {
@@ -68,17 +76,17 @@ public class KambojaClient {
 			oos.writeObject(kp);
 			oos.flush();
 			
-			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), InetAddress.getByName(hostIP), 3224);
-			datagramSocket.send(dp);
+			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), InetAddress.getByName(hostIP), 12345);
+			sendSocket.send(dp);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void connectToHost(String ip, KambojaPacketCallback callback) {
+	public void connectToHost(String ip, KambojaPacketCallback callback) throws UnknownHostException {
 		hostIP = ip;
-		KambojaPacket kp = new KambojaPacket(PacketType.CONNECT_TO_SERVER);
+		KambojaPacket kp = new KambojaPacket(PacketType.CONNECT_TO_SERVER, InetAddress.getLocalHost());
 		sendPackage(kp);
 		confirmCallback = callback;
 	}
