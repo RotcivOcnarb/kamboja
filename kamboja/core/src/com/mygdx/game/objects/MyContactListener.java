@@ -132,7 +132,7 @@ public class MyContactListener implements ContactListener{
 			Player p1 = (Player)contact.getFixtureA().getBody().getUserData();
 			Player p2 = (Player)contact.getFixtureB().getBody().getUserData();
 			if(p1.getEquipment().spike_level > 0)
-			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true);
+			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true, true);
 			
 		}
 		if(
@@ -144,7 +144,7 @@ public class MyContactListener implements ContactListener{
 			Player p1 = (Player)contact.getFixtureB().getBody().getUserData();
 			Player p2 = (Player)contact.getFixtureA().getBody().getUserData();
 			if(p1.getEquipment().spike_level > 0)
-			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true);
+			p2.takeDamage(Equipment.SPIKE_DAMAGE * p1.getEquipment().spike_level, p1, true, true);
 		}
 
 		//player com buraco
@@ -309,7 +309,7 @@ public class MyContactListener implements ContactListener{
 			
 			if(b.getID() != player.getId()){
 				if(!player.isDead()){
-					player.takeDamage(b.getDamage(), b.getPlayer(), true);
+					player.takeDamage(b.getDamage(), b.getPlayer(), true, true);
 					
 					if(b instanceof BazookaBullet){
 						((BazookaBullet)b).explosionDamage();
@@ -332,7 +332,7 @@ public class MyContactListener implements ContactListener{
 			
 			if(b.getID() != player.getId()){
 				if(!player.isDead()){
-					player.takeDamage(b.getDamage(), b.getPlayer(), true);
+					player.takeDamage(b.getDamage(), b.getPlayer(), true, true);
 					
 					if(b instanceof BazookaBullet){
 						((BazookaBullet)b).explosionDamage();

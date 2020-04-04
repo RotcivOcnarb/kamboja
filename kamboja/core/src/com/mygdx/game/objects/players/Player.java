@@ -32,10 +32,14 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.KambojaMain.Protocol;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.multiplayer.KambojaPacket;
+import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
+import com.mygdx.game.multiplayer.packagetypes.PlayerDamage;
 import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.Equipment;
 import com.mygdx.game.objects.Ghost;
@@ -432,7 +436,8 @@ public class Player implements Steerable<Vector2>{
 		score -= amount;
 	}
 	
-	public void takeDamage(float amount, Player owner, boolean showBlood){
+	public void takeDamage(float amount, Player owner, boolean showBlood, boolean local){
+		if(local && KambojaMain.getInstance().multiplayerConnection && !KambojaMain.getInstance().isServer) return;
 		if(imunity <= 0){
 			life -= amount * def;
 			
@@ -482,6 +487,17 @@ public class Player implements Steerable<Vector2>{
 				if(GameState.SFX)
 				grunt[(int)(Math.random()*5)].play();
 				gruntTimer = 0.5f;
+			}
+			
+			if(KambojaMain.getInstance().multiplayerConnection && KambojaMain.getInstance().isServer) {
+				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_DAMAGE);
+				PlayerDamage pd = new PlayerDamage();
+				pd.damage = amount;
+				pd.showBlood = showBlood;
+				pd.owner = state.getPlayers().indexOf(owner);
+				pd.target = state.getPlayers().indexOf(this);
+				kp.data = pd;
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
 			}
 		}
 	}
@@ -1005,7 +1021,7 @@ public class Player implements Steerable<Vector2>{
 			
 			if(acid_timer > 0.5f) {
 				acid_timer -= 0.5f;
-				takeDamage(Equipment.ACID_DAMAGE * biggest_acid.getPlayer().atk * biggest_acid.getAcidLevel(), biggest_acid.getPlayer(), true);
+				takeDamage(Equipment.ACID_DAMAGE * biggest_acid.getPlayer().atk * biggest_acid.getAcidLevel(), biggest_acid.getPlayer(), true, true);
 			}
 			//TODO: tirar vida periodicamente
 		}
@@ -1021,7 +1037,7 @@ public class Player implements Steerable<Vector2>{
 			setAngle(new Vector2((float)Math.sin(getFallingTimer()*10), (float)Math.cos(getFallingTimer()*10)));
 			
 			if(getFallingTimer() <= 0){
-				takeDamage(1000, null, false);
+				takeDamage(1000, null, false, true);
 			}
 		}
 
@@ -1065,7 +1081,7 @@ public class Player implements Steerable<Vector2>{
 		flameTimer -= delta;
 
 		if(flameTimer > 0){
-			takeDamage(Flamethrower.DAMAGE * flameAtk, flamePlayer, false);
+			takeDamage(Flamethrower.DAMAGE * flameAtk, flamePlayer, false, true);
 			state.screenshake(0.03f);
 		}
 		else{
@@ -1397,7 +1413,7 @@ public class Player implements Steerable<Vector2>{
 		if(getMeleeAnimTimer() < 0) {
 			setMeleeAnimTimer(.5f);
 			for(Player p : inMeleeRange) {
-				p.takeDamage(10, this, true);
+				p.takeDamage(10, this, true, true);
 			}
 		}
 	}

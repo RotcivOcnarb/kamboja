@@ -10,7 +10,8 @@ public class KambojaPacket implements Serializable{
 		PLAYER_INPUT,
 		PLAYER_ENTER,
 		PLAYER_POSITION,
-		ITEM_SPAWN
+		ITEM_SPAWN,
+		PLAYER_DAMAGE
 	}
 	
 	public InetAddress ipOrigin;

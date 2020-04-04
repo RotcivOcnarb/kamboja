@@ -57,7 +57,7 @@ public class BazookaBullet extends Bullet{
 		for(Player p : player.getState().getPlayers()){
 			if(!p.equals(player)){
 				if(p.getPosition().cpy().sub(body.getPosition()).len2() < radius * radius){
-					p.takeDamage(getDamage() * player.getAtk(), player, true);
+					p.takeDamage(getDamage() * player.getAtk(), player, true, true);
 				}
 				
 				if(p.getShift() instanceof Turret){

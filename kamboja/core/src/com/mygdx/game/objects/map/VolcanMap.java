@@ -73,7 +73,7 @@ public class VolcanMap extends KambojaMap{
 				for(Player p : gameState.getPlayers()) {
 					float dist = p.getPosition().cpy().sub(lr.position.cpy()).len();
 					if(dist < 1) {
-						p.takeDamage(1000, null, true);
+						p.takeDamage(1000, null, true, true);
 					}
 					
 				}

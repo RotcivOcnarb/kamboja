@@ -55,6 +55,7 @@ import com.mygdx.game.multiplayer.KambojaConnectionListener;
 import com.mygdx.game.multiplayer.KambojaPacket;
 import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 import com.mygdx.game.multiplayer.packagetypes.ItemSpawn;
+import com.mygdx.game.multiplayer.packagetypes.PlayerDamage;
 import com.mygdx.game.multiplayer.packagetypes.PlayerPosition;
 import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.Bullet;
@@ -1898,6 +1899,10 @@ public class GameState extends State implements KambojaConnectionListener{
 		if(data.type == PacketType.ITEM_SPAWN) {
 			ItemSpawn is = (ItemSpawn) data.data;
 			itemQueue.add(is);
+		}
+		if(data.type == PacketType.PLAYER_DAMAGE) {
+			PlayerDamage pd = (PlayerDamage) data.data;
+			getPlayers().get(pd.target).takeDamage(pd.damage, getPlayers().get(pd.owner), pd.showBlood, false);
 		}
 		
 	}

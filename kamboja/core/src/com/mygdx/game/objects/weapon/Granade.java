@@ -86,7 +86,7 @@ public class Granade {
 		for(int i = gameState.getPlayers().size() -1; i >=0; i --) {
 			Player p = gameState.getPlayers().get(i);
 			if(p.getPosition().cpy().sub(body.getWorldCenter()).len2() < 2) {
-				p.takeDamage(50, owner, true);
+				p.takeDamage(50, owner, true, true);
 			}
 		}
 		
