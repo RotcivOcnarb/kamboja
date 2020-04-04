@@ -1872,6 +1872,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
+			pi.controllerID = id;
 			pi.action = InputAction.KEY_DOWN;
 			pi.code = keycode;
 			kp.data = pi;
