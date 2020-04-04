@@ -1393,6 +1393,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 					if(KambojaMain.getInstance().multiplayerConnection) {
 						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
 						PlayerEnter pe = new PlayerEnter();
+						pe.id = put_id;
 						pe.player = pc.getPlayer();
 						pe.controllerName = pc.getControllerName();
 						pe.name = pc.getPlayerName();
@@ -1413,6 +1414,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 						if(KambojaMain.getInstance().multiplayerConnection) {
 							KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
 							PlayerEnter pe = new PlayerEnter();
+							pe.id = KambojaMain.getControllers().size()-1;
 							pe.player = pc.getPlayer();
 							pe.controllerName = pc.getControllerName();
 							pe.name = pc.getPlayerName();
@@ -1892,6 +1894,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 					if(KambojaMain.getInstance().multiplayerConnection) {
 						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
 						PlayerEnter pe = new PlayerEnter();
+						pe.id = put_id;
 						pe.player = pc.getPlayer();
 						pe.controllerName = pc.getControllerName();
 						pe.name = pc.getPlayerName();
@@ -1917,6 +1920,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 						if(KambojaMain.getInstance().multiplayerConnection) {
 							KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
 							PlayerEnter pe = new PlayerEnter();
+							pe.id = KambojaMain.getControllers().size()-1;
 							pe.player = pc.getPlayer();
 							pe.controllerName = pc.getControllerName();
 							pe.name = pc.getPlayerName();
@@ -1973,7 +1977,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 		if(KambojaMain.getControllers().size() > pe.player) {
 			MultiplayerController mc = new MultiplayerController(pe.weapon, pe.player, pe.name, pe.controllerName, kp.ipOrigin.getHostAddress());
-			KambojaMain.getControllers().set(pe.player, mc);
+			KambojaMain.getControllers().set(pe.id, mc);
 			positionPlayerOffset[pe.player] = mc.getPlayer();
 			positionWeaponOffset[pe.player] = mc.getWeapon();
 		}

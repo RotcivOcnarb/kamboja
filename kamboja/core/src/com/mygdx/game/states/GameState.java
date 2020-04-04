@@ -1852,8 +1852,6 @@ public class GameState extends State implements KambojaConnectionListener{
 		public PlayerSpike(Body body, int id, GameState state, String name) {
 			super(body, id, state, name);
 		}
-		
-		
 	}
 
 	@Override
