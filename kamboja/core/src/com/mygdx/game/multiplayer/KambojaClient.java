@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import com.mygdx.game.KambojaMain;
+
 public class KambojaClient {
 	
 	UDPConnection connection;
@@ -37,9 +39,9 @@ public class KambojaClient {
 
 			//Receive server TCP
 			new Thread(() -> {
-				while(true) {
+				while(KambojaMain.gameAlive) {
 					try {
-						if(tcpSocket.getInputStream().read() != -1){
+						if(!tcpSocket.isClosed() && tcpSocket.getInputStream().read() != -1){
 							ObjectInputStream ois = new ObjectInputStream(tcpSocket.getInputStream());
 							listener.receiveTCP((KambojaPacket) ois.readObject());
 						}

@@ -2028,6 +2028,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	public void disconnected() {
 		KambojaMain.getInstance().disconnectClient();
 		System.out.println("I have been disconnected! oh no");
+		manager.changeState(Manager.MENU_STATE);
 	}
 
 }
