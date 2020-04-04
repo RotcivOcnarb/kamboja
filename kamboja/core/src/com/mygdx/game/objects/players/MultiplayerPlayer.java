@@ -21,7 +21,7 @@ public class MultiplayerPlayer extends Player{
 		nonInputUpdate(delta);
 		
 		if(targetPosition != null)
-			body.applyForceToCenter(targetPosition.cpy().sub(body.getWorldCenter()).scl(10f), true);
+			body.applyForceToCenter(targetPosition.cpy().sub(body.getWorldCenter()).scl(100f), true);
 		
 		if(targetAngle != null)
 			nextAngle = targetAngle;
