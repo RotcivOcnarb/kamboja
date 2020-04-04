@@ -1937,7 +1937,8 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 			}
 		}
 		
-		keyDownK(keycode, id);
+		if(id != -1)
+			keyDownK(keycode, id);
 		
 		return false;
 	}
