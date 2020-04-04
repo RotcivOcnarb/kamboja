@@ -30,14 +30,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
-import com.mygdx.game.objects.map.Block;
+import com.mygdx.game.objects.controllers.KeyboardController;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Shift;
 import com.mygdx.game.objects.shift.Turret;
@@ -322,54 +321,54 @@ public class Player implements Steerable<Vector2>{
 			keyboard = true;
 		}
 
-		player = getTexture(KambojaMain.getControllers().get(id).player, 0);
+		player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 0);
 
-		switch(KambojaMain.getControllers().get(id).weapon){
+		switch(KambojaMain.getControllers().get(id).getWeapon()){
 		case 0:
 			setWeapon(new Pistol(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 2);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 2);
 			space = getSpaceTexture(2);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Pistol.WEIGHT) * 10);
 			break;
 		case 1:
 			setWeapon(new DoublePistol(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 0);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 0);
 			space = getSpaceTexture(0);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -DoublePistol.WEIGHT) * 10);
 			break;
 		case 2:
 			setWeapon(new Minigun(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Minigun.WEIGHT) * 10);
 			break;
 		case 3:
 			setWeapon(new Shotgun(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Shotgun.WEIGHT) * 10);
 			break;
 		case 4:
 			setWeapon(new Mp5(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Mp5.WEIGHT) * 10);
 			break;
 		case 5:
 			setWeapon(new Flamethrower(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Flamethrower.WEIGHT) * 10);
 			break;
 		case 6:
 			setWeapon(new Bazooka(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Bazooka.WEIGHT) * 10);
 			break;
 		case 7:
 			setWeapon(new Laser(body.getWorld(), this));
-			player = getTexture(KambojaMain.getControllers().get(id).player, 1);
+			player = getTexture(KambojaMain.getControllers().get(id).getPlayer(), 1);
 			space = getSpaceTexture(1);
 			speed = (float) (Math.pow(KambojaMain.SENSITIVITY, -Laser.WEIGHT) * 10);
 			break;

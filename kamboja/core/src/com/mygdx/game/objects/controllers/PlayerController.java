@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.controllers;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.mygdx.game.KambojaMain;
@@ -6,14 +6,14 @@ import com.mygdx.game.KambojaMain;
 public class PlayerController {
 	
 	int weapon;
-	Controller controller;
+	private Controller controller;
 	int player;
 	String name;
 	String controllerName;
 	
 	public PlayerController(int weapon, Controller controller, int player, String name, String controllerName){
 		this.weapon = weapon;
-		this.controller = controller;
+		this.setController(controller);
 		this.player = player;
 		this.name = name;
 		this.controllerName = controllerName;
@@ -61,6 +61,14 @@ public class PlayerController {
 		if(name.length() > 0) {
 			name = name.substring(0, name.length()-1);
 		}
+	}
+
+	public Controller getController() {
+		return controller;
+	}
+
+	public void setController(Controller controller) {
+		this.controller = controller;
 	}
 	
 

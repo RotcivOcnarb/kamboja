@@ -10,6 +10,8 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.controllers.KeyboardController;
+import com.mygdx.game.objects.controllers.PlayerController;
 
 public class MenuCursors {
 	

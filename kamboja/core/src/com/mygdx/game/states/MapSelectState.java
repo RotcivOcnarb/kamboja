@@ -49,9 +49,9 @@ import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 import com.mygdx.game.multiplayer.packagetypes.PlayerEnter;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput.InputAction;
-import com.mygdx.game.objects.KeyboardController;
-import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.objects.controllers.KeyboardController;
+import com.mygdx.game.objects.controllers.PlayerController;
 
 public class MapSelectState extends State implements KambojaConnectionListener{
 	

@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.controllers;
 
 import com.badlogic.gdx.controllers.Controller;
 

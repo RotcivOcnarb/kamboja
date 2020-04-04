@@ -3,6 +3,7 @@ package com.mygdx.game.objects;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.math.Matrix4;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.objects.controllers.PlayerController;
 
 public class Util {
 	
@@ -20,7 +21,7 @@ public class Util {
 	public static int getControllerID(Controller controller){
 		for(int i = 0; i < KambojaMain.getControllers().size(); i ++){
 			if(KambojaMain.getControllers().get(i) != null) {
-				if(controller.equals(KambojaMain.getControllers().get(i).controller)){
+				if(controller.equals(KambojaMain.getControllers().get(i).getController())){
 					return i;
 				}
 			}

@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.controllers;
 
 public class KeyboardController extends PlayerController{
 

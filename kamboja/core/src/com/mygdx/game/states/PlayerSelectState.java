@@ -49,13 +49,13 @@ import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 import com.mygdx.game.multiplayer.packagetypes.PlayerEnter;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput.InputAction;
-import com.mygdx.game.objects.BotController;
 import com.mygdx.game.objects.GameMusic;
-import com.mygdx.game.objects.KeyboardController;
-import com.mygdx.game.objects.MultiplayerController;
 import com.mygdx.game.objects.Player;
-import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.objects.controllers.BotController;
+import com.mygdx.game.objects.controllers.KeyboardController;
+import com.mygdx.game.objects.controllers.MultiplayerController;
+import com.mygdx.game.objects.controllers.PlayerController;
 import com.mygdx.game.objects.weapon.Weapon;
 
 public class PlayerSelectState extends State implements KambojaConnectionListener{
@@ -146,6 +146,8 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	boolean hasFallen;
 
 	Texture lock;
+	
+	KeyboardController myKeyboard;
 	
 	//TODO: particulas de fumaça
 	//correntes
@@ -1710,18 +1712,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		}
 	}
 	
-	public KeyboardController getKeyboardController() {
-		
-		for(PlayerController pc : KambojaMain.getControllers()) {
-			if(pc instanceof KeyboardController) {
-				return (KeyboardController)pc;
-			}
-		}
-		
-		return null;
-	}
+//	public KeyboardController getKeyboardController() {
+//		
+//		for(PlayerController pc : KambojaMain.getControllers()) {
+//			if(pc instanceof KeyboardController) {
+//				return (KeyboardController)pc;
+//			}
+//		}
+//		
+//		return null;
+//	}
 	
-	public void keyDownK(int keycode) {
+	public void keyDownK(int keycode, int id) {
 		
 		if(keycode == Keys.B) {
 			int put_id = Util.getFirstAvailableID();
@@ -1756,27 +1758,8 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 			}
 		}
 		
-		int id = Util.getControllerID(getKeyboardController());
-		
 		if(keycode == Keys.ENTER) {
-			if(id == -1) {
-				int put_id = Util.getFirstAvailableID();
-				if(put_id != -1) {
-					KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (put_id+1));
-					KambojaMain.getControllers().remove(put_id);
-					KambojaMain.getControllers().add(put_id, pc);
-				}
-				else {
-					if(KambojaMain.getControllers().size() < 4) {
-						KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (KambojaMain.getControllers().size()+1));
-						KambojaMain.getControllers().add(pc);
-						
-						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
-						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
-					}
-				}
-			}
-			else {
+			if(id != -1) {
 				if(!typing[id]) {
 					if(playerReady[id]) {
 						if(allReady) {
@@ -1809,6 +1792,8 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 			}
 		}
+		
+		
 		if(keycode == Keys.DOWN || keycode == Keys.S) {
 			if(id != -1) {
 				if(!typing[id]) {
@@ -1891,6 +1876,8 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	
 	public boolean keyDown(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyDownK();
+		int id = Util.getControllerID(myKeyboard);
+		
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
@@ -1903,7 +1890,46 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 		}
-		keyDownK(keycode);
+		
+		//Player enter via keyboard
+		if(keycode == Keys.ENTER) {
+			if(id == -1) {
+				int put_id = Util.getFirstAvailableID();
+				if(put_id != -1) {
+					KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (put_id+1));
+					KambojaMain.getControllers().set(put_id, pc);
+					myKeyboard = pc;
+					
+					if(KambojaMain.getInstance().multiplayerConnection) {
+						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
+						PlayerEnter pe = new PlayerEnter();
+						pe.player = pc.getPlayer();
+						pe.controllerName = pc.getControllerName();
+						pe.name = pc.getPlayerName();
+						pe.weapon = pc.getWeapon();
+						kp.data = pe;
+						
+						if(KambojaMain.getInstance().isServer) 
+							KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+						else
+							KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+					}
+					
+				}
+				else {
+					if(KambojaMain.getControllers().size() < 4) {
+						KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (KambojaMain.getControllers().size()+1));
+						KambojaMain.getControllers().add(pc);
+						myKeyboard = pc;
+						
+						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
+						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+					}
+				}
+			}
+		}
+		
+		keyDownK(keycode, id);
 		
 		return false;
 	}
@@ -1912,12 +1938,13 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		return Input.Keys.toString(keycode);
 	}
 	
-	public void keyUpK(int keycode) {
+	public void keyUpK(int keycode, int id) {
 		
 	}
 
 	public boolean keyUp(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyUpK();
+		int id = Util.getControllerID(myKeyboard);
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
@@ -1931,7 +1958,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 			
 		}
-		keyUpK(keycode);
+		keyUpK(keycode, id);
 		return false;
 	}
 	
@@ -2001,10 +2028,10 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				case CONTROLLER_DISCONNECTED:
 					break;
 				case KEY_DOWN:
-					keyDownK(pi.code);
+					keyDownK(pi.code, pi.controllerID);
 					break;
 				case KEY_UP:
-					keyUpK(pi.code);
+					keyUpK(pi.code, pi.controllerID);
 					break;
 				}
 				
