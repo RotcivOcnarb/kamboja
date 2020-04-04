@@ -1211,6 +1211,8 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
+			pi.controllerID = id;
+			pi.controllerName = "Keyboard";
 			pi.action = InputAction.KEY_DOWN;
 			pi.code = keycode;
 			kp.data = pi;
@@ -1257,6 +1259,8 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
+			pi.controllerID = id;
+			pi.controllerName = "Keyboard";
 			pi.action = InputAction.KEY_UP;
 			pi.code = keycode;
 			kp.data = pi;
