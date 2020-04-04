@@ -38,37 +38,43 @@ public class KambojaHost {
 						final String clientIP = client.getInetAddress().getHostAddress();
 						System.out.println("Um cliente acabou de se conectar [" + client.getInetAddress().getHostAddress() + "]");
 						if(!connectedClients.containsKey(clientIP)) {
-							connectedClients.put(clientIP, client);
 							
-							new Thread(() -> {
-								while(KambojaMain.gameAlive) {
-									try {
-										if(!client.isClosed()) {
-											System.out.println("Packet received from client " + clientIP);
-											try {
-												ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-												receiveTCPPackage(client, ois.readObject());
+							if(listener.clientTriesToConnect()) {
+								connectedClients.put(clientIP, client);
+								
+								new Thread(() -> {
+									while(KambojaMain.gameAlive) {
+										try {
+											if(!client.isClosed()) {
+												System.out.println("Packet received from client " + clientIP);
+												try {
+													ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+													receiveTCPPackage(client, ois.readObject());
+												}
+												catch(Exception e) {
+													e.printStackTrace();
+													System.out.println("Client " + clientIP + " disconnected");
+													connectedClients.remove(clientIP);
+													break;
+												}
+												
 											}
-											catch(Exception e) {
-												e.printStackTrace();
+											else {
+												//Client disconnected
 												System.out.println("Client " + clientIP + " disconnected");
 												connectedClients.remove(clientIP);
 												break;
 											}
-											
 										}
-										else {
-											//Client disconnected
-											System.out.println("Client " + clientIP + " disconnected");
-											connectedClients.remove(clientIP);
-											break;
+										catch(Exception e) {
+											e.printStackTrace();
 										}
 									}
-									catch(Exception e) {
-										e.printStackTrace();
-									}
-								}
-							}).start();
+								}).start();
+							}
+							else {
+								client.close();
+							}
 						}
 						else {
 							//Opa, alquem que já tá conectado tá tentando conectar de novo

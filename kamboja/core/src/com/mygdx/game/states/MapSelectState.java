@@ -39,14 +39,21 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
+import com.mygdx.game.KambojaMain.Protocol;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.multiplayer.KambojaConnectionListener;
+import com.mygdx.game.multiplayer.KambojaPacket;
+import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
+import com.mygdx.game.multiplayer.packagetypes.PlayerEnter;
+import com.mygdx.game.multiplayer.packagetypes.PlayerInput;
+import com.mygdx.game.multiplayer.packagetypes.PlayerInput.InputAction;
 import com.mygdx.game.objects.KeyboardController;
 import com.mygdx.game.objects.PlayerController;
 import com.mygdx.game.objects.Util;
 
-public class MapSelectState extends State{
+public class MapSelectState extends State implements KambojaConnectionListener{
 	
 	boolean intro;
 	boolean outro;
@@ -244,7 +251,9 @@ public class MapSelectState extends State{
 
 	}
 
-	public void create() {		
+	public void create() {
+		KambojaMain.getInstance().setConnectionListener(this);
+		
 		intro = true;
 		outro = false;
 		alpha = 1;
@@ -806,27 +815,51 @@ public class MapSelectState extends State{
 		
 	}
 
+	@Override
 	public void connected(Controller controller) {
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.CONTROLLER_CONNECTED;
+			pi.controllerID = Util.getControllerID(controller);
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
+	}
+
+	@Override
+	public void disconnected(Controller controller) {		
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.CONTROLLER_DISCONNECTED;
+			pi.controllerID = Util.getControllerID(controller);
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
 		
 	}
 
-	public void disconnected(Controller controller) {
-		
-	}
-
-	public boolean buttonDown(Controller controller, int buttonCode) {
-		int id = Util.getControllerID(controller);
+	public void buttonDownK(int id, String controllerName, int buttonCode) {
 		if(id != -1){
 			int select = 0;
 			int backbtn = 0;
 			int startbtn = 0;
 			
-			if(controller.getName().equals(Gamecube.getID())){
+			if(controllerName.equals(Gamecube.getID())){
 				select = Gamecube.A;
 				backbtn = Gamecube.B;
 				startbtn = Gamecube.START;
 			}
-			else if(controller.getName().toUpperCase().contains("XBOX")){
+			else if(controllerName.toUpperCase().contains("XBOX")){
 				select = XBox.BUTTON_A;
 				backbtn = XBox.BUTTON_B;
 				startbtn = XBox.BUTTON_START;
@@ -847,13 +880,57 @@ public class MapSelectState extends State{
 				selection[id] = 17;
 			}
 		}
+	}
+	
+	public boolean buttonDown(Controller controller, int buttonCode) {
+		int id = Util.getControllerID(controller);
+			
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.BUTTON_DOWN;
+			pi.code = buttonCode;
+			pi.controllerID = Util.getControllerID(controller);
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
+		
+		buttonDownK(id, controller.getName(), buttonCode);
 		
 		return false;
 	}
 
+	@Override
 	public boolean buttonUp(Controller controller, int buttonCode) {
+		//NÃO COLOCAR CÓDIGO AQUI, USE O buttonUpK();
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.BUTTON_UP;
+			pi.code = buttonCode;
+			pi.controllerID = Util.getControllerID(controller);
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
+		buttonUpK(Util.getControllerID(controller), controller.getName(), buttonCode);
 		return false;
 	}
+	
+	public void buttonUpK(int id, String controllerName, int buttonCode) {
+		
+	}
+	
+	
 	
 	boolean xMoved = false;
 	boolean yMoved = false;
@@ -940,10 +1017,33 @@ public class MapSelectState extends State{
 	}
 	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
-	int id = Util.getControllerID(controller);
+		//NÃO COLOCAR CÓDIGO AQUI, USE O axisMovedK();
+		int id = Util.getControllerID(controller);
+		
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.AXIS_MOVED;
+			pi.code = axisCode;
+			pi.value = value;
+			pi.controllerID = id;
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
+		axisMovedK(id, controller.getName(), axisCode, value);
+		return false;
+	}
+
+	public void axisMovedK(int id, String controllerName, int axisCode, float value) {
 
 		if(id != -1){
-			if(controller.getName().equals(Gamecube.getID())){
+			if(controllerName.equals(Gamecube.getID())){
 				if(axisCode == Gamecube.MAIN_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {
@@ -967,7 +1067,7 @@ public class MapSelectState extends State{
 					}
 				}
 			}
-			else if(controller.getName().toUpperCase().contains("XBOX")){
+			else if(controllerName.toUpperCase().contains("XBOX")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {
@@ -1017,9 +1117,8 @@ public class MapSelectState extends State{
 				}
 			}
 		}
-		return false;
 	}
-
+	
 	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
 		return false;
 	}
@@ -1117,6 +1216,25 @@ public class MapSelectState extends State{
 	}
 	
 	public boolean keyDown(int keycode) {
+		//NÃO COLOCAR CÓDIGO AQUI, USE O keyDownK();
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.KEY_DOWN;
+			pi.code = keycode;
+			kp.data = pi;
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+		}
+		keyDownK(keycode);
+		
+		return false;
+	}
+	
+	public void keyDownK(int keycode) {
 		int id = Util.getControllerID(getKeyboardController());
 		
 		if(id != -1) {
@@ -1136,11 +1254,102 @@ public class MapSelectState extends State{
 				changeSelectionX(id, 1);
 			}
 		}
+	}
+	
+	public void keyUpK(int keycode) {
+		
+	}
+
+	public boolean keyUp(int keycode) {
+		//NÃO COLOCAR CÓDIGO AQUI, USE O keyUpK();
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.KEY_UP;
+			pi.code = keycode;
+			kp.data = pi;
+				
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
+				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+			
+		}
+		keyUpK(keycode);
 		return false;
 	}
 
 	public void resize(int width, int height) {
 		
+	}
+
+	@Override
+	public void receiveUDP(KambojaPacket data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void receiveTCP(KambojaPacket data) {
+		switch(data.type) {
+		case PLAYER_INPUT:
+			PlayerInput pi = (PlayerInput)data.data;
+			switch(pi.action) {
+			case AXIS_MOVED:
+				axisMovedK(pi.controllerID, pi.controllerName, pi.code, pi.value);
+				break;
+			case BUTTON_DOWN:
+				buttonDownK(pi.controllerID, pi.controllerName, pi.code);
+				break;
+			case BUTTON_UP:
+				buttonUpK(pi.controllerID, pi.controllerName, pi.code);
+				break;
+			case CONTROLLER_CONNECTED:
+				break;
+			case CONTROLLER_DISCONNECTED:
+				break;
+			case KEY_DOWN:
+				keyDownK(pi.code);
+				break;
+			case KEY_UP:
+				keyUpK(pi.code);
+				break;
+			}
+			
+			break;
+		}
+		
+	if(KambojaMain.getInstance().isServer) {
+		//forward to all other clients
+		for(String key : KambojaMain.getInstance().getConnectedPlayers().keySet()) {
+			if(!key.equals(data.ipOrigin.getHostAddress())) 
+				KambojaMain.getInstance().sendToClient(data, key, Protocol.TCP);
+		}
+	}
+		
+	}
+
+	@Override
+	public void connected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connectionFailed(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnected() {
+		KambojaMain.getInstance().disconnectClient();
+		manager.changeState(Manager.MENU_STATE);
+	}
+
+	@Override
+	public boolean clientTriesToConnect() {
+		return false;
 	}
 
 }

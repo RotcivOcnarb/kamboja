@@ -6,4 +6,5 @@ public interface KambojaConnectionListener {
 	public void connected();
 	public void connectionFailed(String message);
 	public void disconnected();
+	public boolean clientTriesToConnect();
 }

@@ -404,6 +404,11 @@ public class LanMPScreen extends GenericInterface implements KambojaConnectionLi
 		System.out.println(message);
 	}
 
+	@Override
+	public boolean clientTriesToConnect() {
+		return true;
+	}
+
 	
 
 }

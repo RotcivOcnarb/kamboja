@@ -255,7 +255,6 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 	@Override
 	public void create() {
-		System.out.println("Entering player select state, changing listener");
 		KambojaMain.getInstance().setConnectionListener(this);
 		
 		outro = false;
@@ -1373,8 +1372,6 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		}
 
 		int start = 0;
-
-		System.out.println(controller.getName());
 		
 		if(controller.getName().equals(Gamecube.getID()))
 			start = Gamecube.START;
@@ -1987,11 +1984,9 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 	@Override
 	public void receiveTCP(KambojaPacket data) {
-		System.out.println("Receiving TCP Package of type: " + data.type);
 			switch(data.type) {
 			case PLAYER_INPUT:
 				PlayerInput pi = (PlayerInput)data.data;
-				System.out.println("The player input was of action " + pi.action);
 				switch(pi.action) {
 				case AXIS_MOVED:
 					axisMovedK(pi.controllerID, pi.controllerName, pi.code, pi.value);
@@ -2046,8 +2041,12 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	@Override
 	public void disconnected() {
 		KambojaMain.getInstance().disconnectClient();
-		System.out.println("I have been disconnected! oh no");
 		manager.changeState(Manager.MENU_STATE);
+	}
+
+	@Override
+	public boolean clientTriesToConnect() {
+		return true;
 	}
 
 }
