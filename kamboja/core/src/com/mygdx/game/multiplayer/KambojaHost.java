@@ -91,7 +91,6 @@ public class KambojaHost {
 				
 				while(KambojaMain.gameAlive) {
 					KambojaPacket kp = (KambojaPacket) connection.receive();
-					System.out.println("Packet of type " + kp.type + " received!");
 					receivePackage(kp);
 				}
 			}).start();

@@ -1563,23 +1563,17 @@ public class GameState extends State implements KambojaConnectionListener{
 		
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			if(KambojaMain.getInstance().isServer) {
-				for(Player p : getPlayers()) {
-					if(p instanceof MultiplayerPlayer) {
-						MultiplayerPlayer mp = (MultiplayerPlayer) p;
-						for(Player p2 : getPlayers()) {
-							if(p2 != p) {
-								KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
-								
-								PlayerPosition pp = new PlayerPosition();
-								pp.position = p2.getPosition();
-								pp.angle = p2.getAngleVector();
-								pp.player = p2.getId();
-								
-								kp.data = pp;
-								KambojaMain.getInstance().sendToClient(kp, mp.ip, Protocol.UDP);
-							}
-						}
+				for(String s : KambojaMain.getInstance().getConnectedPlayers().keySet()) {
+					for(Player p : getPlayers()) {
+						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
 						
+						PlayerPosition pp = new PlayerPosition();
+						pp.position = p.getPosition();
+						pp.angle = p.getAngleVector();
+						pp.player = p.getId();
+						
+						kp.data = pp;
+						KambojaMain.getInstance().sendToClient(kp, s, Protocol.UDP);
 					}
 				}
 			}
@@ -1860,6 +1854,7 @@ public class GameState extends State implements KambojaConnectionListener{
 		
 		if(data.type == PacketType.PLAYER_POSITION) {
 			PlayerPosition pp = (PlayerPosition) data.data;
+			System.out.println("received player position");
 			
 			if(getPlayers().get(pp.player) instanceof MultiplayerPlayer) {
 				getPlayers().get(pp.player).setPosition(pp.position);
