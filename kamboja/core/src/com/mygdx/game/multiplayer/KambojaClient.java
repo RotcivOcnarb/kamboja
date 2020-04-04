@@ -41,7 +41,7 @@ public class KambojaClient {
 			new Thread(() -> {
 				while(KambojaMain.gameAlive) {
 					try {
-						if(!tcpSocket.isClosed() && tcpSocket.getInputStream().read() != -1){
+						if(!tcpSocket.isClosed()){
 							ObjectInputStream ois = new ObjectInputStream(tcpSocket.getInputStream());
 							listener.receiveTCP((KambojaPacket) ois.readObject());
 						}
@@ -52,7 +52,6 @@ public class KambojaClient {
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

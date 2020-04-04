@@ -24,7 +24,10 @@ public class KambojaConsoleWindow extends JPanel{
 		JScrollPane scroll = new JScrollPane(textArea);
 		add(scroll);
 		
-		System.setOut(new MultiPrintStream(System.out, new ConsolePrintStream(textArea, scroll)));
+		MultiPrintStream mps = new MultiPrintStream(System.out, new ConsolePrintStream(textArea, scroll));
+		System.setOut(mps);
+		System.setErr(mps);
+		
 	}
 	
 }

@@ -46,10 +46,16 @@ public class KambojaHost {
 							new Thread(() -> {
 								while(KambojaMain.gameAlive) {
 									try {
-										if(client.getInputStream().read() != -1) {
+										if(!client.isClosed()) {
 											System.out.println("Packet received from client " + clientIP);
-											ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-											receiveTCPPackage(client, ois.readObject());
+											try {
+												ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+												receiveTCPPackage(client, ois.readObject());
+											}
+											catch(Exception e) {
+												e.printStackTrace();
+											}
+											
 										}
 										else {
 											//Client disconnected
@@ -66,10 +72,7 @@ public class KambojaHost {
 						}
 						else {
 							//Opa, alquem que já tá conectado tá tentando conectar de novo
-						}
-
-						//mandar pacotes
-						
+						}						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -78,15 +81,13 @@ public class KambojaHost {
 			
 			
 			//Recebimento de pacotes UDP
-			new Thread(new Runnable() {
-				public void run() {
-					System.out.println("Thread start");
-					
-					while(KambojaMain.gameAlive) {
-						KambojaPacket kp = (KambojaPacket) connection.receive();
-						System.out.println("Packet of type " + kp.type + " received!");
-						receivePackage(kp);
-					}
+			new Thread(() -> {
+				System.out.println("Thread start");
+				
+				while(KambojaMain.gameAlive) {
+					KambojaPacket kp = (KambojaPacket) connection.receive();
+					System.out.println("Packet of type " + kp.type + " received!");
+					receivePackage(kp);
 				}
 			}).start();
 			
