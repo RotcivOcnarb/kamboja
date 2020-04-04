@@ -248,10 +248,10 @@ public class LanMPScreen extends GenericInterface implements KambojaConnectionLi
 				back_cog_speed += delta*10f;
 				break;
 			case 1:
-				host_cog_speed += delta*10f;
+				connect_cog_speed += delta*10f;
 				break;
 			case 2:
-				connect_cog_speed += delta*10f;
+				host_cog_speed += delta*10f;
 				break;
 			}
 		}
