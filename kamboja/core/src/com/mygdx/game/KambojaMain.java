@@ -146,8 +146,9 @@ public class KambojaMain extends ApplicationAdapter {
 				host.setConnectionListener(listener);
 		}
 		else {
-			if(client != null)
+			if(client != null) {
 				client.setConnectionListener(listener);
+			}
 		}
 	}
 	

@@ -6,11 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
-
 import com.mygdx.game.KambojaMain;
-import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
 
 public class KambojaHost {
 

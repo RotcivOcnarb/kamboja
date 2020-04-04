@@ -29,7 +29,7 @@ public class KambojaClient {
 			}
 			catch(Exception e) {
 				e.printStackTrace();
-				listener.connectionFailed("Could not connect to host");
+				this.listener.connectionFailed("Could not connect to host");
 				connected = false;
 				return;
 			}
@@ -39,10 +39,10 @@ public class KambojaClient {
 					try {
 						if(!tcpSocket.isClosed()){
 							ObjectInputStream ois = new ObjectInputStream(tcpSocket.getInputStream());
-							listener.receiveTCP((KambojaPacket) ois.readObject());
+							this.listener.receiveTCP((KambojaPacket) ois.readObject());
 						}
 						else {
-							listener.disconnected();
+							this.listener.disconnected();
 							break;
 						}
 					} catch (IOException e) {
