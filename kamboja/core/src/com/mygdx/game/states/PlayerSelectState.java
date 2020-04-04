@@ -1939,7 +1939,6 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		
 		while(KambojaMain.getControllers().size() <= pe.player)
 			KambojaMain.getControllers().add(null);
-		
 
 		if(KambojaMain.getControllers().size() > pe.player) {
 			MultiplayerController mc = new MultiplayerController(pe.weapon, pe.player, pe.name, pe.controllerName, kp.ipOrigin.getHostAddress());

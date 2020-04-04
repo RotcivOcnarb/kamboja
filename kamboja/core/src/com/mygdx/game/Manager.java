@@ -74,6 +74,10 @@ public class Manager implements ControllerListener, InputProcessor{
 		shader = new ShaderProgram(Gdx.files.internal("shaders/default.vs"),
 				Gdx.files.internal("shaders/vaporwave.fs"));
 	}
+	
+	public int getCurrentState(){
+		return currentState;
+	}
 
 	public void reAddControllers(){
 		Controllers.clearListeners();

@@ -58,6 +58,8 @@ public class UDPConnection {
 			
 			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), ip, udpport);
 			sendSocket.send(dp);
+			
+			System.out.println("udp packet successfully sent to ip " + ip.getHostAddress());
 		}
 		catch(Exception e) {
 			e.printStackTrace();

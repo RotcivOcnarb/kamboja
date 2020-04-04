@@ -56,8 +56,9 @@ public class KambojaClient {
 			
 			//Receive server UDP
 			new Thread(() -> {
-				while(true) {						
+				while(KambojaMain.gameAlive) {						
 					KambojaPacket kp = (KambojaPacket) connection.receive();
+					System.out.println("KambojaPacket UDP Received " + kp.type);
 					receivePackage(kp);
 				}
 			}).start();
