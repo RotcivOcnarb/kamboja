@@ -130,6 +130,7 @@ public class KambojaHost {
 	
 	public void sendPackage(KambojaPacket kp, InetAddress ip) {
 		connection.send(kp, ip);
+		System.out.println("udp packet successfully sent to ip " + ip.getHostAddress());
 	}
 	
 }

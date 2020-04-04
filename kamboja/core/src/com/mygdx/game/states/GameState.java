@@ -1860,9 +1860,7 @@ public class GameState extends State implements KambojaConnectionListener{
 	public void receiveUDP(KambojaPacket data) {
 		
 		if(data.type == PacketType.PLAYER_POSITION) {
-			PlayerPosition pp = (PlayerPosition) data.data;
-			System.out.println("received player position");
-			
+			PlayerPosition pp = (PlayerPosition) data.data;			
 			Player p = getPlayers().get(pp.player);
 			
 			if(p.isKeyboard() || p instanceof MultiplayerPlayer) {
