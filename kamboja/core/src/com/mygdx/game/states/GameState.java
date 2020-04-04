@@ -54,6 +54,7 @@ import com.mygdx.game.controllers.XBox;
 import com.mygdx.game.multiplayer.KambojaConnectionListener;
 import com.mygdx.game.multiplayer.KambojaPacket;
 import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
+import com.mygdx.game.multiplayer.packagetypes.ItemSpawn;
 import com.mygdx.game.multiplayer.packagetypes.PlayerPosition;
 import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.Bullet;
@@ -181,6 +182,7 @@ public class GameState extends State implements KambojaConnectionListener{
 
 	Vector2 med = new Vector2();
 	Array<Body> bodies = new Array<Body>();
+	ArrayList<ItemSpawn> itemQueue;
 	
 	public static void removeBody(Body b){
 		if(!forRemoval.contains(b)){
@@ -247,6 +249,7 @@ public class GameState extends State implements KambojaConnectionListener{
 	boolean exitMap = false;
 	
 	public void create() {
+		itemQueue = new ArrayList<ItemSpawn>();
 		KambojaMain.getInstance().setConnectionListener(this);
 		acidGlues = new ArrayList<AcidGlue>();
 		
@@ -695,6 +698,7 @@ public class GameState extends State implements KambojaConnectionListener{
 	}
 
 	public void addItem(Vector2 pos, int id){
+				
 		BodyDef def = new BodyDef();
 		def.position.set(pos);
 		def.type = BodyType.StaticBody;
@@ -713,6 +717,17 @@ public class GameState extends State implements KambojaConnectionListener{
 		body.setUserData(i);
 		
 		getItems().add(i);
+		
+		if(KambojaMain.getInstance().multiplayerConnection && KambojaMain.getInstance().isServer) {
+			ItemSpawn is = new ItemSpawn();
+			is.position = body.getWorldCenter();
+			is.id = id;
+			
+			KambojaPacket kp = new KambojaPacket(PacketType.ITEM_SPAWN);
+			kp.data = is;
+			
+			KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+		}
 		
 	}
 
@@ -1465,39 +1480,47 @@ public class GameState extends State implements KambojaConnectionListener{
 			}
 		}
 		
+		while(!itemQueue.isEmpty()) {
+			ItemSpawn is = itemQueue.get(0);
+			addItem(is.position, is.id);
+			itemQueue.remove(0);
+		}
+		
 		if(!inputBlocked){
 			timeCount += delta;
 			itemTimer -= delta;
 			
-			if(itemTimer <= 0){
-				if(KambojaMain.hasItems()){
-					itemTimer = (float) (Math.random() * 10);
-					
-					Vector2 itemPos = new Vector2(
-							(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
-							(float)(Math.random() * mapHeight * (32 / UNIT_SCALE))
-							);
-					
-					int bx = (int)(itemPos.x / (32/UNIT_SCALE));
-					int by = (int)(itemPos.y / (32/UNIT_SCALE));
-					
-					while(bitmap[bx][by] == 1) {
-						itemPos = new Vector2(
+			if(!KambojaMain.getInstance().multiplayerConnection || KambojaMain.getInstance().isServer) {
+				if(itemTimer <= 0){
+					if(KambojaMain.hasItems()){
+						itemTimer = (float) (Math.random() * 10);
+						
+						Vector2 itemPos = new Vector2(
 								(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
 								(float)(Math.random() * mapHeight * (32 / UNIT_SCALE))
 								);
 						
-						bx = (int)(itemPos.x / (32/UNIT_SCALE));
-						by = (int)(itemPos.y / (32/UNIT_SCALE));
+						int bx = (int)(itemPos.x / (32/UNIT_SCALE));
+						int by = (int)(itemPos.y / (32/UNIT_SCALE));
+						
+						while(bitmap[bx][by] == 1) {
+							itemPos = new Vector2(
+									(float)(Math.random() * mapWidth * (32 / UNIT_SCALE)),
+									(float)(Math.random() * mapHeight * (32 / UNIT_SCALE))
+									);
+							
+							bx = (int)(itemPos.x / (32/UNIT_SCALE));
+							by = (int)(itemPos.y / (32/UNIT_SCALE));
+						}
+						
+						
+						int id_spwn = (int)(Math.random() * 11);
+						while(id_spwn == Item.BARRIER || id_spwn == Item.TURRET) {
+							id_spwn = (int)(Math.random() * 11);
+						}
+						
+						addItem(itemPos, id_spwn);
 					}
-					
-					
-					int id_spwn = (int)(Math.random() * 11);
-					while(id_spwn == Item.BARRIER || id_spwn == Item.TURRET) {
-						id_spwn = (int)(Math.random() * 11);
-					}
-					
-					addItem(itemPos, id_spwn);
 				}
 			}
 		}
@@ -1865,10 +1888,15 @@ public class GameState extends State implements KambojaConnectionListener{
 			}
 		}		
 	}
+	
 
 	@Override
 	public void receiveTCP(KambojaPacket data) {
-		// TODO Auto-generated method stub
+		
+		if(data.type == PacketType.ITEM_SPAWN) {
+			ItemSpawn is = (ItemSpawn) data.data;
+			itemQueue.add(is);
+		}
 		
 	}
 
