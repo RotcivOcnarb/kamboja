@@ -44,12 +44,17 @@ import com.badlogic.gdx.physics.box2d.QueryCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.KambojaMain;
+import com.mygdx.game.KambojaMain.Protocol;
 import com.mygdx.game.Manager;
 import com.mygdx.game.State;
 import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.multiplayer.KambojaConnectionListener;
+import com.mygdx.game.multiplayer.KambojaPacket;
+import com.mygdx.game.multiplayer.KambojaPacket.PacketType;
+import com.mygdx.game.multiplayer.packagetypes.PlayerPosition;
 import com.mygdx.game.objects.AcidGlue;
 import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.BotController;
@@ -58,6 +63,8 @@ import com.mygdx.game.objects.FrameBufferStack;
 import com.mygdx.game.objects.GameMusic;
 import com.mygdx.game.objects.GamePause;
 import com.mygdx.game.objects.Item;
+import com.mygdx.game.objects.MultiplayerController;
+import com.mygdx.game.objects.MultiplayerPlayer;
 import com.mygdx.game.objects.MyContactListener;
 import com.mygdx.game.objects.PersistentParticleEffect;
 import com.mygdx.game.objects.Player;
@@ -74,7 +81,7 @@ import com.mygdx.game.objects.weapon.Granade;
 import box2dLight.RayHandler;
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 
-public class GameState extends State{
+public class GameState extends State implements KambojaConnectionListener{
 	
 	public static final float UNIT_SCALE = 45;
 	
@@ -240,6 +247,7 @@ public class GameState extends State{
 	boolean exitMap = false;
 	
 	public void create() {
+		KambojaMain.getInstance().setConnectionListener(this);
 		acidGlues = new ArrayList<AcidGlue>();
 		
 		id_alpha = 0.2f;
@@ -726,6 +734,10 @@ public class GameState extends State{
 		Player player = null;
 		if(KambojaMain.getControllers().get(id) instanceof BotController){
 			player = new BetterBot(body, id, this, KambojaMain.getControllers().get(id).getPlayerName());
+		}
+		else if(KambojaMain.getControllers().get(id) instanceof MultiplayerController) {
+			MultiplayerController mc = (MultiplayerController) KambojaMain.getControllers().get(id);
+			player = new MultiplayerPlayer(body, id, this, KambojaMain.getControllers().get(id).getPlayerName(), mc.ip);
 		}
 		else{
 			player = new Player(body, id, this, KambojaMain.getControllers().get(id).getPlayerName());
@@ -1549,6 +1561,44 @@ public class GameState extends State{
 		
 		getCamera().update();
 		
+		if(KambojaMain.getInstance().multiplayerConnection) {
+			if(KambojaMain.getInstance().isServer) {
+				for(Player p : getPlayers()) {
+					if(p instanceof MultiplayerPlayer) {
+						MultiplayerPlayer mp = (MultiplayerPlayer) p;
+						for(Player p2 : getPlayers()) {
+							if(p2 != p) {
+								KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
+								
+								PlayerPosition pp = new PlayerPosition();
+								pp.position = p2.getPosition();
+								pp.angle = p2.getAngleVector();
+								pp.player = p2.getId();
+								
+								kp.data = pp;
+								KambojaMain.getInstance().sendToClient(kp, mp.ip, Protocol.UDP);
+							}
+						}
+						
+					}
+				}
+			}
+			else {
+				for(Player p : getPlayers()) {
+					if(!(p instanceof MultiplayerPlayer)) {
+						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
+						
+						PlayerPosition pp = new PlayerPosition();
+						pp.position = p.getPosition();
+						pp.angle = p.getAngleVector();
+						pp.player = p.getId();
+						
+						kp.data = pp;
+						KambojaMain.getInstance().sendToServer(kp, Protocol.UDP);
+					}
+				}
+			}
+		}
 		
 	}
 	
@@ -1803,6 +1853,50 @@ public class GameState extends State{
 		}
 		
 		
+	}
+
+	@Override
+	public void receiveUDP(KambojaPacket data) {
+		
+		if(data.type == PacketType.PLAYER_POSITION) {
+			PlayerPosition pp = (PlayerPosition) data.data;
+			
+			if(getPlayers().get(pp.player) instanceof MultiplayerPlayer) {
+				getPlayers().get(pp.player).setPosition(pp.position);
+				getPlayers().get(pp.player).setAngle(pp.angle);
+			}
+		}
+		
+	}
+
+	@Override
+	public void receiveTCP(KambojaPacket data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connectionFailed(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean clientTriesToConnect() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	

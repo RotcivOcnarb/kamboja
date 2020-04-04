@@ -46,7 +46,6 @@ public class KambojaHost {
 									while(KambojaMain.gameAlive) {
 										try {
 											if(!client.isClosed()) {
-												System.out.println("Packet received from client " + clientIP);
 												try {
 													ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 													receiveTCPPackage(client, ois.readObject());

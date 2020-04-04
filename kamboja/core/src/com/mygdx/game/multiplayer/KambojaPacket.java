@@ -8,7 +8,8 @@ public class KambojaPacket implements Serializable{
 
 	public enum PacketType{
 		PLAYER_INPUT,
-		PLAYER_ENTER
+		PLAYER_ENTER,
+		PLAYER_POSITION
 	}
 	
 	public InetAddress ipOrigin;

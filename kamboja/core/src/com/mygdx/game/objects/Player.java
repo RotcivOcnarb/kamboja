@@ -1418,6 +1418,10 @@ public class Player implements Steerable<Vector2>{
 	public float vectorToAngle(Vector2 vector) {return 0;}
 	public Vector2 angleToVector(Vector2 outVector, float angle) {return null;}
 
+	public void setPosition(Vector2 position) {
+		body.setTransform(position, body.getTransform().getRotation());
+	}
+	
 	public float getLife() {
 		return life;
 	}

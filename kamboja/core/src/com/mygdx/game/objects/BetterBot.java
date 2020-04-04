@@ -18,17 +18,11 @@ import com.mygdx.game.states.GameState;
 public class BetterBot extends Player{
 	
 	ArrayList<Vector2> path;
-
 	Vector2 target;
-
 	Pathfinding pf;
-	
 	Vector2 angleAiming;
-	
 	float difficulty;
-	
 	boolean canHit = false;
-	
 	RayCastCallback raycast;
 		
 	public void dispose() {

@@ -1935,14 +1935,14 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		return false;
 	}
 	
-	public void multiplayerEnter(PlayerEnter pe) {
+	public void multiplayerEnter(PlayerEnter pe, KambojaPacket kp) {
 		
 		while(KambojaMain.getControllers().size() <= pe.player)
 			KambojaMain.getControllers().add(null);
 		
 
 		if(KambojaMain.getControllers().size() > pe.player) {
-			MultiplayerController mc = new MultiplayerController(pe.weapon, pe.player, pe.name, pe.controllerName);
+			MultiplayerController mc = new MultiplayerController(pe.weapon, pe.player, pe.name, pe.controllerName, kp.ipOrigin.getHostAddress());
 			KambojaMain.getControllers().set(pe.player, mc);
 			positionPlayerOffset[pe.player] = mc.getPlayer();
 			positionWeaponOffset[pe.player] = mc.getWeapon();
@@ -2012,7 +2012,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				break;
 			case PLAYER_ENTER:
 				PlayerEnter pe = (PlayerEnter) data.data;
-				multiplayerEnter(pe);
+				multiplayerEnter(pe, data);
 				break;
 			}
 			
