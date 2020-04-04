@@ -118,6 +118,7 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 
 	public void createClientConnection(String ip, KambojaConnectionListener listener) {
+		System.out.println("Creating client connection");
 		client = new KambojaClient(ip, listener);
 		host = null;
 		isServer = false;
@@ -125,6 +126,7 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 	
 	public void createHostConnection(KambojaConnectionListener listener) {
+		System.out.println("Creating host connection");
 		host = new KambojaHost(listener);
 		client = null;
 		isServer = true;
@@ -132,6 +134,7 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 	
 	public void disconnectClient() {
+		System.out.println("Disconnecting client");
 		client = null;
 		host = null;
 		isServer = false;

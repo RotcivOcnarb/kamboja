@@ -273,9 +273,7 @@ public class LanMPScreen extends GenericInterface implements KambojaConnectionLi
 			KambojaMain.getInstance().createClientConnection(rawIP, this);
 			break;
 		case 2:
-			
 			KambojaMain.getInstance().createHostConnection(this);
-			
 			manager.changeState(Manager.PLAYER_SELECT_STATE);
 			
 			break;
