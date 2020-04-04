@@ -88,7 +88,6 @@ public class KambojaClient {
 			ObjectOutputStream oos = new ObjectOutputStream(tcpSocket.getOutputStream());
 			oos.flush();
 			oos.writeObject(kp);
-			oos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

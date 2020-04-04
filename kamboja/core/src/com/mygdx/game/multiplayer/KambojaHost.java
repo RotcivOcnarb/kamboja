@@ -116,7 +116,6 @@ public class KambojaHost {
 				ObjectOutputStream saida = new ObjectOutputStream(client.getOutputStream());
 		        saida.flush();
 		        saida.writeObject(kp);
-		        saida.close();
 			}
 			catch(Exception e) {
 				e.printStackTrace();
