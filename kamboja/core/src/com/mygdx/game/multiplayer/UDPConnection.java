@@ -18,9 +18,7 @@ public class UDPConnection {
 	//UDP
 	DatagramSocket receiveSocket;
 	DatagramSocket sendSocket;
-	byte[] receiveByte = new byte[65535];
 	int port;
-	final DatagramPacket receivePacket = new DatagramPacket(receiveByte, 65535);
 	
 	public UDPConnection(int port) {
 		this.port = port;
@@ -35,11 +33,17 @@ public class UDPConnection {
 	
 	public Object receive() {
 		try {
+			byte[] receiveByte = new byte[65535];
+			DatagramPacket receivePacket = new DatagramPacket(receiveByte, 65535);
 			receiveSocket.receive(receivePacket);
 			
 			ByteArrayInputStream bis = new ByteArrayInputStream(receiveByte);
 			ObjectInputStream ois = new ObjectInputStream(bis);
-			return ois.readObject();
+			Object o = ois.readObject();
+			ois.close();
+			bis.close();
+			
+			return o;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -58,6 +62,9 @@ public class UDPConnection {
 			
 			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), ip, port);
 			sendSocket.send(dp);
+			
+			oos.close();
+			bos.close();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
