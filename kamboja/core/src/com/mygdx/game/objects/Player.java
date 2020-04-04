@@ -1193,7 +1193,7 @@ public class Player implements Steerable<Vector2>{
 				a = Gamecube.B;
 				cn = "GC";
 			}
-			else if(controller.getName().equals(XBox.getID())){				
+			else if(controller.getName().toUpperCase().contains("XBOX")){				
 				z = XBox.BUTTON_RB;
 				a = XBox.BUTTON_LB;
 				cn = "XBOX";
@@ -1236,7 +1236,7 @@ public class Player implements Steerable<Vector2>{
 		
 		if(controller.getName().equals(Gamecube.getID())){
 		}
-		if(controller.getName().equals(XBox.getID())){				
+		if(controller.getName().toUpperCase().contains("XBOX")){				
 		}
 		else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 		}
@@ -1276,7 +1276,7 @@ public class Player implements Steerable<Vector2>{
 					getWeapon().analog = value;
 				}
 			}
-			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			else if(controller.getName().toUpperCase().contains("XBOX")){
 				
 				xAxis = XBox.AXIS_LEFT_X;
 				yAxis = XBox.AXIS_LEFT_Y;

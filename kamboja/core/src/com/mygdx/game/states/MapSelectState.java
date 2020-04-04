@@ -826,7 +826,7 @@ public class MapSelectState extends State{
 				backbtn = Gamecube.B;
 				startbtn = Gamecube.START;
 			}
-			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			else if(controller.getName().toUpperCase().contains("XBOX")){
 				select = XBox.BUTTON_A;
 				backbtn = XBox.BUTTON_B;
 				startbtn = XBox.BUTTON_START;
@@ -967,7 +967,7 @@ public class MapSelectState extends State{
 					}
 				}
 			}
-			else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+			else if(controller.getName().toUpperCase().contains("XBOX")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {

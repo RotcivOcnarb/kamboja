@@ -1251,20 +1251,20 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		
 	}
 
-	public void buttonDownK(int id, int buttonCode) {
+	public void buttonDownK(int id, String controllerName, int buttonCode) {
 		int select = 0;
 		int start = 0;
 		int back = 0;
 		int disc = 0;
 		
-		if(KambojaMain.getControllers().get(id).getControllerName().equals(Gamecube.getID())){
+		if(controllerName.equals(Gamecube.getID())){
 			select = Gamecube.A;
 			start = Gamecube.START;
 			back = Gamecube.B;
 			disc = Gamecube.Y;
 
 		}
-		else if(KambojaMain.getControllers().get(id).getControllerName().toUpperCase().contains("XBOX") && KambojaMain.getControllers().get(id).getControllerName().contains("360")){
+		else if(controllerName.toUpperCase().contains("XBOX") && controllerName.contains("360")){
 			select = XBox.BUTTON_A;
 			start = XBox.BUTTON_START;
 			back = XBox.BUTTON_B;
@@ -1361,6 +1361,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				pi.action = InputAction.BUTTON_DOWN;
 				pi.code = buttonCode;
 				pi.controllerID = Util.getControllerID(controller);
+				pi.controllerName = controller.getName();
 				kp.data = pi;
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 			}
@@ -1368,13 +1369,14 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 		int start = 0;
 
-		if(KambojaMain.getControllers().get(id).getControllerName().equals(Gamecube.getID()))
+		System.out.println(controller.getName());
+		
+		if(controller.getName().equals(Gamecube.getID()))
 			start = Gamecube.START;
-		else if(KambojaMain.getControllers().get(id).getControllerName().toUpperCase().contains("XBOX") && KambojaMain.getControllers().get(id).getControllerName().contains("360"))
+		else if(controller.getName().toUpperCase().contains("XBOX"))
 			start = XBox.BUTTON_START;
 		else
 			start = GenericController.START;
-		
 		
 		if(buttonCode == start){
 			if(id == -1){
@@ -1422,12 +1424,10 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 			}
 		}
 		
-		buttonDownK(id, buttonCode);
+		buttonDownK(id, controller.getName(), buttonCode);
 		
 		return false;
 	}
-
-
 
 	@Override
 	public boolean buttonUp(Controller controller, int buttonCode) {
@@ -1439,15 +1439,16 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				pi.action = InputAction.BUTTON_UP;
 				pi.code = buttonCode;
 				pi.controllerID = Util.getControllerID(controller);
+				pi.controllerName = controller.getName();
 				kp.data = pi;
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 			}
 		}
-		buttonUpK(Util.getControllerID(controller), buttonCode);
+		buttonUpK(Util.getControllerID(controller), controller.getName(), buttonCode);
 		return false;
 	}
 	
-	public void buttonUpK(int id, int buttonCode) {
+	public void buttonUpK(int id, String controllerName, int buttonCode) {
 		
 	}
 
@@ -1561,19 +1562,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				pi.code = axisCode;
 				pi.value = value;
 				pi.controllerID = id;
+				pi.controllerName = controller.getName();
 				kp.data = pi;
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 			}
 		}
-		axisMovedK(id, axisCode, value);
+		axisMovedK(id, controller.getName(), axisCode, value);
 		return false;
 	}
 	
-	public void axisMovedK(int id, int axisCode, float value) {
-		PlayerController controller = KambojaMain.getControllers().get(id);
-		
+	public void axisMovedK(int id, String controllerName, int axisCode, float value) {		
 		if(id != -1){
-			if(controller.getControllerName().equals(Gamecube.getID())){
+			if(controllerName.equals(Gamecube.getID())){
 				if(axisCode == Gamecube.MAIN_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {
@@ -1613,7 +1613,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				}
 				return;
 			}
-			else if(controller.getControllerName().toUpperCase().contains("XBOX") && controller.getControllerName().contains("360")){
+			else if(controllerName.toUpperCase().contains("XBOX")){
 				if(axisCode == XBox.AXIS_LEFT_X) {
 					if(Math.abs(value) > 0.5f) {
 						if(!xMoved) {
@@ -1975,13 +1975,13 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				System.out.println("The player input was of action " + pi.action);
 				switch(pi.action) {
 				case AXIS_MOVED:
-					axisMovedK(pi.controllerID, pi.code, pi.value);
+					axisMovedK(pi.controllerID, pi.controllerName, pi.code, pi.value);
 					break;
 				case BUTTON_DOWN:
-					buttonDownK(pi.controllerID, pi.code);
+					buttonDownK(pi.controllerID, pi.controllerName, pi.code);
 					break;
 				case BUTTON_UP:
-					buttonUpK(pi.controllerID, pi.code);
+					buttonUpK(pi.controllerID, pi.controllerName, pi.code);
 					break;
 				case CONTROLLER_CONNECTED:
 					break;

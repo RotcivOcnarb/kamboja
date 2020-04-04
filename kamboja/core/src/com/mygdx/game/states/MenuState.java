@@ -644,7 +644,7 @@ public class MenuState extends State{
 	public boolean buttonDown(Controller controller, int buttonCode) {
 		int A = 0;
 		
-		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+		if(controller.getName().toUpperCase().contains("XBOX")){
 			A = XBox.BUTTON_A;
 		}
 		else if(controller.getName().equals(Gamecube.getID())){
@@ -671,7 +671,7 @@ public class MenuState extends State{
 	ArrayList<Integer> buttonPress;
 	
 	public boolean axisMoved(Controller controller, int axisCode, float value) {
-		if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+		if(controller.getName().toUpperCase().contains("XBOX")){
 			if(axisCode == XBox.AXIS_LEFT_X){
 				x_value = value;
 			}

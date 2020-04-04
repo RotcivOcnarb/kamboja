@@ -1574,7 +1574,7 @@ public class GameState extends State{
 		if(controller.getName().equals(Gamecube.getID())){
 			start = Gamecube.START;
 		}
-		else if(controller.getName().toUpperCase().contains("XBOX") && controller.getName().contains("360")){
+		else if(controller.getName().toUpperCase().contains("XBOX")){
 			start = XBox.BUTTON_START;
 		}
 		else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){

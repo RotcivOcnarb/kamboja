@@ -17,5 +17,6 @@ public class PlayerInput implements Serializable{
 	public InputAction action;
 	public float value;
 	public int code, controllerID;
+	public String controllerName;
 	
 }
