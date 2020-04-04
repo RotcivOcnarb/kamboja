@@ -134,12 +134,14 @@ public class Player implements Steerable<Vector2>{
 	
 	ArrayList<Ghost> ghosts;
 	
+	/*
 	float[] raycastAroundVertices;
 	int raycastAroundRays = 100;
 	float raycastAroundDistance = 1.5f;
 	
 	Color transparentRed = new Color(1, 0, 0, 0);
 	Color endRaycastRed = new Color(1, 0, 0, .5f);
+	*/
 	
 	public ArrayList<AcidGlue> stepping;
 	
@@ -241,7 +243,7 @@ public class Player implements Steerable<Vector2>{
 		equipment = new Equipment(this);
 		this.name = name;
 
-		raycastAroundVertices = new float[raycastAroundRays * 2];
+		//raycastAroundVertices = new float[raycastAroundRays * 2];
 		
 		inMeleeRange = new ArrayList<Player>();
 		stepping = new ArrayList<AcidGlue>();
@@ -702,6 +704,7 @@ public class Player implements Steerable<Vector2>{
 		}
 		sb.end();
 		
+		/*
 		for(int i = 0; i < raycastAroundRays; i ++) {
 			
 			float normz = (i / (float)raycastAroundRays) * 2f - 1; //Range -1 to 1
@@ -730,6 +733,7 @@ public class Player implements Steerable<Vector2>{
 		
 		}
 		
+		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 				
@@ -750,6 +754,7 @@ public class Player implements Steerable<Vector2>{
 					transparentRed, transparentRed.cpy().lerp(endRaycastRed, dst1), transparentRed.cpy().lerp(endRaycastRed, dst2));
 		}
 		sr.end();
+		*/
 	}
 	
 	public void renderAbove(SpriteBatch sb) {
