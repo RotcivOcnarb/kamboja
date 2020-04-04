@@ -1884,7 +1884,7 @@ public class GameState extends State implements KambojaConnectionListener{
 	public void receiveUDP(KambojaPacket data) {
 		if(data.type == PacketType.PLAYER_POSITION) {
 			PlayerPosition pp = (PlayerPosition) data.data;		
-			if(getPlayers().size() <= pp.player) return;
+			if(getPlayers() != null || getPlayers().size() <= pp.player) return;
 			Player p = getPlayers().get(pp.player);
 			if(p instanceof MultiplayerPlayer) {
 				p.updateTransform(pp.position, pp.angle, pp.weaponAnalog);
