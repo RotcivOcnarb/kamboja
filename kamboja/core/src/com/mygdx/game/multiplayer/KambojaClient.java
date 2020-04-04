@@ -61,6 +61,7 @@ public class KambojaClient {
 					KambojaPacket kp = (KambojaPacket) connection.receive();
 					System.out.println("KambojaPacket UDP Received " + kp.type);
 					receivePackage(kp);
+					System.out.println("Now returning loop to listen to more UDP");
 				}
 				System.out.println("Finished waiting for UDP packages");
 			}).start();
