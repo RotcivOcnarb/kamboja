@@ -20,9 +20,7 @@ public class KambojaClient {
 	public KambojaClient(String hostIP, KambojaConnectionListener listener) {
 		this.listener = listener;
 		this.hostIP = hostIP;
-		try {
-			System.out.println("Creating Client connection to server");
-			
+		try {			
 			connection = new UDPConnection(12345, 54321);
 			ip = InetAddress.getLocalHost();
 			
@@ -35,8 +33,6 @@ public class KambojaClient {
 				connected = false;
 				return;
 			}
-			listener.connected();
-
 			//Receive server TCP
 			new Thread(() -> {
 				while(KambojaMain.gameAlive) {
@@ -62,7 +58,6 @@ public class KambojaClient {
 			new Thread(() -> {
 				while(true) {						
 					KambojaPacket kp = (KambojaPacket) connection.receive();
-					System.out.println("Kamboja packed read successfully, forwarding");
 					receivePackage(kp);
 				}
 			}).start();
@@ -74,8 +69,12 @@ public class KambojaClient {
 		}
 	}
 	
+	public void connect() {
+		if(connected)
+			listener.connected();
+	}
+	
 	public void setConnectionListener(KambojaConnectionListener listener) {
-		System.out.println("Changing connection listener to class " + listener.getClass().getSimpleName());
 		this.listener = listener;
 	}
 	
