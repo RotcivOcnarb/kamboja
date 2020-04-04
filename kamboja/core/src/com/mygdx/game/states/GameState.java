@@ -1883,7 +1883,8 @@ public class GameState extends State implements KambojaConnectionListener{
 	@Override
 	public void receiveUDP(KambojaPacket data) {
 		if(data.type == PacketType.PLAYER_POSITION) {
-			PlayerPosition pp = (PlayerPosition) data.data;		
+			PlayerPosition pp = (PlayerPosition) data.data;
+			if(pp == null) return;
 			if(getPlayers() != null || getPlayers().size() <= pp.player) return;
 			Player p = getPlayers().get(pp.player);
 			if(p instanceof MultiplayerPlayer) {
@@ -1901,7 +1902,6 @@ public class GameState extends State implements KambojaConnectionListener{
 			itemQueue.add(is);
 		}
 		if(data.type == PacketType.PLAYER_DAMAGE) {
-			System.out.print("Message received from server that someone has been damaged - ");
 			PlayerDamage pd = (PlayerDamage) data.data;
 			getPlayers().get(pd.target).takeDamage(pd.damage, getPlayers().get(pd.owner), pd.showBlood, false);
 			System.out.println("Processed");
@@ -1918,6 +1918,7 @@ public class GameState extends State implements KambojaConnectionListener{
 	@Override
 	public void connectionFailed(String message) {
 		// TODO Auto-generated method stub
+		
 		
 	}
 
