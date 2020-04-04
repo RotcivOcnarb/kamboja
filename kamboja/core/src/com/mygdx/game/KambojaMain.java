@@ -108,8 +108,8 @@ public class KambojaMain extends ApplicationAdapter {
 	BitmapFont font;
 	
 	//Multiplayer
-	public KambojaClient client;
-	public KambojaHost host;
+	KambojaClient client;
+	KambojaHost host;
 	public boolean isServer = false;
 	public boolean multiplayerConnection = false;
 	
@@ -120,6 +120,7 @@ public class KambojaMain extends ApplicationAdapter {
 	public void createClientConnection(String ip, KambojaConnectionListener listener) {
 		System.out.println("Creating client connection");
 		client = new KambojaClient(ip, listener);
+		System.out.println("After creaing client connection, client is " + client);
 		host = null;
 		isServer = false;
 		multiplayerConnection = true;
