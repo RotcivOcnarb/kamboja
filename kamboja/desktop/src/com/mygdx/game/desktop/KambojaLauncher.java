@@ -130,8 +130,8 @@ public class KambojaLauncher{
 			config.setResizable(false);
 			config.setWindowIcon("icon.png");
 		
-		if(debug)
-			openConsoleWindow();
+		//if(debug)
+			//openConsoleWindow();
 			
 		new Lwjgl3Application(new KambojaMain(), config);
 		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());

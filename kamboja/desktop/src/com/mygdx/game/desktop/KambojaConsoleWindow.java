@@ -45,14 +45,14 @@ class ConsolePrintStream extends PrintStream{
 	
 	@Override
 	public void println(String s) {
-		area.setText(area.getText() + s + "\n");
+		//area.setText(area.getText() + s + "\n");
 		JScrollBar vertical = scroll.getVerticalScrollBar();
 		vertical.setValue( vertical.getMaximum() );
 	}
 	
 	@Override
 	public void print(String s) {
-		area.setText(area.getText() + s);
+		//area.setText(area.getText() + s);
 		JScrollBar vertical = scroll.getVerticalScrollBar();
 		vertical.setValue( vertical.getMaximum() );
 	}

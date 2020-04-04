@@ -1858,17 +1858,14 @@ public class GameState extends State implements KambojaConnectionListener{
 
 	@Override
 	public void receiveUDP(KambojaPacket data) {
-		System.out.println("Processing UDP package received at GAME STATE");
 		if(data.type == PacketType.PLAYER_POSITION) {
-			PlayerPosition pp = (PlayerPosition) data.data;			
+			PlayerPosition pp = (PlayerPosition) data.data;		
+			if(getPlayers().size() <= pp.player) return;
 			Player p = getPlayers().get(pp.player);
-			
 			if(p.isKeyboard() || p instanceof MultiplayerPlayer) {
 				p.updateTransform(pp.position, pp.angle);
 			}
-		}
-		System.out.println("Finished processing UDP");
-		
+		}		
 	}
 
 	@Override
