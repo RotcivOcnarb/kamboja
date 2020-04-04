@@ -21,7 +21,7 @@ public class KambojaClient {
 		this.listener = listener;
 		this.hostIP = hostIP;
 		try {			
-			connection = new UDPConnection(12345, 54321);
+			connection = new UDPConnection(12345);
 			ip = InetAddress.getLocalHost();
 			
 			try {

@@ -26,7 +26,7 @@ public class KambojaHost {
 			connectedClients = new HashMap<String, Socket>();
 			
 			System.out.println("Creating host at IP " + InetAddress.getLocalHost().getHostAddress());
-			connection = new UDPConnection(12345, 54321);
+			connection = new UDPConnection(12345);
 			ip = InetAddress.getLocalHost();
 			
 			//Recebimento de conexão TCP

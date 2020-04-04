@@ -19,13 +19,13 @@ public class UDPConnection {
 	DatagramSocket receiveSocket;
 	DatagramSocket sendSocket;
 	byte[] receiveByte = new byte[65535];
-	int udpport, tcpport;
+	int port;
 	final DatagramPacket receivePacket = new DatagramPacket(receiveByte, 65535);
 	
-	public UDPConnection(int udpport, int tcpport) {
-		this.udpport = udpport;
+	public UDPConnection(int port) {
+		this.port = port;
 		try {
-			receiveSocket = new DatagramSocket(udpport);
+			receiveSocket = new DatagramSocket(port);
 			sendSocket = new DatagramSocket();
 		}
 		catch(Exception e) {
@@ -56,7 +56,7 @@ public class UDPConnection {
 			oos.writeObject(data);
 			oos.flush();
 			
-			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), ip, udpport);
+			DatagramPacket dp = new DatagramPacket(bos.toByteArray(), bos.size(), ip, port);
 			sendSocket.send(dp);
 		}
 		catch(Exception e) {
