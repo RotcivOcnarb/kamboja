@@ -37,7 +37,7 @@ public class UDPConnection {
 			DatagramPacket receivePacket = new DatagramPacket(receiveByte, 65535);
 			receiveSocket.receive(receivePacket);
 			
-			ByteArrayInputStream bis = new ByteArrayInputStream(receiveByte);
+			ByteArrayInputStream bis = new ByteArrayInputStream(receivePacket.getData());
 			ObjectInputStream ois = new ObjectInputStream(bis);
 			Object o = ois.readObject();
 			ois.close();
