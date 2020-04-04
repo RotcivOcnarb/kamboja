@@ -387,7 +387,7 @@ public class LanMPScreen extends GenericInterface implements KambojaConnectionLi
 
 	@Override
 	public void receiveTCP(KambojaPacket data) {
-		System.out.println("I just received a TCP package!");
+		System.out.println("I just received a TCP package! type: " + data.type);
 	}
 	
 	@Override

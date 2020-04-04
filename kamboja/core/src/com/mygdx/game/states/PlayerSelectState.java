@@ -271,8 +271,6 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		back_angle = 0;
 
 		chainBody.clear();
-
-
 		
 		shaderBuffer = new FrameBuffer(Format.RGBA8888, 1920, 1080, false);
 		

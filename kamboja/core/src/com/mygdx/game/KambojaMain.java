@@ -119,9 +119,6 @@ public class KambojaMain extends ApplicationAdapter {
 
 	public void createClientConnection(String ip, KambojaConnectionListener listener) {
 		client = new KambojaClient(ip, listener);
-		if(!client.connected) {
-			client = null;
-		}
 		host = null;
 		isServer = false;
 		multiplayerConnection = true;
