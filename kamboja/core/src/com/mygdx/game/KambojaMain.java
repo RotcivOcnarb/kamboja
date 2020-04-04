@@ -119,10 +119,11 @@ public class KambojaMain extends ApplicationAdapter {
 
 	public void createClientConnection(String ip, KambojaConnectionListener listener) {
 		client = new KambojaClient(ip, listener);
-		client.connect();
 		host = null;
 		isServer = false;
 		multiplayerConnection = true;
+		
+		client.connect();
 	}
 	
 	public void createHostConnection(KambojaConnectionListener listener) {
