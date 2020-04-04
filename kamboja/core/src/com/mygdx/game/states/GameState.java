@@ -1901,8 +1901,10 @@ public class GameState extends State implements KambojaConnectionListener{
 			itemQueue.add(is);
 		}
 		if(data.type == PacketType.PLAYER_DAMAGE) {
+			System.out.print("Message received from server that someone has been damaged - ");
 			PlayerDamage pd = (PlayerDamage) data.data;
 			getPlayers().get(pd.target).takeDamage(pd.damage, getPlayers().get(pd.owner), pd.showBlood, false);
+			System.out.println("Processed");
 		}
 		
 	}

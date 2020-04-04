@@ -490,6 +490,7 @@ public class Player implements Steerable<Vector2>{
 			}
 			
 			if(KambojaMain.getInstance().multiplayerConnection && KambojaMain.getInstance().isServer) {
+				System.out.print("Someone has been damaged, broadcasting to clients - ");
 				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_DAMAGE);
 				PlayerDamage pd = new PlayerDamage();
 				pd.damage = amount;
@@ -498,6 +499,7 @@ public class Player implements Steerable<Vector2>{
 				pd.target = state.getPlayers().indexOf(this);
 				kp.data = pd;
 				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+				System.out.println("Sent");
 			}
 		}
 	}
