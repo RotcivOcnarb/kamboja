@@ -1181,9 +1181,10 @@ public class Player implements Steerable<Vector2>{
 	
 	public Vector2 nextPosition, nextAngle;
 	
-	public void updateTransform(Vector2 position, Vector2 angle) {
+	public void updateTransform(Vector2 position, Vector2 angle, float weaponAnalog) {
 		nextPosition = position;
 		nextAngle = angle;
+		getWeapon().analog = weaponAnalog;
 	}
 	
 	public void update(float delta){

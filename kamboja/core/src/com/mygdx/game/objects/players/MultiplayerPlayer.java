@@ -28,9 +28,10 @@ public class MultiplayerPlayer extends Player{
 	}
 	
 	@Override
-	public void updateTransform(Vector2 position, Vector2 angle) {
+	public void updateTransform(Vector2 position, Vector2 angle, float weaponAnalog) {
 		this.targetPosition = position;
 		this.targetAngle = angle;
+		getWeapon().analog = weaponAnalog;
 	}
 	
 }

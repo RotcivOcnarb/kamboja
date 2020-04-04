@@ -650,6 +650,7 @@ public class GameState extends State implements KambojaConnectionListener{
 								KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
 								
 								PlayerPosition pp = new PlayerPosition();
+								pp.weaponAnalog = p.getWeapon().analog;
 								pp.position = p.getPosition();
 								pp.angle = p.getAngleVector();
 								pp.player = p.getId();
@@ -665,6 +666,7 @@ public class GameState extends State implements KambojaConnectionListener{
 								KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_POSITION);
 								
 								PlayerPosition pp = new PlayerPosition();
+								pp.weaponAnalog = p.getWeapon().analog;
 								pp.position = p.getPosition();
 								pp.angle = p.getAngleVector();
 								pp.player = p.getId();
@@ -1884,7 +1886,7 @@ public class GameState extends State implements KambojaConnectionListener{
 			if(getPlayers().size() <= pp.player) return;
 			Player p = getPlayers().get(pp.player);
 			if(p instanceof MultiplayerPlayer) {
-				p.updateTransform(pp.position, pp.angle);
+				p.updateTransform(pp.position, pp.angle, pp.weaponAnalog);
 			}
 		}		
 	}
