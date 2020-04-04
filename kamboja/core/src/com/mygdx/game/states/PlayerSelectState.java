@@ -1225,28 +1225,32 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	@Override
 	public void connected(Controller controller) {
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.CONTROLLER_CONNECTED;
-				pi.controllerID = Util.getControllerID(controller);
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.CONTROLLER_CONNECTED;
+			pi.controllerID = Util.getControllerID(controller);
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 	}
 
 	@Override
 	public void disconnected(Controller controller) {		
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.CONTROLLER_DISCONNECTED;
-				pi.controllerID = Util.getControllerID(controller);
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.CONTROLLER_DISCONNECTED;
+			pi.controllerID = Util.getControllerID(controller);
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 		
 	}
@@ -1355,16 +1359,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		int id = Util.getControllerID(controller);
 		
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.BUTTON_DOWN;
-				pi.code = buttonCode;
-				pi.controllerID = Util.getControllerID(controller);
-				pi.controllerName = controller.getName();
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.BUTTON_DOWN;
+			pi.code = buttonCode;
+			pi.controllerID = Util.getControllerID(controller);
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 
 		int start = 0;
@@ -1387,16 +1393,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 					KambojaMain.getControllers().set(put_id, pc);
 					
 					if(KambojaMain.getInstance().multiplayerConnection) {
-						if(!KambojaMain.getInstance().isServer) {
-							KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
-							PlayerEnter pe = new PlayerEnter();
-							pe.player = pc.getPlayer();
-							pe.controllerName = pc.getControllerName();
-							pe.name = pc.getPlayerName();
-							pe.weapon = pc.getWeapon();
-							kp.data = pe;
+						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
+						PlayerEnter pe = new PlayerEnter();
+						pe.player = pc.getPlayer();
+						pe.controllerName = pc.getControllerName();
+						pe.name = pc.getPlayerName();
+						pe.weapon = pc.getWeapon();
+						kp.data = pe;
+
+						if(KambojaMain.getInstance().isServer) 
+							KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+						else
 							KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-						}
 					}
 				}
 				else {
@@ -1405,16 +1413,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 						KambojaMain.getControllers().add(pc);
 						
 						if(KambojaMain.getInstance().multiplayerConnection) {
-							if(!KambojaMain.getInstance().isServer) {
-								KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
-								PlayerEnter pe = new PlayerEnter();
-								pe.player = pc.getPlayer();
-								pe.controllerName = pc.getControllerName();
-								pe.name = pc.getPlayerName();
-								pe.weapon = pc.getWeapon();
-								kp.data = pe;
+							KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
+							PlayerEnter pe = new PlayerEnter();
+							pe.player = pc.getPlayer();
+							pe.controllerName = pc.getControllerName();
+							pe.name = pc.getPlayerName();
+							pe.weapon = pc.getWeapon();
+							kp.data = pe;
+							
+							if(KambojaMain.getInstance().isServer) 
+								KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+							else
 								KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-							}
 						}
 						
 						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
@@ -1433,16 +1443,18 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	public boolean buttonUp(Controller controller, int buttonCode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O buttonUpK();
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.BUTTON_UP;
-				pi.code = buttonCode;
-				pi.controllerID = Util.getControllerID(controller);
-				pi.controllerName = controller.getName();
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.BUTTON_UP;
+			pi.code = buttonCode;
+			pi.controllerID = Util.getControllerID(controller);
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 		buttonUpK(Util.getControllerID(controller), controller.getName(), buttonCode);
 		return false;
@@ -1555,17 +1567,20 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		int id = Util.getControllerID(controller);
 		
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.AXIS_MOVED;
-				pi.code = axisCode;
-				pi.value = value;
-				pi.controllerID = id;
-				pi.controllerName = controller.getName();
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.AXIS_MOVED;
+			pi.code = axisCode;
+			pi.value = value;
+			pi.controllerID = id;
+			pi.controllerName = controller.getName();
+			kp.data = pi;
+
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 		axisMovedK(id, controller.getName(), axisCode, value);
 		return false;
@@ -1881,14 +1896,16 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	public boolean keyDown(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyDownK();
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.KEY_DOWN;
-				pi.code = keycode;
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.KEY_DOWN;
+			pi.code = keycode;
+			kp.data = pi;
+			
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
 		}
 		keyDownK(keycode);
 		
@@ -1906,14 +1923,17 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	public boolean keyUp(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyUpK();
 		if(KambojaMain.getInstance().multiplayerConnection) {
-			if(!KambojaMain.getInstance().isServer) {
-				KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
-				PlayerInput pi = new PlayerInput();
-				pi.action = InputAction.KEY_UP;
-				pi.code = keycode;
-				kp.data = pi;
+			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
+			PlayerInput pi = new PlayerInput();
+			pi.action = InputAction.KEY_UP;
+			pi.code = keycode;
+			kp.data = pi;
+				
+			if(KambojaMain.getInstance().isServer) 
+				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
-			}
+			
 		}
 		keyUpK(keycode);
 		return false;

@@ -173,6 +173,19 @@ public class KambojaMain extends ApplicationAdapter {
 			break;
 		}
 	}
+
+	public void broadcast(KambojaPacket kp, Protocol protocol) {
+		for(String s : getConnectedPlayers().keySet()) {
+			switch(protocol) {
+			case TCP:
+				host.sendTCPPackage(kp, s);
+				break;
+			case UDP:
+				host.sendPackage(kp, host.connectedClients.get(s).getInetAddress());
+				break;
+			}
+		}
+	}
 	
 	public HashMap<String, Socket> getConnectedPlayers(){
 		return host.connectedClients;
