@@ -494,8 +494,8 @@ public class Player implements Steerable<Vector2>{
 				PlayerDamage pd = new PlayerDamage();
 				pd.damage = amount;
 				pd.showBlood = showBlood;
-				pd.owner = state.getPlayers().indexOf(owner);
-				pd.target = state.getPlayers().indexOf(this);
+				pd.owner = owner.getId();
+				pd.target = getId();
 				kp.data = pd;
 				System.out.print(pd.owner + " damaged " + pd.target + ", broadcasting to clients - ");
 				KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
