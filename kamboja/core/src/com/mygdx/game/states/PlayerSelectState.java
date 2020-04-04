@@ -1712,17 +1712,6 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 		}
 	}
 	
-//	public KeyboardController getKeyboardController() {
-//		
-//		for(PlayerController pc : KambojaMain.getControllers()) {
-//			if(pc instanceof KeyboardController) {
-//				return (KeyboardController)pc;
-//			}
-//		}
-//		
-//		return null;
-//	}
-	
 	public void keyDownK(int keycode, int id) {
 		
 		if(keycode == Keys.B) {
@@ -1924,6 +1913,21 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 						
 						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
 						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
+						
+						if(KambojaMain.getInstance().multiplayerConnection) {
+							KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
+							PlayerEnter pe = new PlayerEnter();
+							pe.player = pc.getPlayer();
+							pe.controllerName = pc.getControllerName();
+							pe.name = pc.getPlayerName();
+							pe.weapon = pc.getWeapon();
+							kp.data = pe;
+							
+							if(KambojaMain.getInstance().isServer) 
+								KambojaMain.getInstance().broadcast(kp, Protocol.TCP);
+							else
+								KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
+						}
 					}
 				}
 			}
