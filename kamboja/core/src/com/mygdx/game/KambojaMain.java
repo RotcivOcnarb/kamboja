@@ -166,7 +166,6 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 	
 	public void sendToClient(KambojaPacket kp, String clientIP, Protocol protocol) {
-		System.out.println("sending packet " + kp.type + " to client " + clientIP);
 		switch(protocol) {
 		case TCP:
 			host.sendTCPPackage(kp, clientIP);
