@@ -75,6 +75,7 @@ public class KambojaClient {
 	}
 	
 	public void setConnectionListener(KambojaConnectionListener listener) {
+		System.out.println("Changing connection listener to class " + listener.getClass().getSimpleName());
 		this.listener = listener;
 	}
 	

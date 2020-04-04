@@ -139,6 +139,7 @@ public class KambojaMain extends ApplicationAdapter {
 	}
 	
 	public void setConnectionListener(KambojaConnectionListener listener) {
+		System.out.println("changing listener, server? " + isServer + " and client state is " + client);
 		if(isServer) {
 			if(host != null)
 				host.setConnectionListener(listener);

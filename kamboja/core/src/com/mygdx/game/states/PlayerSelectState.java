@@ -255,6 +255,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 	@Override
 	public void create() {
+		System.out.println("Entering player select state, changing listener");
 		KambojaMain.getInstance().setConnectionListener(this);
 		
 		outro = false;
