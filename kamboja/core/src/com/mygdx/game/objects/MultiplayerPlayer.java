@@ -12,4 +12,9 @@ public class MultiplayerPlayer extends Player{
 		this.ip = ip;
 	}
 
+	@Override
+	public void update(float delta) {
+		nonInputUpdate(delta);
+	}
+	
 }

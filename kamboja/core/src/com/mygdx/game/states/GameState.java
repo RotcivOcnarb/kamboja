@@ -1859,8 +1859,7 @@ public class GameState extends State implements KambojaConnectionListener{
 			Player p = getPlayers().get(pp.player);
 			
 			if(p.isKeyboard() || p instanceof MultiplayerPlayer) {
-				p.setPosition(pp.position);
-				p.setAngle(pp.angle);
+				p.updateTransform(pp.position, pp.angle);
 			}
 		}
 		

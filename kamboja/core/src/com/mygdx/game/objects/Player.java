@@ -883,10 +883,91 @@ public class Player implements Steerable<Vector2>{
 	private float slowness = 1;
 	float acid_timer = 0;
 	
-	public void update(float delta){
+	public void inputedUpdate(float delta) {
 		if(!isDead())
 		body.applyForceToCenter(axisVel.cpy().nor().scl(speed * spd * slowness * (inSpace ? 0.1f : 1f)), true);
 		
+		if(!(this instanceof BetterBot) && !keyboard) {
+			
+			Player aiming = null;
+			
+			for(Player p : state.getPlayers()) {
+				if(p != this && !p.isDead()) {
+					
+					Vector2 line = p.getPosition().cpy().sub(getPosition().cpy());
+					Vector2 angle_inverted = angle.cpy().scl(1, -1);
+					
+					float a_b = (float) Math.acos(line.dot(angle_inverted) / (line.len() * angle_inverted.len()));
+					
+					if(Math.toDegrees(a_b) < 30) {
+						
+						if(aiming == null) {
+							aiming = p;
+						}
+						else {
+							if(line.len2() < aiming.getPosition().cpy().sub(getPosition()).len2()) {
+								aiming = p;
+							}
+						}
+						
+					}
+					
+				}
+			}
+			if(aiming != null) {
+				Vector2 end = aiming.getPosition().cpy().sub(getPosition().cpy()).nor().scl(1, -1);
+				axis.add(end.cpy().sub(axis.cpy()).scl(1/10.0f));
+			}
+		}
+
+		if(keyboard && !isDead() && !inputBlocked){
+		
+			Vector2 mouseTransformed = new Vector2(
+			getState().getCamera().position.x + (Gdx.input.getX() - 1920/2)*getState().getCamera().zoom,
+			getState().getCamera().position.y + (1080 - Gdx.input.getY() - 1080/2)*getState().getCamera().zoom);
+			
+			angle = mouseTransformed.cpy().sub(body.getWorldCenter().cpy()).nor();
+			angle.y = -angle.y;
+			
+			if(Gdx.input.isTouched() && !isDead() && !inputBlocked){
+				getWeapon().analog = 1.0f;
+			}
+			else{
+				getWeapon().analog = 0.0f;
+			}
+			
+			if(!isDead() && !inputBlocked){
+			axisVel.set(
+					Gdx.input.isKeyPressed(Keys.A) ? -1 : (Gdx.input.isKeyPressed(Keys.D) ? 1 : 0),
+					Gdx.input.isKeyPressed(Keys.W) ? 1 : (Gdx.input.isKeyPressed(Keys.S) ? -1 : 0)
+						);
+			
+			axisVel.nor();
+			}
+			
+			if(Gdx.input.isKeyJustPressed(Keys.SPACE) && !isDead() && !inputBlocked){
+				if(getSprintCooldown() < 0){
+					dash();
+				}
+			}
+			
+			if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT) && !isDead() && !inputBlocked){
+				meleeHit();
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.C) && !isDead() && !inputBlocked){
+				throwGranade();
+			}
+		
+		}
+		
+		if(!(this instanceof BetterBot) && !(this instanceof MultiplayerPlayer)) {
+			angle.x += (axis.x - angle.x)/5.0f;
+			angle.y += (axis.y - angle.y)/5.0f;
+		}
+	}
+	
+	public void nonInputUpdate(float delta) {
+
 		equipment.update(delta);
 		
 		if(lastGranade != null && lastGranade.dead) {
@@ -925,45 +1006,7 @@ public class Player implements Steerable<Vector2>{
 				body.setLinearVelocity(body.getLinearVelocity().cpy().nor().scl(3));
 			}
 		}
-		
-		if(!(this instanceof BetterBot) && !keyboard) {
-			
-			Player aiming = null;
-			
-			for(Player p : state.getPlayers()) {
-				if(p != this && !p.isDead()) {
-					
-					Vector2 line = p.getPosition().cpy().sub(getPosition().cpy());
-					Vector2 angle_inverted = angle.cpy().scl(1, -1);
-					
-					float a_b = (float) Math.acos(line.dot(angle_inverted) / (line.len() * angle_inverted.len()));
-					
-					if(Math.toDegrees(a_b) < 30) {
-						
-						if(aiming == null) {
-							aiming = p;
-						}
-						else {
-							if(line.len2() < aiming.getPosition().cpy().sub(getPosition()).len2()) {
-								aiming = p;
-							}
-						}
-						
-					}
-					
-				}
-			}
-			
-			if(aiming != null) {
 				
-				Vector2 end = aiming.getPosition().cpy().sub(getPosition().cpy()).nor().scl(1, -1);
-				
-				axis.add(end.cpy().sub(axis.cpy()).scl(1/10.0f));
-				
-			}
-			
-		}
-		
 		if(isFalling()){
 			setFallingTimer(getFallingTimer() - delta);
 			setAngle(new Vector2((float)Math.sin(getFallingTimer()*10), (float)Math.cos(getFallingTimer()*10)));
@@ -1043,45 +1086,7 @@ public class Player implements Steerable<Vector2>{
 		
 		if(mana > 100) mana = 100;
 		
-		if(keyboard && !isDead() && !inputBlocked){
-
-			Vector2 mouseTransformed = new Vector2(
-			getState().getCamera().position.x + (Gdx.input.getX() - 1920/2)*getState().getCamera().zoom,
-			getState().getCamera().position.y + (1080 - Gdx.input.getY() - 1080/2)*getState().getCamera().zoom);
-			
-			angle = mouseTransformed.cpy().sub(body.getWorldCenter().cpy()).nor();
-			angle.y = -angle.y;
-			
-			if(Gdx.input.isTouched() && !isDead() && !inputBlocked){
-				getWeapon().analog = 1.0f;
-			}
-			else{
-				getWeapon().analog = 0.0f;
-			}
-			
-			if(!isDead() && !inputBlocked){
-			axisVel.set(
-					Gdx.input.isKeyPressed(Keys.A) ? -1 : (Gdx.input.isKeyPressed(Keys.D) ? 1 : 0),
-					Gdx.input.isKeyPressed(Keys.W) ? 1 : (Gdx.input.isKeyPressed(Keys.S) ? -1 : 0)
-						);
-			
-			axisVel.nor();
-			}
-			
-			if(Gdx.input.isKeyJustPressed(Keys.SPACE) && !isDead() && !inputBlocked){
-				if(getSprintCooldown() < 0){
-					dash();
-				}
-			}
-			
-			if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT) && !isDead() && !inputBlocked){
-				meleeHit();
-			}
-			if(Gdx.input.isKeyJustPressed(Keys.C) && !isDead() && !inputBlocked){
-				throwGranade();
-			}
-
-		}
+	
 		
 		if(!isDead()){
 			if(body.getLinearVelocity().len2() < 0.1){
@@ -1154,16 +1159,27 @@ public class Player implements Steerable<Vector2>{
 			if(getShift() != null)
 			getShift().fire();
 		}
-		if(Float.isNaN(body.getWorldCenter().x)){
-			System.out.println("NaN detected, exiting");
-			System.out.println("Velocity: " + body.getLinearVelocity());
-			System.exit(0);
-		}
 		
-		if(!(this instanceof BetterBot)) {
-			angle.x += (axis.x - angle.x)/5.0f;
-			angle.y += (axis.y - angle.y)/5.0f;
+		if(nextPosition != null) {
+			body.setTransform(nextPosition, body.getTransform().getRotation());
+			nextPosition = null;
 		}
+		if(nextAngle != null) {
+			setAngle(nextAngle);
+			nextAngle = null;
+		}
+	}
+	
+	public Vector2 nextPosition, nextAngle;
+	
+	public void updateTransform(Vector2 position, Vector2 angle) {
+		nextPosition = position;
+		nextAngle = angle;
+	}
+	
+	public void update(float delta){
+		nonInputUpdate(delta);
+		inputedUpdate(delta);
 	}
 	
 	public void dash() {
@@ -1190,26 +1206,20 @@ public class Player implements Steerable<Vector2>{
 			int a = 0;
 			
 			System.out.println("Controller ["+controller.getName()+"] button pressed: " + buttonCode + "\nZ = " + Gamecube.Z + "\nB = " + Gamecube.B);
-			
-			String cn = "";
-			
+						
 			if(controller.getName().equals(Gamecube.getID())){
 				z = Gamecube.Z;
 				a = Gamecube.B;
-				cn = "GC";
 			}
 			else if(controller.getName().toUpperCase().contains("XBOX")){				
 				z = XBox.BUTTON_RB;
 				a = XBox.BUTTON_LB;
-				cn = "XBOX";
 			}
 			else if(controller.getName().toUpperCase().contains("SONY") || controller.getName().toUpperCase().contains("PLAYSTATION")){
 				z = Playstation3.R1;
 				a = Playstation3.L1;
-				cn = "PS3";
 			}
 			else{
-				cn = "GENERIC";
 				z = GenericController.R1;
 				a = GenericController.L1;
 				
