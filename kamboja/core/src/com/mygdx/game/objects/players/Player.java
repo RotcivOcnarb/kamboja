@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.players;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +36,11 @@ import com.mygdx.game.controllers.Gamecube;
 import com.mygdx.game.controllers.GenericController;
 import com.mygdx.game.controllers.Playstation3;
 import com.mygdx.game.controllers.XBox;
+import com.mygdx.game.objects.AcidGlue;
+import com.mygdx.game.objects.Equipment;
+import com.mygdx.game.objects.Ghost;
+import com.mygdx.game.objects.Item;
+import com.mygdx.game.objects.Util;
 import com.mygdx.game.objects.controllers.KeyboardController;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Shift;
@@ -153,10 +158,16 @@ public class Player implements Steerable<Vector2>{
 	}
 	
 
-	class PlayerFall{
+	public class PlayerFall{
 		
-		Player player;
+		private Player player;
 		public PlayerFall(Player player){
+			this.setPlayer(player);
+		}
+		public Player getPlayer() {
+			return player;
+		}
+		public void setPlayer(Player player) {
 			this.player = player;
 		}
 		
@@ -547,14 +558,13 @@ public class Player implements Steerable<Vector2>{
 		sb.setShader(null);
 
 		Gdx.gl.glDisable(GL20.GL_BLEND);
-	
 		
 		sb.begin();
 
 		for(int i = ghosts.size() - 1; i >= 0; i --){
 			Ghost g = ghosts.get(i);
 			
-			switch(g.color){
+			switch(g.getColor()){
 			case 0:
 				sb.setColor(0.7f, 0.7f, 1f, opacity);
 				break;
@@ -980,22 +990,22 @@ public class Player implements Steerable<Vector2>{
 			if(biggest_acid == null) {
 				biggest_acid = stepping.get(i);
 			}
-			else if(stepping.get(i).acid_level > biggest_acid.acid_level) {
+			else if(stepping.get(i).getAcidLevel() > biggest_acid.getAcidLevel()) {
 				biggest_acid = stepping.get(i);
 			}
-			if(stepping.get(i).glue_level > biggest_glue) {
-				biggest_glue = stepping.get(i).glue_level;
+			if(stepping.get(i).getGlueLevel() > biggest_glue) {
+				biggest_glue = stepping.get(i).getGlueLevel();
 			}
 		}
 		
 		slowness = 1/(1+biggest_glue);
 		
-		if(biggest_acid != null && biggest_acid.acid_level > 0) {
+		if(biggest_acid != null && biggest_acid.getAcidLevel() > 0) {
 			acid_timer += delta;
 			
 			if(acid_timer > 0.5f) {
 				acid_timer -= 0.5f;
-				takeDamage(Equipment.ACID_DAMAGE * biggest_acid.player.atk * biggest_acid.acid_level, biggest_acid.player, true);
+				takeDamage(Equipment.ACID_DAMAGE * biggest_acid.getPlayer().atk * biggest_acid.getAcidLevel(), biggest_acid.getPlayer(), true);
 			}
 			//TODO: tirar vida periodicamente
 		}

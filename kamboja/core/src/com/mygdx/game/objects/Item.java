@@ -37,7 +37,7 @@ public class Item implements Steerable<Vector2>{
 	
 	float timer = 0;
 	
-	boolean canRemove = false;
+	public boolean canRemove = false;
 	
 	ParticleEffect showing;
 	

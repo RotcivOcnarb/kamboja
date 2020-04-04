@@ -12,13 +12,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.states.GameState;
 
 public class AcidGlue {
 
-	Player player;
-	int acid_level;
-	int glue_level;
+	private Player player;
+	private int acid_level;
+	private int glue_level;
 	float waitTime = 5f;
 	float rotation;
 	Body body;
@@ -27,10 +28,10 @@ public class AcidGlue {
 	ArrayList<AcidGlue> list;
 	
 	public AcidGlue(ArrayList<AcidGlue> list, World world, Player player, int acid, int glue) {
-		this.player = player;
+		this.setPlayer(player);
 		this.list = list;
-		this.acid_level = acid;
-		this.glue_level = glue;
+		this.setAcidLevel(acid);
+		this.setGlueLevel(glue);
 		rotation = (float) (Math.random() * 360);
 		tex = new Texture("Weapons/glue.png");
 		
@@ -57,8 +58,8 @@ public class AcidGlue {
 		}
 	
 		float alpha = 0;
-		if(glue_level != 0) {
-			alpha = (float)Math.pow(2, -(acid_level/glue_level));
+		if(getGlueLevel() != 0) {
+			alpha = (float)Math.pow(2, -(getAcidLevel()/getGlueLevel()));
 		}
 		
 		sb.setColor(new Color(0, 0.5f, 0, Math.min(1, waitTime)).cpy().lerp(new Color(1, 1, 1, Math.min(1, waitTime)).cpy(), alpha));
@@ -80,6 +81,30 @@ public class AcidGlue {
 		
 	
 		
+	}
+
+	public int getAcidLevel() {
+		return acid_level;
+	}
+
+	public void setAcidLevel(int acid_level) {
+		this.acid_level = acid_level;
+	}
+
+	public int getGlueLevel() {
+		return glue_level;
+	}
+
+	public void setGlueLevel(int glue_level) {
+		this.glue_level = glue_level;
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 	
 }

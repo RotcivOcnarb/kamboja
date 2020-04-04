@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.mygdx.game.objects.Player;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.states.GameState;
 
 public class Flamethrower extends Weapon{

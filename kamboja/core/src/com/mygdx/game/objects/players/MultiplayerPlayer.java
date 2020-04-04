@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.players;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.states.GameState;

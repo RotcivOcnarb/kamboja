@@ -4,12 +4,13 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.mygdx.game.objects.Player.PlayerFall;
 import com.mygdx.game.objects.map.Asteroid;
 import com.mygdx.game.objects.map.Block;
 import com.mygdx.game.objects.map.BreakableBlock;
 import com.mygdx.game.objects.map.HoleBlock;
 import com.mygdx.game.objects.map.UnbreakableBlock;
+import com.mygdx.game.objects.players.Player;
+import com.mygdx.game.objects.players.Player.PlayerFall;
 import com.mygdx.game.objects.shift.BarrierObject;
 import com.mygdx.game.objects.shift.TurretObject;
 import com.mygdx.game.objects.weapon.Flamethrower;
@@ -104,7 +105,7 @@ public class MyContactListener implements ContactListener{
 			AcidGlue ag = (AcidGlue) contact.getFixtureB().getUserData();
 			Player p = (Player) contact.getFixtureA().getBody().getUserData();
 			
-			if(!ag.player.equals(p) && !p.stepping.contains(ag)) {
+			if(!ag.getPlayer().equals(p) && !p.stepping.contains(ag)) {
 				p.stepping.add(ag);
 			}
 			
@@ -115,7 +116,7 @@ public class MyContactListener implements ContactListener{
 			AcidGlue ag = (AcidGlue) contact.getFixtureA().getUserData();
 			Player p = (Player) contact.getFixtureB().getBody().getUserData();
 			
-			if(!ag.player.equals(p) && !p.stepping.contains(ag)) {
+			if(!ag.getPlayer().equals(p) && !p.stepping.contains(ag)) {
 				p.stepping.add(ag);
 			}
 			
@@ -149,12 +150,12 @@ public class MyContactListener implements ContactListener{
 		//player com buraco
 		if(contact.getFixtureA().getUserData() instanceof PlayerFall && contact.getFixtureB().getUserData() instanceof HoleBlock){
 			PlayerFall p = (PlayerFall) contact.getFixtureA().getUserData();
-			p.player.setFalling();
+			p.getPlayer().setFalling();
 		}
 		if(contact.getFixtureB().getUserData() instanceof PlayerFall && contact.getFixtureA().getUserData() instanceof HoleBlock){
 			PlayerFall p = (PlayerFall) contact.getFixtureB().getUserData();
 			
-			p.player.setFalling();
+			p.getPlayer().setFalling();
 		}
 
 		//qualquer objeto com range do laser
@@ -427,7 +428,7 @@ public class MyContactListener implements ContactListener{
 					AcidGlue ag = (AcidGlue) contact.getFixtureB().getUserData();
 					Player p = (Player) contact.getFixtureA().getBody().getUserData();
 					
-					if(!ag.player.equals(p) && p.stepping.contains(ag)) {
+					if(!ag.getPlayer().equals(p) && p.stepping.contains(ag)) {
 						p.stepping.remove(ag);
 					}
 					
@@ -438,7 +439,7 @@ public class MyContactListener implements ContactListener{
 					AcidGlue ag = (AcidGlue) contact.getFixtureA().getUserData();
 					Player p = (Player) contact.getFixtureB().getBody().getUserData();
 					
-					if(!ag.player.equals(p) && p.stepping.contains(ag)) {
+					if(!ag.getPlayer().equals(p) && p.stepping.contains(ag)) {
 						p.stepping.remove(ag);
 					}
 					

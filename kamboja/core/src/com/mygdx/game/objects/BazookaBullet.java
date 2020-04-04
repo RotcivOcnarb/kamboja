@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.objects.map.Block;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.BarrierObject;
 import com.mygdx.game.objects.shift.Turret;

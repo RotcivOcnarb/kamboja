@@ -13,8 +13,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.mygdx.game.KambojaMain;
-import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.map.Block;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.states.GameState;
 
 public class Granade {

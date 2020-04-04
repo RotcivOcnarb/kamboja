@@ -2,7 +2,7 @@ package com.mygdx.game.objects.shift;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.objects.Player;
+import com.mygdx.game.objects.players.Player;
 
 public abstract class Shift {
 	

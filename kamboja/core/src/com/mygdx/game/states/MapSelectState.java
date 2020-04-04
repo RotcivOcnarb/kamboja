@@ -1135,17 +1135,6 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 		return false;
 	}
 	
-	public KeyboardController getKeyboardController() {
-			
-			for(PlayerController pc : KambojaMain.getControllers()) {
-				if(pc instanceof KeyboardController) {
-					return (KeyboardController)pc;
-				}
-			}
-			
-			return null;
-		}
-	
 	public void doSelection(int id) {
 
 		switch(selection[id]) {
@@ -1217,6 +1206,8 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 	
 	public boolean keyDown(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyDownK();
+		int id = Util.getControllerID(KambojaMain.getInstance().myKeyboard);
+
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
@@ -1229,14 +1220,12 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 			else
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 		}
-		keyDownK(keycode);
+		keyDownK(keycode, id);
 		
 		return false;
 	}
 	
-	public void keyDownK(int keycode) {
-		int id = Util.getControllerID(getKeyboardController());
-		
+	public void keyDownK(int keycode, int id) {		
 		if(id != -1) {
 			if(keycode == Keys.ENTER) {
 				doSelection(id);
@@ -1256,12 +1245,15 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 		}
 	}
 	
-	public void keyUpK(int keycode) {
+	public void keyUpK(int keycode, int id) {
 		
 	}
 
 	public boolean keyUp(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyUpK();
+		
+		int id = Util.getControllerID(KambojaMain.getInstance().myKeyboard);
+		
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();
@@ -1275,7 +1267,7 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 				KambojaMain.getInstance().sendToServer(kp, Protocol.TCP);
 			
 		}
-		keyUpK(keycode);
+		keyUpK(keycode, id);
 		return false;
 	}
 
@@ -1309,10 +1301,10 @@ public class MapSelectState extends State implements KambojaConnectionListener{
 			case CONTROLLER_DISCONNECTED:
 				break;
 			case KEY_DOWN:
-				keyDownK(pi.code);
+				keyDownK(pi.code, pi.controllerID);
 				break;
 			case KEY_UP:
-				keyUpK(pi.code);
+				keyUpK(pi.code, pi.controllerID);
 				break;
 			}
 			

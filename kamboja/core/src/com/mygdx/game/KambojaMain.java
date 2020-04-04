@@ -47,10 +47,11 @@ import com.mygdx.game.multiplayer.KambojaConnectionListener;
 import com.mygdx.game.multiplayer.KambojaHost;
 import com.mygdx.game.multiplayer.KambojaPacket;
 import com.mygdx.game.objects.GameMusic;
-import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.SaveObject;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.objects.controllers.KeyboardController;
 import com.mygdx.game.objects.controllers.PlayerController;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.objects.shift.Barrier;
 import com.mygdx.game.objects.shift.Turret;
 import com.mygdx.game.objects.weapon.Bazooka;
@@ -112,6 +113,7 @@ public class KambojaMain extends ApplicationAdapter {
 	KambojaHost host;
 	public boolean isServer = false;
 	public boolean multiplayerConnection = false;
+	public KeyboardController myKeyboard;
 	
 	public enum Protocol{
 		TCP, UDP

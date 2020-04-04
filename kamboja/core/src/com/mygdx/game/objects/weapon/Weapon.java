@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.objects.Player;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.states.GameState;
 
 public abstract class Weapon {

@@ -18,13 +18,13 @@ public class Ghost {
 	
 	float timer = 0;
 	
-	int color;
+	private int color;
 	
 	public Ghost(int color, Vector2 position) {
 		target = new Vector2();
 		velocity = new Vector2((float)Math.random() * 0.1f, (float)Math.random() * 0.1f);
 		this.position = position.cpy();
-		this.color = color;
+		this.setColor(color);
 		
 		Texture sheet = new Texture("imgs/ghost.png");
 		
@@ -65,6 +65,14 @@ public class Ghost {
 		
 		position.add(velocity.cpy().scl(delta));
 		
+	}
+
+	public int getColor() {
+		return color;
+	}
+
+	public void setColor(int color) {
+		this.color = color;
 	}
 
 }

@@ -2,7 +2,7 @@ package com.mygdx.game.objects.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.objects.Player;
+import com.mygdx.game.objects.players.Player;
 
 public class IcelandMap extends KambojaMap{
 

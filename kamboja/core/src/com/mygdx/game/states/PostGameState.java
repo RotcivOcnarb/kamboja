@@ -29,10 +29,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.mygdx.game.KambojaMain;
 import com.mygdx.game.Manager;
 import com.mygdx.game.analytics.HitData;
-import com.mygdx.game.objects.BetterBot;
 import com.mygdx.game.objects.GameMusic;
-import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
+import com.mygdx.game.objects.players.BetterBot;
+import com.mygdx.game.objects.players.Player;
 
 public class PostGameState extends GenericInterface{
 

@@ -50,12 +50,12 @@ import com.mygdx.game.multiplayer.packagetypes.PlayerEnter;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput;
 import com.mygdx.game.multiplayer.packagetypes.PlayerInput.InputAction;
 import com.mygdx.game.objects.GameMusic;
-import com.mygdx.game.objects.Player;
 import com.mygdx.game.objects.Util;
 import com.mygdx.game.objects.controllers.BotController;
 import com.mygdx.game.objects.controllers.KeyboardController;
 import com.mygdx.game.objects.controllers.MultiplayerController;
 import com.mygdx.game.objects.controllers.PlayerController;
+import com.mygdx.game.objects.players.Player;
 import com.mygdx.game.objects.weapon.Weapon;
 
 public class PlayerSelectState extends State implements KambojaConnectionListener{
@@ -146,9 +146,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	boolean hasFallen;
 
 	Texture lock;
-	
-	KeyboardController myKeyboard;
-	
+		
 	//TODO: particulas de fumaça
 	//correntes
 	//mayber logo imagem no titulo
@@ -1867,7 +1865,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 	
 	public boolean keyDown(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyDownK();
-		int id = Util.getControllerID(myKeyboard);
+		int id = Util.getControllerID(KambojaMain.getInstance().myKeyboard);
 		
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
@@ -1891,7 +1889,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 				if(put_id != -1) {
 					KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (put_id+1));
 					KambojaMain.getControllers().set(put_id, pc);
-					myKeyboard = pc;
+					KambojaMain.getInstance().myKeyboard = pc;
 					
 					if(KambojaMain.getInstance().multiplayerConnection) {
 						KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_ENTER);
@@ -1914,7 +1912,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 					if(KambojaMain.getControllers().size() < 4) {
 						KeyboardController pc = new KeyboardController(0, firstPlayerAvailable(), "Player " + (KambojaMain.getControllers().size()+1));
 						KambojaMain.getControllers().add(pc);
-						myKeyboard = pc;
+						KambojaMain.getInstance().myKeyboard = pc;
 						
 						positionPlayerOffset[KambojaMain.getControllers().size() - 1] = pc.getPlayer();
 						positionWeaponOffset[KambojaMain.getControllers().size() - 1] = 0;
@@ -1955,7 +1953,7 @@ public class PlayerSelectState extends State implements KambojaConnectionListene
 
 	public boolean keyUp(int keycode) {
 		//NÃO COLOCAR CÓDIGO AQUI, USE O keyUpK();
-		int id = Util.getControllerID(myKeyboard);
+		int id = Util.getControllerID(KambojaMain.getInstance().myKeyboard);
 		if(KambojaMain.getInstance().multiplayerConnection) {
 			KambojaPacket kp = new KambojaPacket(PacketType.PLAYER_INPUT);
 			PlayerInput pi = new PlayerInput();

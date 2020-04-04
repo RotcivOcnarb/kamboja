@@ -1,4 +1,4 @@
-package com.mygdx.game.objects;
+package com.mygdx.game.objects.players;
 
 import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.mygdx.game.objects.Pathfinding;
 import com.mygdx.game.objects.map.BreakableBlock;
 import com.mygdx.game.objects.map.UnbreakableBlock;
 import com.mygdx.game.objects.weapon.Flamethrower;
